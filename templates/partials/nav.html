@@ -1,0 +1,29 @@
+
+<!-- Start Nav -->
+<nav>
+    <div class="container">
+        <div class="nav">
+            <div class="nav-item {% if request.path == '/' %}active{% endif %}">
+                <a href=" {% url 'store:home' %} " id="home" ><i class="fa-solid fa-store"></i></a>
+                <label for="home">الرئيسية</label>
+            </div>
+            <div class="nav-item {% if request.path == '/cart' %}active{% endif %}">
+                <a href="/templates/cart.html" id="cart"><i class="fa-solid fa-bag-shopping"></i></a>
+                <label for="cart">حقيبتي</label>
+            </div>
+            <div class="nav-item  {% if request.path == '/search' %}active{% endif %}">
+                <a href="/templates/search.html" id="search"><i class="fa-solid fa-magnifying-glass"></i></a>
+                <label for="search">البحث</label>
+            </div>
+            <div class="nav-item  {% if request.path == '/favorites' %}active{% endif %}">
+                <a href="/templates/fav.html" id="fav"><i class="fa-solid fa-bookmark"></i></a>
+                <label for="fav">المفضلة</label>
+            </div>
+            <div class="nav-item  {% if request.path == '/account' %}active{% endif %}">
+                <a href="/templates/account.html" id="account"><i class="fa-solid fa-circle-user"></i></a>
+                <label for="account">حسابي</label>
+            </div>
+        </div>
+    </div>
+</nav>
+<!-- End Nav -->

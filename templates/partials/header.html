@@ -1,0 +1,94 @@
+{% load static %}
+
+<!-- Start Header  -->
+<header>
+    <div class='header' id="header" >     
+        <div class="upper-part">
+            <div class="icons">
+                <!-- start mega-menu  -->
+                <input type="checkbox" name="" id="side-menu" hidden>
+                <label for="side-menu" class="menu"><i class="fa-solid fa-bars"></i></label> 
+                <div class="mega-menu" >
+                    <div class="top-icon">
+                        <div class="exit">
+                            <i class="fa-solid fa-xmark"></i>
+                        </div>
+                        <div class="toggle">
+                            <input type="checkbox" name="" id="them">
+                            <label for="them">
+                                <img src="{% static "/images/dark_mode_30dp_B18E4B_FILL0_wght400_GRAD0_opsz24.svg" %}" class="moon icon" alt="">
+                                <img src="{% static "/images/wb_sunny_30dp_B18E4B_FILL0_wght400_GRAD0_opsz24.svg" %}" class="sun icon" alt="">
+                            </label>    
+                        </div>
+                    </div>
+                    <div class="links-sections">
+                        <div class="title">
+                            <h1>قسم الرجالي</h1>
+                        </div>
+                        <ul class="links">
+                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
+                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
+                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
+                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
+                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
+                        </ul>
+                    </div>
+                    <div class="links-sections">
+                        <div class="title">
+                            <h1>قسم النسائي</h1>
+                        </div>
+                        <ul class="links">
+                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
+                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
+                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
+                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
+                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
+                        </ul>
+                    </div>
+                    <div class="social-links">
+                        <div class="title">
+                            <h1>تواصل معنا </h1>
+                        </div>
+                        <ul  class="links">
+                            <li><a href=""><i class="fa-brands fa-facebook"></i>فيسبوك</a></li>
+                            <li><a href=""><i class="fa-brands fa-instagram"></i>انستغرام</a></li>
+                            <li><a href=""><i class="fa-brands fa-whatsapp"></i>واتساب</a></li>
+                            <li><a href=""><i class="fa-regular fa-envelope"></i>ايميل</a></li>
+                            <li><a href=""><i class="fa-solid fa-phone-volume"></i>اتصل بنا</a></li>
+                        </ul>
+                    </div>  
+                    <div class="secondary-nav">
+                        <ul >
+                            <li class="li contact-us"><i class="fa-solid fa-headset"></i></li>
+                            <li class="li"><a href="/templates/my-orders.html"><i class="fa-solid fa-list-check"></i></a></li>
+                            <li class="li"><a href="{% url 'blog:blog' %}"><i class="fa-regular fa-circle-question"></i></a></li>
+                        </ul>
+                    </div>      
+                </div>  
+                <!-- end mega-menu  -->
+                <a href="/templates/account-info.html#notfications" style="position: relative;"><i class="fa-regular fa-bell bell" ></i><span class="has-new-notif">.</span></a><!-- اذا كان هنالك رسائل جديدة اظهر السبان والا اخفيه  -->
+            </div>
+            <div class="logo">
+                <img src="{% static "/images/name logo.jpg" %}" alt="Fikra Store Name">
+            </div>
+            <div class="points">
+                <a href="/templates/account.html#points-products">
+                    <span>26</span>
+                    <i class="fa-solid fa-gem"></i>                
+                </a>
+            </div>
+        </div>
+        <div class="lower-part">
+            <div class="categories">
+                <a class="category" href="#">عروض</a>    
+                <a class="category" href="#">تصنيف</a>    
+                <a class="category" href="#">تصنيف</a>    
+                <a class="category" href="#">تصنيف</a>    
+                <a class="category" href="#">تصنيف</a>    
+                <a class="category" href="#">تصنيف</a>     
+            </div>
+        </div>
+
+    </div>
+</header>
+<!-- End Header  -->

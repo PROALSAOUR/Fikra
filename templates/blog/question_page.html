@@ -1,0 +1,35 @@
+{% extends "partials/base.html" %}
+
+
+{% block content %}
+
+<!-- Start blog page   -->
+<div class="blog secondary-page" style="position: relative;  padding-top: 80px;">
+    <div class="image">
+        <img src="{{ question_page.image.url }}" alt="{{ question_page.title }}">
+    </div>
+    <div class="container">    
+        <div class="title">
+            <h1>{{ question_page.title }}</h1>
+        </div>
+        <div class="content">
+            {% for question in questions %}
+            <div class="paragraph article">
+                <h3 class="article-title" onclick="toggleContent(this)" id="what-points"> {{ question.title }} <i class="fa-solid fa-chevron-down "></i></h3>
+                <p class="article-content"> {{ question.content }} </p>        
+            </div>
+            {% endfor %}
+        </div>
+        <!-- للعودة الى صفحة المدونة -->
+        <div class="back-to-help">
+            <a href="{% url 'blog:blog' %}">
+                العودة إلى صفحة المدونة
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+<!-- End blog page   -->
+
+{% endblock content %}
+   

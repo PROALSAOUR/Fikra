@@ -1,0 +1,35 @@
+{% extends "partials/base.html" %}
+{% load static %}
+{% block content %}
+    <!-- Start blog page   -->
+    <div class="blog" style="position: relative; padding-top: 80px;">
+        <!-- Start blog page   -->
+        <div class="image">
+            <img src="{% static '/images/blog-background.jpg' %}" alt="">
+        </div>
+        <div class="container">
+            <div class="title">
+                <h1>الأقسام</h1>
+            </div>
+            <div class="sections">
+                <ul class="sections-links">
+                    {% if blog_pages %}
+                        {% for page in blog_pages %}
+                            <li>
+                                <a href="{% url 'blog:page-details' page.id %}"> {{ page.title }} <i class="fa-solid fa-angles-left"></i></a>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                    <p style='padding:20px;'>مع الأسف! لا توجد أقسام حتى الأن</p>
+                    {% endif %}
+                    {% if question_page %}
+                        <li>
+                            <a href="{% url 'blog:qustions-page' %}">{{ question_page.title }} <i class="fa-solid fa-angles-left"></i></a>
+                        </li>
+                    {% endif %}
+                </ul>            
+            </div>
+        </div>
+    </div>
+    <!-- End blog page   -->
+{% endblock content %}
