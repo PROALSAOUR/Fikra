@@ -1,0 +1,24 @@
+<!-- product-start -->
+<div class="swiper-slide product-box {% if product.offer %} offer {% endif %}"> <!-- اضف كلاس اوفر اذا كان هنالك تخفيض- -->
+    <a href="اضف رابط صفحة المنتج">
+        <div class="product-image">
+            <div class="off-holder">
+                <span>تخفيض</span>
+            </div>
+            <img src="{{ product.thumbnail_img.url }}" alt="{{ product.name}}">
+        </div>
+        <div class="product-info">
+            <h4 class="product-name"> {{ product.name|slice:":20" }}{% if product.name|length > 20 %}...{% endif %}</h4> <!-- اقصى طول 20 حرف -->
+            <p class="product-description"> {{ product.description|slice:":60" }}{% if product.description|length > 60 %}...{% endif %}</p> <!-- اقل طول 42 حرف اقصى طول 60 حرف -->
+            <h4 class="product-price {% if product.payment_type == 'points' %} point {% endif %}"> <!-- اضف كلاس بوينت اذا كان سعر اليع نقاط- -->
+                <div class="buy-by-money"><span class="old"> {{ product.price }} </span><span class="new"> | {{ product.new_price }} </span><span> دل </span></div>
+                <div class="buy-by-points"> {{ product.point_price }} <i class="fa-solid fa-gem"></i></div>        
+            </h4>
+        </div>
+    </a> 
+    <span class="add-to-fav"><a href="/templates/fav.html"><i class="fa-regular fa-heart"></i></a></span>
+    <span class="add-to-cart">
+        <a href="/templates/cart.html"><span> إضافة الى السلة </span><i class="fa-solid fa-cart-shopping"></i> </a>
+    </span>
+</div>
+<!-- product-end -->

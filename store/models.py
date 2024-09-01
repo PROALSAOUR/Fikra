@@ -47,10 +47,17 @@ class Brand(models.Model):
     class Meta:
         verbose_name_plural = 'Brands'
   
-class Category(models.Model):
+class Category(models.Model):   
+    status_choices = {
+        ('visible', 'Visible'),
+        ('hiddin', 'Hiddin'),
+    }
+    
     name = models.CharField(max_length=255)
     img = models.ImageField( upload_to='store/categories')  
     featured = models.BooleanField(default=False)
+    status = models.CharField(choices=status_choices, max_length=20, default='visible')
+    
     
     def category_image(self):
         return mark_safe("<img src='%s' width='50' height='50'/>" % (self.img.url) )
@@ -59,7 +66,14 @@ class Category(models.Model):
         return self.name
     
     class Meta:
+        verbose_name = 'Category'
         verbose_name_plural = 'Categories'
+            
+    def __str__(self) -> str:
+        return self.name
+    
+    class Meta:
+        verbose_name_plural = 'Products Types'
 
 class Tag(models.Model):
     name = models.CharField(max_length=255)
@@ -106,13 +120,13 @@ class Product(models.Model):
         ],
         default='money'
     )
-    price = models.IntegerField() 
+    price = models.IntegerField(default=0) 
     new_price = models.DecimalField(decimal_places=2, max_digits=10, blank=True, null=True)
     point_price = models.IntegerField(blank=True, null=True)
+    offer = models.BooleanField(default=False)
     ready_to_sale = models.BooleanField(default=False)
     upload_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)  
-    
+    updated_at = models.DateTimeField(auto_now=True)     
     
     def __str__(self) -> str:
         return self.name
@@ -126,6 +140,16 @@ class Product(models.Model):
             discount_percentage = ((self.price - self.new_price) / self.price) * 100
             return round(discount_percentage, 2)
         return 0
+
+    def update_offer_status(self):
+        """
+        Update the offer status based on the presence of a new price.
+        """
+        if self.new_price and self.new_price < self.price:
+            self.offer = True
+        else:
+            self.offer = False
+        self.save()
 
 class ProductColor(models.Model):
     product = models.ForeignKey(Product, related_name='colors', on_delete=models.CASCADE)
@@ -144,7 +168,7 @@ class ProductSize(models.Model):
     
     def __str__(self):
         return  self.size_value
-
+        
 class ProductVariants(models.Model):
     product = models.ForeignKey(Product, related_name='variants', on_delete=models.CASCADE)
     color = models.ForeignKey(ProductColor, related_name='variants', on_delete=models.CASCADE)
@@ -154,7 +178,7 @@ class ProductVariants(models.Model):
     sold = models.IntegerField(default=0)  # الكمية المباعة
     
     def __str__(self):
-        return f"{self.product.name} - {self.color.name} - {self.size}"
+        return f"{self.product.pid} - {self.color.name} - {self.size}"
     
     def update_stock(self, quantity_change):
         """
@@ -190,3 +214,4 @@ class ProductVariants(models.Model):
     
     class Meta:
         verbose_name_plural = 'Product Variants'
+   

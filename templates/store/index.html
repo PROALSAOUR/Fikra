@@ -64,39 +64,38 @@
     <section  id="products">
             <a href="/templates/search.html">
                 <div class="title">
-                    <h2> شراء بالنقاط</h2>
+                    <h2> اقوى العروض</h2>
                     <i class="fa-solid fa-angles-left"></i>
                 </div>
             </a>  
             <div class="swiper products-slider">
                 <div class="swiper-wrapper">
-                    <!-- product-start -->
-                    <div class="swiper-slide product-box "> <!-- اضف كلاس اوفر اذا كان هنالك تخفيض- -->
-                        <a href="/templates/product-details.html">
-                            <div class="product-image">
-                                <div class="off-holder">
-                                    <span>تخفيض</span>
-                                </div>
-                                <img src="/images/product_holder.png" alt="">
-                            </div>
-                            <div class="product-info">
-                                <h4 class="product-name">ساعة يابخت من لبسها  </h4> <!-- اقصى طول 20 حرف -->
-                                <p class="product-description"> الاصلي ساعة ذهب معدن من الداخل صناعة الهنولولو</p> <!-- اقل طول 42 حرف اقصى طول 60 حرف -->
-                                <h4 class="product-price point"> <!-- اضف كلاس بوينت اذا كان سعر اليع نقاط- -->
-                                    <div class="buy-by-money"><span class="old"> 45 </span><span class="new"> | 15 </span><span> دل </span></div>
-                                    <div class="buy-by-points">200 <i class="fa-solid fa-gem"></i></div>            
-                                </h4>
-                            </div>
-                        </a> 
-                        <span class="add-to-fav"><a href="/templates/fav.html"><i class="fa-regular fa-heart"></i></a></span>
-                        <span class="add-to-cart">
-                            <a href="/templates/cart.html"><span> إضافة الى السلة </span><i class="fa-solid fa-cart-shopping"></i> </a>
-                        </span>
-                    </div>
-                    <!-- product-end -->
+                    {% for product in offered_products %}
+                        {% include "common/product-card.html" %}
+                    {% endfor %}
                 </div>
             </div> 
     </section>
     <!-- End Products Section -->
+   {% for category in categories %}
+        <!-- Start Products Section -->
+        <hr class="sep">
+        <section  id="products">
+                <a href="/templates/search.html">
+                    <div class="title">
+                        <h2> {{ category.name }} </h2>
+                        <i class="fa-solid fa-angles-left"></i>
+                    </div>
+                </a>  
+                <div class="swiper products-slider">
+                    <div class="swiper-wrapper">
+                        {% for product in category.products.all %}
+                            {% include "common/product-card.html" %}
+                        {% endfor %}
+                    </div>
+                </div> 
+        </section>
+        <!-- End Products Section -->
+   {% endfor %}
 </div>
 {% endblock content %}
