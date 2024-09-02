@@ -1,0 +1,133 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="search-page">
+        <!-- Start Search Bar -->
+        <div class="search-bar">
+            <div class="container">
+                <form action="" class="search">
+                        <input type="search" class="search-input" name="search-query" placeholder="ما الذي تبحث عنه؟">
+                        <div class="filter-container">
+                            <button type="button" class="filter-toggle">
+                                <i class="fa-solid fa-sliders"></i>
+                            </button>
+                            <div class="filter-options">
+                                <div class="filter-header">
+                                    <h2>خيارات الفلترة</h2>
+                                    <button type="button" class="close-filter">&times;</button>
+                                </div>
+                                <!-- قائمة الفلترة -->
+                                <div class="filter-tabs">
+                                    <button type="button" class="filter-tab" data-target="price">السعر</button>
+                                    <button type="button" class="filter-tab" data-target="category">التصنيف</button>
+                                    <button type="button" class="filter-tab" data-target="product_type">نوع المنتج</button>
+                                    <button type="button" class="filter-tab" data-target="size">المقاس</button>
+                                </div>
+                                <!-- محتويات الفلترة -->
+                                <div class="filter-content">
+                                    <!-- سيتم إضافة الفلاتر المختارة هنا -->
+                                </div>
+                                <!-- زر تطبيق الفلاتر -->
+                                <button type="submit" class="apply-filters">تطبيق الفلاتر</button>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+        <!-- نماذج الفلاتر المخفية -->
+        <div id="price" class="filter-group-template">
+            <label>نطاق السعر:</label>
+            <div class="price-range">
+                <input type="number" placeholder="من" aria-label="سعر من">
+                <input type="number" placeholder="إلى" aria-label="سعر إلى">
+            </div>
+        </div>
+        
+        <div id="category" class="filter-group-template">
+            <label>التصنيف:</label>
+            <select>
+                <option value="">اختر التصنيف</option>
+                <option value="category1">رجالي </option>
+                <option value="category2">نسائي </option>
+            </select>
+        </div>
+
+        <div id="product_type" class="filter-group-template">
+            <label>نوع المنتج:</label>
+            <select>
+                <option value="">اختر  نوع المنتج</option>
+                <option value="category1">سروال </option>
+                <option value="category2">نظارة </option>
+                <option value="category2">تي شيرت </option>
+                <option value="category2">معطف  </option>
+            </select>
+        </div>
+
+        <div id="size" class="filter-group-template">
+            <label>المقاس:</label>
+            <select>
+                <option value="">اختر المقاس</option>
+                <option value="small">S</option>
+                <option value="medium">M</option>
+                <option value="large">L</option>
+                <option value="large">Xl</option>
+                <option value="large">2Xl</option>
+                <option value="large">3Xl</option>
+            </select>
+        </div>
+        <!-- End Search Bar -->
+        <!-- Start Searched-products  -->
+        <div class="search">
+            <div class="search-title">
+                <div class="title-image">
+                    <img src="{{ brand.img.url }}" alt="{{ brand.title }}">
+                </div>
+                <h2>{{ brand.title }}<span>({{ brand.brand_count }})</span></h2>
+            </div>
+            <div class="searched-products">
+                <div class="container">
+                    <div class="products-cards">
+                        {% if products %}
+                            {% for product in products %}
+                                <!-- product-start -->
+                                <div class="specific">
+                                    {% include "common/product-card.html" %}
+                                </div>
+                                <!-- product-end -->
+                            {% endfor %}        
+                        {% else %} 
+                            {% include "common/no-result.html" %}
+                        {% endif %}  
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Searched-products  -->
+        <!-- Start Pagination -->
+        <div class="pagination-container">
+            <div class="container">
+                <div class="pagination">
+                    <div class="previous disapled">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+                    <div class="page-number">
+                        <span class="in-page">1</span><span class="from">من</span><span class="total-pages">12</span>
+                    </div>
+                    <div class="next ">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Pagination -->
+    </div>
+{% endblock content %}
+
+
+
+
+
+
+
+

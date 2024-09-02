@@ -26,11 +26,9 @@
                             <h1>قسم الرجالي</h1>
                         </div>
                         <ul class="links">
-                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
-                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
-                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
-                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
-                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
+                            {% for category in men_categores %}
+                                <li><a href="{% url "store:category" category.id %}"><i class="fa-solid fa-angles-left"></i> {{ category.name }}</a></li>
+                            {% endfor %}
                         </ul>
                     </div>
                     <div class="links-sections">
@@ -38,11 +36,9 @@
                             <h1>قسم النسائي</h1>
                         </div>
                         <ul class="links">
-                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
-                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
-                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
-                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
-                            <li><a href=""><i class="fa-solid fa-angles-left"></i>اسم التصنيف</a></li>
+                            {% for category in women_categores %}
+                                <li><a href="{% url "store:category" category.id %}"><i class="fa-solid fa-angles-left"></i> {{ category.name }}</a></li>
+                            {% endfor %}     
                         </ul>
                     </div>
                     <div class="social-links">

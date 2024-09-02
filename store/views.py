@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from store.models import *
 
 def index(request):
@@ -30,3 +30,51 @@ def index(request):
     }
     
     return render(request, 'store/index.html', context)
+
+def brand_page(request, id):
+    brand = get_object_or_404(Brand, id=id)
+    products = Product.objects.filter(brand=brand)[:12]
+    
+    context = {
+        'products': products,
+        'brand': brand,
+    }
+    
+    return render(request, 'store/brand.html', context)
+
+def category_page(request, id):
+    
+    category = get_object_or_404(Category, id=id)
+    
+    # استرجاع التصنيفات الفرعية التي تنتمي للتصنيف الأب
+    subcategories = Category.objects.filter(parent_category=category)
+    
+    # استرجاع المنتجات التي تنتمي للتصنيفات الفرعية
+    subcategory_products = Product.objects.filter(category__in=subcategories)
+    
+    # استرجاع المنتجات التي تنتمي للتصنيف الأب مباشرة
+    parent_category_products = Product.objects.filter(category=category)
+    
+    # دمج المنتجات من التصنيف الأب والتصنيفات الفرعية
+    combined_products = parent_category_products | subcategory_products
+    
+    # حساب العدد الكلي للمنتجات
+    total_products_count = combined_products.count()
+    
+    # الحصول على المنتجات التي سيتم عرضها (احصرها إلى 12)
+    products = combined_products.distinct()[:12]
+    
+    context = {
+        'products': products,
+        'category': category,
+        'subcategories': subcategories,
+        'total_products_count': total_products_count,  # إضافة العدد الكلي إلى السياق
+    }
+    return render(request, 'store/category.html', context)
+
+
+
+
+
+
+

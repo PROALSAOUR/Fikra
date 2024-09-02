@@ -8,7 +8,7 @@ class AdsSliderAdmin(admin.ModelAdmin):
     list_filter = ('show',)
     
 class BrandAdmin(admin.ModelAdmin):
-    list_display = ('title', 'featured', 'brand_image')
+    list_display = ('title', 'featured', 'brand_count', 'brand_image')
     search_fields = ('title', 'featured')
     list_filter = ('featured',)
  
