@@ -4,6 +4,7 @@ from django.utils.html import mark_safe
 from shortuuid.django_fields import ShortUUIDField
 import string
 
+# ======================== Product ======================================
 
 class AdsSlider(models.Model):
     title = models.CharField(max_length=255)
@@ -86,11 +87,15 @@ class Category(models.Model):
     status = models.CharField(choices=status_choices, max_length=20, default='visible')
     size_category = models.ForeignKey(SizeCategory, on_delete=models.CASCADE, null=True, blank=True)
     parent_category = models.ForeignKey('self', on_delete=models.CASCADE,  null=True, blank=True)
+    
     def category_image(self):
         return mark_safe("<img src='%s' width='50' height='50'/>" % (self.img.url) )
     
     def __str__(self) -> str:
         return self.name
+    
+    def category_count(self):
+        return self.products.count()
     
     class Meta:
         verbose_name = 'تصنيف'
@@ -190,7 +195,7 @@ class ProductItem(models.Model):
 
 class ProductVariation(models.Model):
     product_item = models.ForeignKey(ProductItem, related_name='variations', on_delete=models.PROTECT,)
-    size = models.ForeignKey(SizeOption, related_name='variations', on_delete=models.PROTECT,)
+    size = models.ForeignKey(SizeOption, related_name='variations', on_delete=models.PROTECT)
     stock = models.IntegerField(default=0)  # الكمية المتاحة
     reserved = models.IntegerField(default=0)  # الكمية المحجوزة
     sold = models.IntegerField(default=0)  # الكمية المباعة
@@ -237,3 +242,7 @@ class ProductVariation(models.Model):
     class Meta:
         verbose_name = 'المخزون'
         verbose_name_plural = 'المخزون'
+        
+# ========================== Favourite ===================================
+
+# ============================= Order ====================================

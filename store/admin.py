@@ -23,7 +23,7 @@ class SizeCategoryAdmin(admin.ModelAdmin):
     inlines = (SizeOptionInline ,)
  
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'featured', 'status', 'size_category', 'parent_category', 'category_image')
+    list_display = ('name', 'featured', 'status', 'parent_category', 'category_count', 'category_image')
     search_fields = ('name',)
     list_filter = ('featured', 'status', 'size_category', 'parent_category',)
 
@@ -40,7 +40,7 @@ class ProductVariationAdmin(admin.ModelAdmin):
     list_display = ('item_thumbnail' ,'product_item' ,'size', 'stock', 'reserved', 'sold',)
     search_fields = ('product_item',)
     exclude = ('reserved', 'sold',)
-
+      
 class ProductItemInline(admin.TabularInline):
     model = ProductItem
     extra = 1
