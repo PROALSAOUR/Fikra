@@ -46,19 +46,33 @@ class Brand(models.Model):
     
     class Meta:
         verbose_name_plural = 'Brands'
-  
-class Category(models.Model):   
-    status_choices = {
+
+class SizeCategory(models.Model):
+    name = models.CharField(max_length=80)
+    
+    def __str__(self) -> str:
+        return self.name
+
+class SizeOption(models.Model):
+    value = models.CharField(max_length=20)
+    size_category = models.ForeignKey(SizeCategory, on_delete=models.CASCADE, related_name='size_options')
+    
+    def __str__(self) -> str:
+        return self.value
+
+class Category(models.Model):
+    status_choices = [
         ('visible', 'Visible'),
         ('hiddin', 'Hiddin'),
-    }
+    ]
     
-    name = models.CharField(max_length=255)
-    img = models.ImageField( upload_to='store/categories')  
+    name = models.CharField(max_length=100)
+    img = models.ImageField( upload_to='store/categories') 
+    gender_cat = models.BooleanField(default=False) 
     featured = models.BooleanField(default=False)
     status = models.CharField(choices=status_choices, max_length=20, default='visible')
-    
-    
+    size_category = models.ForeignKey(SizeCategory, on_delete=models.CASCADE, null=True, blank=True)
+    parent_category = models.ForeignKey('self', on_delete=models.CASCADE,  null=True, blank=True)
     def category_image(self):
         return mark_safe("<img src='%s' width='50' height='50'/>" % (self.img.url) )
     
@@ -68,48 +82,23 @@ class Category(models.Model):
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
-            
-    def __str__(self) -> str:
-        return self.name
-    
-    class Meta:
-        verbose_name_plural = 'Products Types'
 
 class Tag(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=20, blank=True)
     
     def __str__(self) -> str:
         return self.name
     
-    class Meta:
-        verbose_name_plural = 'Tags'
-
-class ProductImages(models.Model):
-    product = models.ForeignKey('Product', related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='store/Products/images')
-    
-    def __str__(self):
-        return self.product.name
-    
-    class Meta:
-        verbose_name_plural = 'Product Images'
+    def tag_count(self):
+        return self.products.count()
 
 class Product(models.Model):
     pid = ShortUUIDField(unique=True, length=12, max_length=30, prefix='pr', alphabet= string.ascii_lowercase + string.digits)
-    sku = ShortUUIDField(unique=True, length=8, max_length=20, alphabet= string.ascii_lowercase + string.digits)
     name = models.CharField(max_length=255)
     description = models.TextField()
-    category =  models.ForeignKey(Category ,related_name='products', on_delete=models.SET_NULL, blank=True, null=True)
-    brand = models.ForeignKey(Brand, related_name='products' , on_delete=models.SET_NULL, blank=True, null=True)
-    tags = models.ManyToManyField(Tag, blank=True) 
-    gender_category = models.CharField(
-        max_length=10, 
-        choices=[ 
-            ('male', 'رجالي'),
-            ('female', 'نسائي'),
-            ('unisex', 'صالح للجنسين'),
-            ], 
-        default='unisex')
+    brand = models.ForeignKey(Brand, related_name='products', on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
+    tag = models.ManyToManyField(Tag, related_name='products')
     thumbnail_img = models.ImageField(upload_to='store/Products/thumbnails')
     featured = models.BooleanField(default=False)   
     payment_type = models.CharField(
@@ -127,7 +116,7 @@ class Product(models.Model):
     ready_to_sale = models.BooleanField(default=False)
     upload_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)     
-    
+
     def __str__(self) -> str:
         return self.name
     
@@ -151,8 +140,17 @@ class Product(models.Model):
             self.offer = False
         self.save()
 
+class ProductImages(models.Model):
+    product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='store/Products/images')
+    
+    def __str__(self):
+        return self.product.name
+    
+    class Meta:
+        verbose_name_plural = 'Product Images'
+
 class ProductColor(models.Model):
-    product = models.ForeignKey(Product, related_name='colors', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     image = models.ImageField(upload_to='store/Products/product_colors/')
     
@@ -162,24 +160,24 @@ class ProductColor(models.Model):
     def product_color(self):
         return mark_safe("<img src='%s' width='50' height='50'/>" % (self.image.url) )
 
-class ProductSize(models.Model):
-    product = models.ForeignKey(Product, related_name='sizes', on_delete=models.CASCADE)
-    size_value = models.CharField(max_length=10)
-    
-    def __str__(self):
-        return  self.size_value
-        
-class ProductVariants(models.Model):
-    product = models.ForeignKey(Product, related_name='variants', on_delete=models.CASCADE)
-    color = models.ForeignKey(ProductColor, related_name='variants', on_delete=models.CASCADE)
-    size = models.ForeignKey(ProductSize, related_name='variants', on_delete=models.CASCADE)
+class ProductItem(models.Model):
+    product = models.ForeignKey(Product, related_name='items', on_delete=models.CASCADE)
+    sku = ShortUUIDField(unique=True, prefix='sku',  length=8, max_length=20, alphabet= string.ascii_lowercase + string.digits)
+    color = models.ForeignKey(ProductColor, related_name='items', on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return str(self.sku)
+
+class ProductVariation(models.Model):
+    product_item = models.ForeignKey(ProductItem, related_name='variations', on_delete=models.PROTECT,)
+    size = models.ForeignKey(SizeOption, related_name='variations', on_delete=models.PROTECT,)
     stock = models.IntegerField(default=0)  # الكمية المتاحة
     reserved = models.IntegerField(default=0)  # الكمية المحجوزة
     sold = models.IntegerField(default=0)  # الكمية المباعة
-    
+
     def __str__(self):
-        return f"{self.product.pid} - {self.color.name} - {self.size}"
-    
+        return f"{self.product_item} - {self.product_item.product.name} - {self.product_item.color} - {self.size}"
+
     def update_stock(self, quantity_change):
         """
         This method updates the stock and ensures the stock never goes negative.
@@ -211,7 +209,7 @@ class ProductVariants(models.Model):
             self.save()
         else:
             raise ValueError("Not enough reserved stock to sell.")
-    
-    class Meta:
-        verbose_name_plural = 'Product Variants'
-   
+
+    @property
+    def product_thumbnail(self):
+        return self.product_item.product.product_thumbnail  # استرجع صورة المصغرة من المنتج

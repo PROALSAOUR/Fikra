@@ -8,24 +8,24 @@ def index(request):
     # جلب العلامات التجارية المميزة
     brands = Brand.objects.filter(featured=True).only('title', 'img')
     
-    # جلب الفئات المميزة والظاهرة فقط، وتحميل المنتجات التابعة لهذه الفئات
-    categories = Category.objects.filter(
-        featured=True,
-        status='visible'
-    ).prefetch_related(
-        'products'
-    ).filter(
-        products__featured=True,
-        products__ready_to_sale=True
-    ).distinct()[:8] # عدد اقسام المنتجات المطلوب عرضها بالصفحة الرئيسية
+    # # جلب الفئات المميزة والظاهرة فقط، وتحميل المنتجات التابعة لهذه الفئات
+    # categories = Category.objects.filter(
+    #     featured=True,
+    #     status='visible'
+    # ).prefetch_related(
+    #     'products'
+    # ).filter(
+    #     products__featured=True,
+    #     products__ready_to_sale=True
+    # ).distinct()[:8] # عدد اقسام المنتجات المطلوب عرضها بالصفحة الرئيسية
     
-    offered_products = Product.objects.filter(offer = True)[:10]
+    # offered_products = Product.objects.filter(offer = True)[:10]
     
     context = {
         'ads': ads,
         'brands': brands,
-        'categories': categories,
-        'offered_products':offered_products,
+        # 'categories': categories,
+        # 'offered_products':offered_products,
     }
     
     return render(request, 'store/index.html', context)
