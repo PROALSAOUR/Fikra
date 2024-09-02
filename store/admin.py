@@ -37,35 +37,27 @@ class ProductImagesInline(admin.TabularInline):
     fields = ('image',)
      
 class ProductVariationAdmin(admin.ModelAdmin):
-    list_display = ('product_thumbnail' ,'product_item' ,'size', 'stock', 'reserved', 'sold',)
+    list_display = ('item_thumbnail' ,'product_item' ,'size', 'stock', 'reserved', 'sold',)
     search_fields = ('product_item',)
-    list_filter = ('stock', 'sold', 'reserved')
+    exclude = ('reserved', 'sold',)
 
-class ProductColorInline(admin.TabularInline):
-    model = ProductColor
-    extra = 1
-    fields = ('name', 'image')
-
-class ProductItemInline(admin.StackedInline):
+class ProductItemInline(admin.TabularInline):
     model = ProductItem
     extra = 1
-    fields = ('sku', 'color')  # إذا كنت ترغب في إضافة ألوان مباشرة هنا، يمكنك إضافة تلك الحقول التي تحتاجها
- 
+    fields = ('sku', 'color', 'image') 
+
 class ProductItemAdmin(admin.ModelAdmin):
-    list_display = ('sku', 'product__name', 'color', )
+    list_display = ('sku', 'product__name', 'color', 'item_image')
     search_fields = ('sku',)
     list_filter = ('sku', 'color')
-    inlines = (ProductColorInline,)
    
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('product_thumbnail', 'name', 'category', 'brand', 'ready_to_sale', 'offer')
     search_fields = ('name', )
     list_filter = ('category', 'brand', 'ready_to_sale', 'payment_type', 'price', 'point_price', 'featured' , 'offer')
     ordering = ('updated_at',)   
-    inlines = (ProductImagesInline, ProductItemInline, )
+    inlines = (ProductImagesInline, ProductItemInline,)
 
-
- 
 admin.site.register(AdsSlider, AdsSliderAdmin)
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(SizeCategory, SizeCategoryAdmin)
@@ -74,29 +66,3 @@ admin.site.register(Tag, TagAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductItem, ProductItemAdmin)
 admin.site.register(ProductVariation, ProductVariationAdmin)
-
- 
- 
- 
- 
- 
- 
-
-# class ProductVariantsAdmin(admin.ModelAdmin):
-#     form = ProductVariantsForm
-#     list_display = ('product__pid', 'product', 'color', 'size', 'stock', 'reserved', 'sold')
-#     search_fields = ('product__pid', 'product__name')
-#     list_filter = ('product', 'product__category', 'product__brand', 'product__featured', 'product__gender_category', 'product__payment_type',)
-#     exclude = ('reserved', 'sold')
-
-# class ProductVariantsInline(admin.TabularInline):
-#     model = ProductVariants
-#     extra = 1
-#     fields = ('size', 'color', 'stock')
-
-# class ProductAdmin(admin.ModelAdmin):
-#     list_display = ('product_thumbnail', 'sku', 'name', 'category', 'brand', 'ready_to_sale')
-#     search_fields = ('name', )
-#     list_filter = ('category', 'gender_category', 'brand', 'ready_to_sale', 'payment_type', 'price', 'point_price', 'tags', 'featured')
-#     ordering = ('updated_at',)
-#     inlines = [ProductImagesInline, ProductColorInline, ProductSizeInline, ProductVariantsInline]

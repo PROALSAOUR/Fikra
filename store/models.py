@@ -33,6 +33,10 @@ class AdsSlider(models.Model):
     def __str__(self) -> str:
         return self.title
     
+    class Meta:
+        verbose_name = 'اعلان'
+        verbose_name_plural = 'الاعلانات'
+    
 class Brand(models.Model):
     title = models.CharField(max_length=255)
     img = models.ImageField( upload_to='store/Brands')
@@ -45,13 +49,18 @@ class Brand(models.Model):
         return mark_safe("<img src='%s' width='50' height='50'/>" % (self.img.url) )
     
     class Meta:
-        verbose_name_plural = 'Brands'
+        verbose_name = 'علامة تجارية'
+        verbose_name_plural = 'العلامات تجارية'
 
 class SizeCategory(models.Model):
     name = models.CharField(max_length=80)
     
     def __str__(self) -> str:
         return self.name
+    
+    class Meta:
+        verbose_name = 'فئة المقاسات'
+        verbose_name_plural = 'فئات المقاسات'
 
 class SizeOption(models.Model):
     value = models.CharField(max_length=20)
@@ -59,6 +68,10 @@ class SizeOption(models.Model):
     
     def __str__(self) -> str:
         return self.value
+    
+    class Meta:
+        verbose_name = 'مقاس'
+        verbose_name_plural = 'المقاسات'
 
 class Category(models.Model):
     status_choices = [
@@ -80,8 +93,8 @@ class Category(models.Model):
         return self.name
     
     class Meta:
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
+        verbose_name = 'تصنيف'
+        verbose_name_plural = 'التصنيفات'
 
 class Tag(models.Model):
     name = models.CharField(max_length=20, blank=True)
@@ -91,6 +104,10 @@ class Tag(models.Model):
     
     def tag_count(self):
         return self.products.count()
+    
+    class Meta:
+        verbose_name = 'هاشتاج'
+        verbose_name_plural = 'هاشتاج'
 
 class Product(models.Model):
     pid = ShortUUIDField(unique=True, length=12, max_length=30, prefix='pr', alphabet= string.ascii_lowercase + string.digits)
@@ -139,6 +156,10 @@ class Product(models.Model):
         else:
             self.offer = False
         self.save()
+        
+    class Meta:
+        verbose_name = 'منتج'
+        verbose_name_plural = 'المنتجات'
 
 class ProductImages(models.Model):
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
@@ -148,25 +169,24 @@ class ProductImages(models.Model):
         return self.product.name
     
     class Meta:
-        verbose_name_plural = 'Product Images'
-
-class ProductColor(models.Model):
-    name = models.CharField(max_length=255)
-    image = models.ImageField(upload_to='store/Products/product_colors/')
-    
-    def __str__(self):
-        return self.name
-    
-    def product_color(self):
-        return mark_safe("<img src='%s' width='50' height='50'/>" % (self.image.url) )
+        verbose_name = 'صورة المنتج'
+        verbose_name_plural = 'صور المنتج'
 
 class ProductItem(models.Model):
     product = models.ForeignKey(Product, related_name='items', on_delete=models.CASCADE)
     sku = ShortUUIDField(unique=True, prefix='sku',  length=8, max_length=20, alphabet= string.ascii_lowercase + string.digits)
-    color = models.ForeignKey(ProductColor, related_name='items', on_delete=models.CASCADE)
+    color =  models.CharField(max_length=255)
+    image = models.ImageField(upload_to='store/Products/product_items/', null=True)
+    
+    def item_image(self):
+        return mark_safe("<img src='%s' width='50' height='50'/>" % (self.image.url) )
 
     def __str__(self) -> str:
         return str(self.sku)
+    
+    class Meta:
+        verbose_name = 'متغير المنتج'
+        verbose_name_plural = 'متغيرات المنتج'
 
 class ProductVariation(models.Model):
     product_item = models.ForeignKey(ProductItem, related_name='variations', on_delete=models.PROTECT,)
@@ -211,5 +231,9 @@ class ProductVariation(models.Model):
             raise ValueError("Not enough reserved stock to sell.")
 
     @property
-    def product_thumbnail(self):
-        return self.product_item.product.product_thumbnail  # استرجع صورة المصغرة من المنتج
+    def item_thumbnail(self):
+        return self.product_item.item_image # استرجع صورة المصغرة من المنتج
+
+    class Meta:
+        verbose_name = 'المخزون'
+        verbose_name_plural = 'المخزون'
