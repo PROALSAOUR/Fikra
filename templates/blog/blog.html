@@ -16,7 +16,7 @@
                     {% if blog_pages %}
                         {% for page in blog_pages %}
                             <li>
-                                <a href="{% url 'blog:page-details' page.id %}"> {{ page.title }} <i class="fa-solid fa-angles-left"></i></a>
+                                <a href="{% url 'blog:page-details' page.slug %}"> {{ page.title }} <i class="fa-solid fa-angles-left"></i></a>
                             </li>
                         {% endfor %}
                     {% else %}

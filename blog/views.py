@@ -14,9 +14,9 @@ def blog(request):
     
     return render(request, 'blog/blog.html', context)
 
-def page_details(request, id):
+def page_details(request, slug):
     # جلب الصفحة المحددة أو إظهار خطأ 404 إذا لم يتم العثور عليها
-    blog_page = get_object_or_404(BlogPage, id=id)
+    blog_page = get_object_or_404(BlogPage, slug=slug)
     
     context = {
         'blog_page': blog_page,

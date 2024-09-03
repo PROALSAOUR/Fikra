@@ -77,7 +77,7 @@
             </select>
         </div>
         <!-- End Search Bar -->
-        <!-- Start Searched-products  -->
+        <!-- Start barnd-products  -->
         <div class="search">
             <div class="search-title">
                 <div class="title-image">
@@ -85,6 +85,51 @@
                 </div>
                 <h2>{{ brand.title }}<span>({{ brand.brand_count }})</span></h2>
             </div>
+            <!-- Start Last Products Section -->
+            {% if last_products %}
+                <section  id="products" style="margin-top:50px;">               
+                        <div class="title" style="justify-content:center;">
+                            <h2> احدث المتتجات من {{brand.title}} </h2>
+                            <i class="fa-regular fa-clock"></i>
+                        </div> 
+                        <div class="swiper products-slider">
+                            <div class="swiper-wrapper">
+                                {% for product in last_products %}
+                                    {% include "common/product-card.html" %}
+                                {% endfor %}
+                            </div>
+                        </div> 
+                </section>     
+            {% endif %}
+            <!-- End Last Products Section -->
+            <!-- Start Offer Products  -->
+            {% if offerd_products %}
+                <hr class="sep">
+                <section  id="products" style="margin-bottom:50px;">               
+                    <div class="title" style="justify-content:center;">
+                        <h2>   اقوى العروض من {{brand.title}} </h2>
+                        <i class="fa-solid fa-fire"></i>
+                    </div> 
+                    <div class="swiper products-slider">
+                        <div class="swiper-wrapper">
+                            {% for product in offerd_products %}
+                                {% include "common/product-card.html" %}
+                            {% endfor %}
+                        </div>
+                    </div> 
+                </section>
+            {% endif %}
+            <!-- End Offer Products  -->
+            <!-- Start Last Products  -->
+            {% if products %}
+                <hr class="sep">
+                <section  id="products" style="margin-bottom:50px;">               
+                    <div class="title" style="justify-content:center;">
+                        <h2> جميع منتجات {{brand.title}} </h2>
+                        <i class="fa-brands fa-stack-overflow"></i>
+                    </div> 
+                </section>
+            {% endif %}
             <div class="searched-products">
                 <div class="container">
                     <div class="products-cards">
@@ -102,8 +147,9 @@
                     </div>
                 </div>
             </div>
+            <!-- End Last Products  -->
         </div>
-        <!-- End Searched-products  -->
+        <!-- End barnd-products  -->
         <!-- Start Pagination -->
         <div class="pagination-container">
             <div class="container">

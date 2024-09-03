@@ -31,12 +31,16 @@ def index(request):
     
     return render(request, 'store/index.html', context)
 
-def brand_page(request, id):
-    brand = get_object_or_404(Brand, id=id)
+def brand_page(request, slug):
+    brand = get_object_or_404(Brand, title=slug)
     products = Product.objects.filter(brand=brand)[:12]
+    last_products = Product.objects.filter(brand=brand).order_by('-updated_at')[:12]
+    offerd_products = Product.objects.filter(brand=brand, offer=True)[:12]
     
     context = {
         'products': products,
+        'last_products': last_products,
+        'offerd_products':offerd_products,
         'brand': brand,
     }
     

@@ -4,6 +4,7 @@ from django.db import models
 
 class BlogPage(models.Model):
     title = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, unique=True, null=True, blank=True)
     order = models.IntegerField(default=0)
     image = models.ImageField(upload_to='blog/pages', null=True, blank=True)
     
@@ -11,8 +12,8 @@ class BlogPage(models.Model):
         return self.title
     
     class Meta:
-        verbose_name = 'Blog Page'
-        verbose_name_plural = 'Blog Pages'
+        verbose_name = 'صفحة مدونة'
+        verbose_name_plural = 'صفحات المدونة '
 
 class PageSection(models.Model):
     blog_page = models.ForeignKey(BlogPage, on_delete=models.CASCADE, related_name='sections' )
@@ -33,8 +34,8 @@ class QuestionPage(models.Model):
         return self.title
     
     class Meta:
-        verbose_name = 'Question Page'
-        verbose_name_plural = 'Question Page'
+        verbose_name = 'صفحة الاسئلة '
+        verbose_name_plural = 'صفحة الاسئلة '
      
 class QuestionContent(models.Model):
     question_page = models.ForeignKey(QuestionPage, on_delete=models.CASCADE, related_name='questions')

@@ -11,23 +11,6 @@ class AdsSlider(models.Model):
     img = models.ImageField( upload_to='store/Ads')
     show = models.BooleanField( default=False)
     
-    # url_type = models.CharField(max_length=20, choices=[
-    #     ('product', 'Product'),
-    #     ('category', 'Category'),
-    #     ('custom', 'Custom Page'),
-    # ], default='custom') 
-    # url_value = models.CharField(max_length=255, blank=True, null=True) #  قيمة مختلفة بناءً على نوع الرابط
-    
-    # def get_ad_url(self):
-    #     if self.url_type == 'product':
-    #         return reverse('product_detail', args=[self.url_value])
-    #     elif self.url_type == 'category':
-    #         return reverse('category_detail', args=[self.url_value])  # Assuming 'category_detail' is the URL name for category
-    #     else:
-    #         return self.url_value  # Custom URL       
-    # def ad_image(self):
-    #     url = self.get_ad_url()
-    #     return mark_safe("<img src='%s' width='80' height='50'/>" % (url, self.img.url) )
     def ad_image(self):
         return mark_safe("<img src='%s' width='80' height='50'/>" % (self.img.url) )
     
