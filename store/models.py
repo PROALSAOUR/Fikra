@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.core.exceptions import ValidationError
 from django.utils.html import mark_safe
 from shortuuid.django_fields import ShortUUIDField
 import string
@@ -7,10 +8,42 @@ import string
 # ======================== Product ======================================
 
 class AdsSlider(models.Model):
+    
+    ads_options = [
+        ('category', 'Category Ads'),
+        ('one_product', 'One Product Ads'),
+        ('special_products', 'Special Products Ads'),
+        ('just_show', 'Just For Show'),
+    ]
+    
     title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=100, unique=True)
     img = models.ImageField( upload_to='store/Ads')
     show = models.BooleanField( default=False)
+    info = models.TextField(null=True, blank=True)
+    ads_for = models.CharField(choices=ads_options, max_length=20, default='special_products')
+    category = models.ForeignKey('Category', null=True, blank=True, related_name='ads', on_delete=models.CASCADE)
+    one_product = models.ForeignKey('Product', null=True, blank=True, related_name='ads', on_delete=models.CASCADE)
     
+    def get_ad_url(self):
+        if self.ads_for == 'category':
+            return reverse('store:category', kwargs={'slug': self.category.slug})
+        elif self.ads_for == 'one_product':
+            # return reverse('store:product_detail', kwargs={'slug': self.one_product.slug})
+            pass
+        elif self.ads_for == 'special_products':
+            return reverse('store:ad_details', kwargs={'slug': self.slug})
+        else:
+            return reverse('store:home')
+    
+    def clean(self):
+        super().clean() 
+
+        if self.ads_for == 'category' and not self.category:
+            raise ValidationError('Category Ads must be linked to a Category.')
+        elif self.ads_for == 'one_product' and not self.one_product:
+            raise ValidationError('One Product Ads must be linked to a Product.')
+
     def ad_image(self):
         return mark_safe("<img src='%s' width='80' height='50'/>" % (self.img.url) )
     
@@ -21,6 +54,10 @@ class AdsSlider(models.Model):
         verbose_name = 'اعلان'
         verbose_name_plural = 'الاعلانات'
     
+class AdsProducts(models.Model):
+    product =  models.ManyToManyField('Product', related_name='products') 
+    Ads_name = models.ForeignKey(AdsSlider, null=True, blank=True, related_name='adsproducts', on_delete=models.CASCADE)
+   
 class Brand(models.Model):
     title = models.CharField(max_length=255)
     img = models.ImageField( upload_to='store/Brands')
@@ -67,6 +104,7 @@ class Category(models.Model):
     ]
     
     name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, unique=True)
     img = models.ImageField( upload_to='store/categories') 
     gender_cat = models.BooleanField(default=False) 
     featured = models.BooleanField(default=False)

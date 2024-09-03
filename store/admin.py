@@ -2,10 +2,17 @@ from django.contrib import admin
 from store.models import *
 from django.utils.html import mark_safe
 
+
+class AdsProductsInline(admin.TabularInline):
+    model = AdsProducts
+    extra = 1 
+    fields = ('product',)
+
 class AdsSliderAdmin(admin.ModelAdmin):
-    list_display = ('title', 'show', 'ad_image')
+    list_display = ('title', 'show', 'ads_for','ad_image')
     search_fields = ('title', 'show')
     list_filter = ('show',)
+    inlines = (AdsProductsInline,)
     
 class BrandAdmin(admin.ModelAdmin):
     list_display = ('title', 'featured', 'brand_count', 'brand_image')
@@ -23,7 +30,7 @@ class SizeCategoryAdmin(admin.ModelAdmin):
     inlines = (SizeOptionInline ,)
  
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'featured', 'status', 'parent_category', 'category_count', 'category_image')
+    list_display = ('id', 'name', 'featured', 'status', 'parent_category', 'category_count', 'category_image')
     search_fields = ('name',)
     list_filter = ('featured', 'status', 'size_category', 'parent_category',)
 

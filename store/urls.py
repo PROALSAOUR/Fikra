@@ -6,5 +6,7 @@ app_name = 'store'
 urlpatterns = [
     path("", index, name="home"),
     path("brand/<slug:slug>/", brand_page, name="brand"),
-    path("category/<int:id>/", category_page, name="category"),
+    path("category/<slug:slug>/", category_page, name="category"),
+    path("ad-details/<slug:slug>/", ads_page, name="ad_details"),
+    path("offer/", offer_page, name="offer_page"),
 ]

@@ -31,6 +31,16 @@ def index(request):
     
     return render(request, 'store/index.html', context)
 
+def ads_page(request, slug):
+    ad = get_object_or_404(AdsSlider, slug=slug)
+    ad_content = AdsProducts.objects.filter(Ads_name=ad).prefetch_related('product')
+    
+    context = {
+        'ad_content': ad_content,
+        'ad': ad,
+    }
+    return render(request, 'store/ads-details.html', context)
+
 def brand_page(request, slug):
     brand = get_object_or_404(Brand, title=slug)
     products = Product.objects.filter(brand=brand)[:12]
@@ -46,9 +56,9 @@ def brand_page(request, slug):
     
     return render(request, 'store/brand.html', context)
 
-def category_page(request, id):
+def category_page(request, slug):
     
-    category = get_object_or_404(Category, id=id)
+    category = get_object_or_404(Category, slug=slug)
     
     # استرجاع التصنيفات الفرعية التي تنتمي للتصنيف الأب
     subcategories = Category.objects.filter(parent_category=category)
@@ -76,8 +86,15 @@ def category_page(request, id):
     }
     return render(request, 'store/category.html', context)
 
-
-
+def offer_page(request):
+    offerd_products = Product.objects.filter(offer=True, ready_to_sale=True).order_by('-new_price')
+    products_count = offerd_products.count()
+    
+    context  ={
+        'offerd_products': offerd_products,
+        'products_count': products_count,
+    }
+    return render(request, 'store/offer-products.html', context)
 
 
 

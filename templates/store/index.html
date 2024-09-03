@@ -59,10 +59,10 @@
         </section>
     </div>
     <!-- End Brands -->
-    <!-- Start Products Section -->
+    <!-- Start Offer Products Section -->
     <hr class="sep">
     <section  id="products">
-            <a href="/templates/search.html">
+            <a href="{% url "store:offer_page" %}">
                 <div class="title">
                     <h2> اقوى العروض</h2>
                     <i class="fa-solid fa-angles-left"></i>
@@ -76,12 +76,12 @@
                 </div>
             </div> 
     </section>
-    <!-- End Products Section -->
+    <!-- End Offer Products Section -->
     {% for category in categories %}
     <!-- Start Products Section -->
         <hr class="sep">
         <section  id="products">
-                <a href="{% url "store:category" category.id %}">
+                <a href="{% url "store:category" category.slug %}">
                     <div class="title">
                         <h2> {{ category.name }} </h2>
                         <i class="fa-solid fa-angles-left"></i>
