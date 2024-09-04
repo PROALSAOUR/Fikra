@@ -27,7 +27,7 @@
                         </div>
                         <ul class="links">
                             {% for category in men_categores %}
-                                <li><a href="{% url "store:category" category.id %}"><i class="fa-solid fa-angles-left"></i> {{ category.name }}</a></li>
+                                <li><a href="{% url "store:category" category.slug %}"><i class="fa-solid fa-angles-left"></i> {{ category.name }}</a></li>
                             {% endfor %}
                         </ul>
                     </div>
@@ -37,7 +37,7 @@
                         </div>
                         <ul class="links">
                             {% for category in women_categores %}
-                                <li><a href="{% url "store:category" category.id %}"><i class="fa-solid fa-angles-left"></i> {{ category.name }}</a></li>
+                                <li><a href="{% url "store:category" category.slug %}"><i class="fa-solid fa-angles-left"></i> {{ category.name }}</a></li>
                             {% endfor %}     
                         </ul>
                     </div>

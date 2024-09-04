@@ -1,0 +1,147 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="search-page">
+    <!-- Start Search Bar -->
+    <div class="search-bar">
+        <div class="container">
+            <form id="filter-form" method="get" action="{% url 'store:search_page' %}" class="search">
+                <input type="search" class="search-input" id="search-query" name="q" placeholder="ما الذي تبحث عنه؟" value="{{ request.GET.q }}">
+                
+                <div class="filter-container">
+                    <button type="button" class="filter-toggle">
+                        <i class="fa-solid fa-sliders"></i>
+                    </button>
+                    <div class="filter-options">
+                        <div class="filter-header">
+                            <h2>خيارات الفلترة</h2>
+                            <button type="button" class="close-filter">&times;</button>
+                        </div>
+                        <div class="filter-tabs">
+                            <button type="button" class="filter-tab" data-target="price">السعر</button>
+                            <button type="button" class="filter-tab" data-target="category">التصنيف</button>
+                            <button type="button" class="filter-tab" data-target="brand">العلامة التجارية</button>
+                        </div>
+                        <div class="filter-content">
+                            <!-- الفلاتر المخفية هنا -->
+                            <div id="price" class="filter-group">
+                                <label>نطاق السعر:</label>
+                                <div class="price-range">
+                                    <input type="number" id="price_min" name="price_min" placeholder="من" aria-label="سعر من" value="{{ request.GET.price_min }}">
+                                    <input type="number" id="price_max" name="price_max" placeholder="إلى" aria-label="سعر إلى" value="{{ request.GET.price_max }}">
+                                </div>
+                            </div>
+                            
+                            <div id="category" class="filter-group">
+                                <label>التصنيف:</label>
+                                <select id="category_filter" name="category">
+                                    <option value="">اختر التصنيف</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}" {% if category.id == request.GET.category %}selected{% endif %}>{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div id="brand" class="filter-group">
+                                <label>العلامة التجارية:</label>
+                                <select id="brand_filter" name="brand">
+                                    <option value="">اختر العلامة التجارية</option>
+                                    {% for brand in brands %}
+                                        <option value="{{ brand.id }}" {% if brand.id == request.GET.brand %}selected{% endif %}>{{ brand.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="apply-filters">تطبيق الفلاتر</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- End Search Bar -->
+    <!-- Start Product quantities --> 
+    {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.category or request.GET.brand %}
+        {% if products %}
+            <h2 class='searched-product-counts'>عدد النتائج ({{ products_count }})</h2>
+        {% endif %}
+    {% endif %}  
+    <!-- End Product quantities --> 
+    <!-- Start Searched-products  -->
+    <div class="search">
+        {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.category or request.GET.brand %}
+            <!-- إذا كان هناك استعلام بحث، اعرض المنتجات -->
+            <div id="products-container" class="searched-products">
+                <div class="container">
+                    <div class="products-cards">
+                        {% if products %}
+                            {% for product in products %}
+                                <!-- product-start -->
+                                <div class="specific">
+                                    {% include "common/product-card.html" with product=product %}
+                                </div>
+                                <!-- product-end -->
+                            {% endfor %}
+                        {% else %}
+                            {% include "common/no-result.html" %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <!-- إذا لم يكن هناك استعلام بحث، اعرض رسالة "جرب البحث" -->
+            <div id="search-message" class="search-message">
+                <div class="no-result" >
+                    <h2>جرب البحث عن المنتج الذي تريده</h2>
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    <!-- End Searched-products  -->
+    <!-- Start Pagination -->
+    {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.category or request.GET.brand %}
+        {% if products %}
+            <div class="pagination-container">
+                <div class="container">
+                    <div class="pagination">
+                        <!-- Previous Page Link -->
+                        {% if products.has_previous %}
+                            <a href="?page={{ products.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.price_min %}&price_min={{ request.GET.price_min }}{% endif %}{% if request.GET.price_max %}&price_max={{ request.GET.price_max }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}" 
+                            class="previous">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        {% else %}
+                            <div class="previous disapled">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                        {% endif %}
+
+                        <!-- Page Number Display -->
+                        <div class="page-number">
+                            <span class="in-page">{{ products.number }}</span>
+                            <span class="from">من</span>
+                            <span class="total-pages">{{ products.paginator.num_pages }}</span>
+                        </div>
+
+                        <!-- Next Page Link -->
+                        {% if products.has_next %}
+                            <a href="?page={{ products.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.price_min %}&price_min={{ request.GET.price_min }}{% endif %}{% if request.GET.price_max %}&price_max={{ request.GET.price_max }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}" 
+                            class="next">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </a>
+                        {% else %}
+                            <div class="next disapled">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+    <!-- End Pagination -->
+</div>
+
+{% endblock content %}

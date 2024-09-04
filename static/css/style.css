@@ -2618,6 +2618,42 @@ hr.sep {
   }
 }
 /* End Search Bar */
+/* Start Search welcome */
+.search-message {
+  width: 60%;
+  padding: 0 40px 40px;
+  margin: 10px auto 40px;
+  background-color: var(--background-color);
+  text-align: center;
+}
+/* mobile */
+@media (max-width: 598px) {
+  .search-message{
+    width: 90%;
+  }
+}
+/* End Search welcome */
+/* Start searched-product-counts */
+.search-page .searched-product-counts {
+  color: var(--disaple-text-color);
+  width: 100%;
+  text-align: center;
+  padding: 10px;
+  font-size: var(--lab-xs-size);
+}
+/* tablet */
+@media (max-width: 768px) {
+  .search-page .searched-product-counts{
+    font-size: var(--tab-xs-size);
+  }
+}
+/* phone */
+@media (max-width: 576px) {
+  .search-page .searched-product-counts{
+    font-size: var(--mob-xs-size);
+  }
+}
+/* End searched-product-counts */
 /* Start Search title  */
 .search .search-title {
   position: relative;
@@ -5554,3 +5590,6 @@ input[type="number"] {
   }
 }
 /* End ads-details Section */
+.hidden {
+  display: none;
+}

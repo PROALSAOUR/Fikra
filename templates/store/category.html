@@ -87,7 +87,7 @@
             </div>
             <div class="sec-cat">
                 {% for sub_cat in subcategories %}
-                <a href="{% url "store:category" sub_cat.id %}"> {{sub_cat.name}} </a>
+                <a href="{% url "store:category" sub_cat.slug %}"> {{sub_cat.name}} </a>
                 {% endfor %}
             </div>
             <div class="searched-products">
