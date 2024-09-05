@@ -69,7 +69,7 @@ class Brand(models.Model):
     def brand_image(self):
         return mark_safe("<img src='%s' width='50' height='50'/>" % (self.img.url) )
     
-    def brand_count(self):
+    def products_count(self):
         return self.products.count()
     
     class Meta:
@@ -118,7 +118,7 @@ class Category(models.Model):
     def __str__(self) -> str:
         return self.name
     
-    def category_count(self):
+    def products_count(self):
         return self.products.count()
     
     class Meta:

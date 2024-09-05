@@ -3,81 +3,7 @@
 
 {% block content %}
     <div class="search-page">
-        <!-- Start Search Bar -->
-        <div class="search-bar">
-            <div class="container">
-                <form action="" class="search">
-                        <input type="search" class="search-input" name="search-query" placeholder="ما الذي تبحث عنه؟">
-                        <div class="filter-container">
-                            <button type="button" class="filter-toggle">
-                                <i class="fa-solid fa-sliders"></i>
-                            </button>
-                            <div class="filter-options">
-                                <div class="filter-header">
-                                    <h2>خيارات الفلترة</h2>
-                                    <button type="button" class="close-filter">&times;</button>
-                                </div>
-                                <!-- قائمة الفلترة -->
-                                <div class="filter-tabs">
-                                    <button type="button" class="filter-tab" data-target="price">السعر</button>
-                                    <button type="button" class="filter-tab" data-target="category">التصنيف</button>
-                                    <button type="button" class="filter-tab" data-target="product_type">نوع المنتج</button>
-                                    <button type="button" class="filter-tab" data-target="size">المقاس</button>
-                                </div>
-                                <!-- محتويات الفلترة -->
-                                <div class="filter-content">
-                                    <!-- سيتم إضافة الفلاتر المختارة هنا -->
-                                </div>
-                                <!-- زر تطبيق الفلاتر -->
-                                <button type="submit" class="apply-filters">تطبيق الفلاتر</button>
-                            </div>
-                        </div>
-                </form>
-            </div>
-        </div>
-        <!-- نماذج الفلاتر المخفية -->
-        <div id="price" class="filter-group-template">
-            <label>نطاق السعر:</label>
-            <div class="price-range">
-                <input type="number" placeholder="من" aria-label="سعر من">
-                <input type="number" placeholder="إلى" aria-label="سعر إلى">
-            </div>
-        </div>
-        
-        <div id="category" class="filter-group-template">
-            <label>التصنيف:</label>
-            <select>
-                <option value="">اختر التصنيف</option>
-                <option value="category1">رجالي </option>
-                <option value="category2">نسائي </option>
-            </select>
-        </div>
-
-        <div id="product_type" class="filter-group-template">
-            <label>نوع المنتج:</label>
-            <select>
-                <option value="">اختر  نوع المنتج</option>
-                <option value="category1">سروال </option>
-                <option value="category2">نظارة </option>
-                <option value="category2">تي شيرت </option>
-                <option value="category2">معطف  </option>
-            </select>
-        </div>
-
-        <div id="size" class="filter-group-template">
-            <label>المقاس:</label>
-            <select>
-                <option value="">اختر المقاس</option>
-                <option value="small">S</option>
-                <option value="medium">M</option>
-                <option value="large">L</option>
-                <option value="large">Xl</option>
-                <option value="large">2Xl</option>
-                <option value="large">3Xl</option>
-            </select>
-        </div>
-        <!-- End Search Bar -->
-        <div class="search">
+        <div class="search" style='padding-top:100px;'>
             <div class="search-title" style='background-color:#ff4b4b;'>
                 <div class="title-image">
                     <img src="{% static "/images/offer.jpg" %}" alt="تخفيضات ملابس">
@@ -85,40 +11,67 @@
                 <h2 style='color:#ffffff;'> اقوى العروض<span style='color:#ffffff;'>({{ products_count }})</span></h2>
             </div>
             <!-- Start Offer Products  -->
-            {% if offerd_products %}
-                <section  id="products" style="margin-top:50px;">               
-                    <div class="swiper products-slider">
-                        <div class="swiper-wrapper">
+            <div id="products-container" class="searched-products">
+                <div class="container">
+                    <div class="products-cards">
+                        {% if offerd_products %}
                             {% for product in offerd_products %}
-                                {% include "common/product-card.html" %}
+                                <!-- product-start -->
+                                <div class="specific">
+                                    {% include "common/product-card.html" with product=product %}
+                                </div>
+                                <!-- product-end -->
                             {% endfor %}
-                        </div>
-                    </div> 
-                </section>
-            {% endif %}
-            <!-- End Offer Products  -->
-        </div>
-        <!-- Start Pagination -->
-        <div class="pagination-container">
-            <div class="container">
-                <div class="pagination">
-                    <div class="previous disapled">
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
-                    <div class="page-number">
-                        <span class="in-page">1</span><span class="from">من</span><span class="total-pages">12</span>
-                    </div>
-                    <div class="next ">
-                        <i class="fa-solid fa-arrow-left"></i>
+                        {% else %}
+                            {% include "common/no-result.html" %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
+            <!-- End Offer Products  -->
         </div>
+        <!-- Start Pagination -->
+        {% if offerd_products %}
+            <div class="pagination-container">
+                <div class="container">
+                    <div class="pagination">
+                        <!-- Previous Page Link -->
+                        {% if offerd_products.has_previous %}
+                            <a href="?page={{ offerd_products.previous_page_number }}" class="previous">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        {% else %}
+                            <div class="previous disapled">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                        {% endif %}
+
+                        <!-- Page Number Display -->
+                        <div class="page-number">
+                            <span class="in-page">{{ offerd_products.number }}</span>
+                            <span class="from">من</span>
+                            <span class="total-pages">{{ offerd_products.paginator.num_pages }}</span>
+                        </div>
+
+                        <!-- Next Page Link -->
+                        {% if offerd_products.has_next %}
+                            <a href="?page={{ offerd_products.next_page_number }}" class="next">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </a>
+                        {% else %}
+                            <div class="next disapled">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         <!-- End Pagination -->
     </div>
 {% endblock content %}
 
-
+        
 
 
 

@@ -1170,9 +1170,9 @@ select option::selection {
     font-size: var(--mob-xs-size);
   }
   .mega-menu .secondary-nav {
-      position:sticky;
+      position:fixed;
       bottom: 0;
-      width: 100%;
+      width: 60%;
       padding: 15px;
       background-color: var(--background-color);
       border-top-right-radius: var(--main-border-radius);

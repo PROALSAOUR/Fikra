@@ -1,16 +1,15 @@
 {% extends "partials/base.html" %}
 
-
 {% block content %}
 
 <!-- Start blog page   -->
 <div class="blog secondary-page" style="position: relative;  padding-top: 80px;">
     <div class="image">
-        <img src="{{ question_page.image.url }}" alt="{{ question_page.title }}">
+        <img src="{{ questions_page.image.url }}" alt="{{ questions_page.title }}">
     </div>
     <div class="container">    
         <div class="title">
-            <h1>{{ question_page.title }}</h1>
+            <h1>{{ questions_page.title }}</h1>
         </div>
         <div class="content">
             {% for question in questions %}

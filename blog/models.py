@@ -38,7 +38,7 @@ class QuestionPage(models.Model):
         verbose_name_plural = 'صفحة الاسئلة '
      
 class QuestionContent(models.Model):
-    question_page = models.ForeignKey(QuestionPage, on_delete=models.CASCADE, related_name='questions')
+    questions_page = models.ForeignKey(QuestionPage, on_delete=models.CASCADE, related_name='questions')
     title = models.CharField(max_length=255)
     content = models.TextField()
     order = models.IntegerField(default=100)

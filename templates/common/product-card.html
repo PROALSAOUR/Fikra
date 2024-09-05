@@ -1,5 +1,5 @@
 <!-- product-start -->
-<div class="swiper-slide product-box {% if product.offer %} offer {% endif %}"> <!-- اضف كلاس اوفر اذا كان هنالك تخفيض- -->
+<div class="swiper-slide product-box {% if product.offer %}{% if product.payment_type == 'money' %} offer {% endif %} {% endif %}"> <!-- اضف كلاس اوفر اذا كان هنالك تخفيض- -->
     <a href="اضف رابط صفحة المنتج">
         <div class="product-image">
             <div class="off-holder">

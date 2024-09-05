@@ -6,166 +6,230 @@
         <!-- Start Search Bar -->
         <div class="search-bar">
             <div class="container">
-                <form action="" class="search">
-                        <input type="search" class="search-input" name="search-query" placeholder="ما الذي تبحث عنه؟">
-                        <div class="filter-container">
-                            <button type="button" class="filter-toggle">
-                                <i class="fa-solid fa-sliders"></i>
-                            </button>
-                            <div class="filter-options">
-                                <div class="filter-header">
-                                    <h2>خيارات الفلترة</h2>
-                                    <button type="button" class="close-filter">&times;</button>
-                                </div>
-                                <!-- قائمة الفلترة -->
-                                <div class="filter-tabs">
-                                    <button type="button" class="filter-tab" data-target="price">السعر</button>
-                                    <button type="button" class="filter-tab" data-target="category">التصنيف</button>
-                                    <button type="button" class="filter-tab" data-target="product_type">نوع المنتج</button>
-                                    <button type="button" class="filter-tab" data-target="size">المقاس</button>
-                                </div>
-                                <!-- محتويات الفلترة -->
-                                <div class="filter-content">
-                                    <!-- سيتم إضافة الفلاتر المختارة هنا -->
-                                </div>
-                                <!-- زر تطبيق الفلاتر -->
-                                <button type="submit" class="apply-filters">تطبيق الفلاتر</button>
+                <form id="filter-form" method="get" action="{% url 'store:brand' brand.title %}" class="search">
+                    <input type="search" class="search-input" id="search-query" name="q" placeholder="ما الذي تبحث عنه؟" value="{{ request.GET.q }}">
+                    
+                    <div class="filter-container">
+                        <button type="button" class="filter-toggle">
+                            <i class="fa-solid fa-sliders"></i>
+                        </button>
+                        <div class="filter-options">
+                            <div class="filter-header">
+                                <h2>خيارات الفلترة</h2>
+                                <button type="button" class="close-filter">&times;</button>
                             </div>
+                            <div class="filter-tabs">
+                                <button type="button" class="filter-tab" data-target="price">السعر</button>
+                                <button type="button" class="filter-tab" data-target="category">التصنيف</button>
+                            </div>
+                            <div class="filter-content">
+                                <!-- الفلاتر المخفية هنا -->
+                                <div id="price" class="filter-group">
+                                    <label>نطاق السعر:</label>
+                                    <div class="price-range">
+                                        <input type="number" id="price_min" name="price_min" placeholder="من" aria-label="سعر من" value="{{ request.GET.price_min }}">
+                                        <input type="number" id="price_max" name="price_max" placeholder="إلى" aria-label="سعر إلى" value="{{ request.GET.price_max }}">
+                                    </div>
+                                </div>
+                                
+                                <div id="category" class="filter-group">
+                                    <label>التصنيف:</label>
+                                    <select id="category_filter" name="category">
+                                        <option value="">اختر التصنيف</option>
+                                        {% for category in categories %}
+                                            <option value="{{ category.id }}" {% if category.id == request.GET.category %}selected{% endif %}>{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                            </div>
+                            <button type="submit" class="apply-filters">تطبيق الفلاتر</button>
                         </div>
+                    </div>
                 </form>
             </div>
         </div>
-        <!-- نماذج الفلاتر المخفية -->
-        <div id="price" class="filter-group-template">
-            <label>نطاق السعر:</label>
-            <div class="price-range">
-                <input type="number" placeholder="من" aria-label="سعر من">
-                <input type="number" placeholder="إلى" aria-label="سعر إلى">
-            </div>
-        </div>
-        
-        <div id="category" class="filter-group-template">
-            <label>التصنيف:</label>
-            <select>
-                <option value="">اختر التصنيف</option>
-                <option value="category1">رجالي </option>
-                <option value="category2">نسائي </option>
-            </select>
-        </div>
-
-        <div id="product_type" class="filter-group-template">
-            <label>نوع المنتج:</label>
-            <select>
-                <option value="">اختر  نوع المنتج</option>
-                <option value="category1">سروال </option>
-                <option value="category2">نظارة </option>
-                <option value="category2">تي شيرت </option>
-                <option value="category2">معطف  </option>
-            </select>
-        </div>
-
-        <div id="size" class="filter-group-template">
-            <label>المقاس:</label>
-            <select>
-                <option value="">اختر المقاس</option>
-                <option value="small">S</option>
-                <option value="medium">M</option>
-                <option value="large">L</option>
-                <option value="large">Xl</option>
-                <option value="large">2Xl</option>
-                <option value="large">3Xl</option>
-            </select>
-        </div>
         <!-- End Search Bar -->
-        <!-- Start barnd-products  -->
-        <div class="search">
-            <div class="search-title">
-                <div class="title-image">
-                    <img src="{{ brand.img.url }}" alt="{{ brand.title }}">
-                </div>
-                <h2>{{ brand.title }}<span>({{ brand.brand_count }})</span></h2>
-            </div>
-            <!-- Start Last Products Section -->
-            {% if last_products %}
-                <section  id="products" style="margin-top:50px;">               
-                        <div class="title" style="justify-content:center;">
-                            <h2> احدث المتتجات من {{brand.title}} </h2>
-                            <i class="fa-regular fa-clock"></i>
-                        </div> 
-                        <div class="swiper products-slider">
-                            <div class="swiper-wrapper">
-                                {% for product in last_products %}
-                                    {% include "common/product-card.html" %}
-                                {% endfor %}
-                            </div>
-                        </div> 
-                </section>     
-            {% endif %}
-            <!-- End Last Products Section -->
-            <!-- Start Offer Products  -->
-            {% if offerd_products %}
-                <hr class="sep">
-                <section  id="products" style="margin-bottom:50px;">               
-                    <div class="title" style="justify-content:center;">
-                        <h2>   اقوى العروض من {{brand.title}} </h2>
-                        <i class="fa-solid fa-fire"></i>
-                    </div> 
-                    <div class="swiper products-slider">
-                        <div class="swiper-wrapper">
-                            {% for product in offerd_products %}
-                                {% include "common/product-card.html" %}
-                            {% endfor %}
-                        </div>
-                    </div> 
-                </section>
-            {% endif %}
-            <!-- End Offer Products  -->
-            <!-- Start Last Products  -->
+        <!-- Start Product quantities --> 
+        {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.category  %}
             {% if products %}
-                <hr class="sep">
-                <section  id="products" style="margin-bottom:50px;">               
-                    <div class="title" style="justify-content:center;">
-                        <h2> جميع منتجات {{brand.title}} </h2>
-                        <i class="fa-brands fa-stack-overflow"></i>
-                    </div> 
-                </section>
+                <h2 class='searched-product-counts'>عدد النتائج ({{ products_count }})</h2>
             {% endif %}
-            <div class="searched-products">
-                <div class="container">
-                    <div class="products-cards">
-                        {% if products %}
-                            {% for product in products %}
-                                <!-- product-start -->
-                                <div class="specific">
-                                    {% include "common/product-card.html" %}
+        {% endif %}  
+        <!-- End Product quantities --> 
+        <!-- Start Searched-products  -->
+        <div class="search">
+            {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.category %}
+                <!-- إذا كان هناك استعلام بحث، اعرض المنتجات -->
+                <div id="products-container" class="searched-products">
+                    <div class="container">
+                        <div class="products-cards">
+                            {% if products %}
+                                {% for product in products %}
+                                    <!-- product-start -->
+                                    <div class="specific">
+                                        {% include "common/product-card.html" with product=product %}
+                                    </div>
+                                    <!-- product-end -->
+                                {% endfor %}
+                            {% else %}
+                                {% include "common/no-result.html" %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                    <div class="search-title">
+                        <div class="title-image">
+                            <img src="{{ brand.img.url }}" alt="{{ brand.title }}">
+                        </div>
+                        <h2>{{ brand.title }}<span>({{ brand.products_count }})</span></h2>
+                    </div>
+                    <!-- Start Last Products Section -->
+                    {% if last_products %}
+                        <section  id="products" style="margin-top:50px;">               
+                                <div class="title" style="justify-content:center;">
+                                    <h2> احدث المنتجات من {{brand.title}} </h2>
+                                    <i class="fa-regular fa-clock"></i>
+                                </div> 
+                                <div class="swiper products-slider">
+                                    <div class="swiper-wrapper">
+                                        {% for product in last_products %}
+                                            {% include "common/product-card.html" %}
+                                        {% endfor %}
+                                    </div>
+                                </div> 
+                        </section>     
+                    {% endif %}
+                    <!-- End Last Products Section -->
+                    <!-- Start Offer Products  -->
+                    {% if offerd_products %}
+                        <hr class="sep">
+                        <section  id="products" style="margin-bottom:50px;">               
+                            <div class="title" style="justify-content:center;">
+                                <h2>   اقوى العروض من {{brand.title}} </h2>
+                                <i class="fa-solid fa-fire"></i>
+                            </div> 
+                            <div class="swiper products-slider">
+                                <div class="swiper-wrapper">
+                                    {% for product in offerd_products %}
+                                        {% include "common/product-card.html" %}
+                                    {% endfor %}
                                 </div>
-                                <!-- product-end -->
-                            {% endfor %}        
-                        {% else %} 
-                            {% include "common/no-result.html" %}
-                        {% endif %}  
-                    </div>
-                </div>
-            </div>
-            <!-- End Last Products  -->
+                            </div> 
+                        </section>
+                    {% endif %}
+                    <!-- End Offer Products  -->
+                    <!-- Start Last Products  -->
+                    {% if all_brand_products %}
+                        <hr class="sep">
+                        <section  id="products" style="margin-bottom:50px;">               
+                            <div class="title" style="justify-content:center;">
+                                <h2> جميع منتجات {{brand.title}} </h2>
+                                <i class="fa-brands fa-stack-overflow"></i>
+                            </div> 
+                        </section>
+                        <div class="searched-products">
+                            <div class="container">
+                                <div class="products-cards">
+                                    {% if all_brand_products %}
+                                        {% for product in all_brand_products %}
+                                            <!-- product-start -->
+                                            <div class="specific">
+                                                {% include "common/product-card.html" %}
+                                            </div>
+                                            <!-- product-end -->
+                                        {% endfor %}        
+                                    {% else %} 
+                                        {% include "common/no-result.html" %}
+                                    {% endif %}  
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Start Pagination -->
+                        {% if all_brand_products %}
+                            <div class="pagination-container">
+                                <div class="container">
+                                    <div class="pagination">
+                                        <!-- Previous Page Link -->
+                                        {% if all_brand_products.has_previous %}
+                                            <a href="?page_all={{ all_brand_products.previous_page_number }}" class="previous">
+                                                <i class="fa-solid fa-arrow-right"></i>
+                                            </a>
+                                        {% else %}
+                                            <div class="previous disapled">
+                                                <i class="fa-solid fa-arrow-right"></i>
+                                            </div>
+                                        {% endif %}
+
+                                        <!-- Page Number Display -->
+                                        <div class="page-number">
+                                            <span class="in-page">{{ all_brand_products.number }}</span>
+                                            <span class="from">من</span>
+                                            <span class="total-pages">{{ all_brand_products.paginator.num_pages }}</span>
+                                        </div>
+
+                                        <!-- Next Page Link -->
+                                        {% if all_brand_products.has_next %}
+                                            <a href="?page_all={{ all_brand_products.next_page_number }}" class="next"> 
+                                                <i class="fa-solid fa-arrow-left"></i>
+                                            </a>
+                                        {% else %}
+                                            <div class="next disapled">
+                                                <i class="fa-solid fa-arrow-left"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <!-- End Pagination -->
+                    {% endif %}
+                    <!-- End Last Products  -->
+            {% endif %}
         </div>
-        <!-- End barnd-products  -->
+        <!-- End Searched-products  -->
         <!-- Start Pagination -->
-        <div class="pagination-container">
-            <div class="container">
-                <div class="pagination">
-                    <div class="previous disapled">
-                        <i class="fa-solid fa-arrow-right"></i>
+        {% if request.GET.q or request.GET.price_min or request.GET.price_max  or  request.GET.category %}
+                {% if products %}
+                    <div class="pagination-container">
+                        <div class="container">
+                            <div class="pagination">
+                                <!-- Previous Page Link -->
+                                {% if products.has_previous %}
+                                    <a href="?page={{ products.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.price_min %}&price_min={{ request.GET.price_min }}{% endif %}{% if request.GET.price_max %}&price_max={{ request.GET.price_max }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}" 
+                                    class="previous">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </a>
+                                {% else %}
+                                    <div class="previous disapled">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Page Number Display -->
+                                <div class="page-number">
+                                    <span class="in-page">{{ products.number }}</span>
+                                    <span class="from">من</span>
+                                    <span class="total-pages">{{ products.paginator.num_pages }}</span>
+                                </div>
+
+                                <!-- Next Page Link -->
+                                {% if products.has_next %}
+                                    <a href="?page={{ products.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.price_min %}&price_min={{ request.GET.price_min }}{% endif %}{% if request.GET.price_max %}&price_max={{ request.GET.price_max }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}" 
+                                    class="next">
+                                        <i class="fa-solid fa-arrow-left"></i>
+                                    </a>
+                                {% else %}
+                                    <div class="next disapled">
+                                        <i class="fa-solid fa-arrow-left"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
-                    <div class="page-number">
-                        <span class="in-page">1</span><span class="from">من</span><span class="total-pages">12</span>
-                    </div>
-                    <div class="next ">
-                        <i class="fa-solid fa-arrow-left"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
+                {% endif %}
+        {% endif %}
         <!-- End Pagination -->
     </div>
 {% endblock content %}

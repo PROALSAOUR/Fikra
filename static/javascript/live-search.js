@@ -51,21 +51,24 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let typingTimer;
     const doneTypingInterval = 500;
-    document.getElementById('search-query').addEventListener('input', (event) => {
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(() => {
-            const query = event.target.value.trim();
-            if (query.length > 0) {
-                filterForm.submit();
-            }
-        }, doneTypingInterval);
-    });
-
-    const queryParams = new URLSearchParams(window.location.search);
-    const searchQuery = queryParams.get('q');
     const searchInput = document.getElementById('search-query');
 
-    if (searchInput && searchQuery) {
-        searchInput.value = searchQuery;
+    if (searchInput) {
+        searchInput.addEventListener('input', (event) => {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                const query = event.target.value.trim();
+                if (query.length > 0) {
+                    filterForm.submit();
+                }
+            }, doneTypingInterval);
+        });
+
+        // لإعادة تعيين قيمة البحث بعد تحميل الصفحة
+        const queryParams = new URLSearchParams(window.location.search);
+        const searchQuery = queryParams.get('q');
+        if (searchQuery) {
+            searchInput.value = searchQuery;
+        }
     }
 });

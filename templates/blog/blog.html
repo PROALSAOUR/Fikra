@@ -22,9 +22,9 @@
                     {% else %}
                     <p style='padding:20px;'>مع الأسف! لا توجد أقسام حتى الأن</p>
                     {% endif %}
-                    {% if question_page %}
+                    {% if questions_page %}
                         <li>
-                            <a href="{% url 'blog:qustions-page' %}">{{ question_page.title }} <i class="fa-solid fa-angles-left"></i></a>
+                            <a href="{% url 'blog:questions-page' %}">{{ questions_page.title }} <i class="fa-solid fa-angles-left"></i></a>
                         </li>
                     {% endif %}
                 </ul>            

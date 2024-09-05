@@ -15,7 +15,7 @@ class AdsSliderAdmin(admin.ModelAdmin):
     inlines = (AdsProductsInline,)
     
 class BrandAdmin(admin.ModelAdmin):
-    list_display = ('title', 'featured', 'brand_count', 'brand_image')
+    list_display = ('title', 'featured', 'products_count', 'brand_image')
     search_fields = ('title', 'featured')
     list_filter = ('featured',)
  
@@ -30,7 +30,7 @@ class SizeCategoryAdmin(admin.ModelAdmin):
     inlines = (SizeOptionInline ,)
  
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'featured', 'status', 'parent_category', 'category_count', 'category_image')
+    list_display = ('id', 'name', 'featured', 'status', 'parent_category', 'products_count', 'category_image')
     search_fields = ('name',)
     list_filter = ('featured', 'status', 'size_category', 'parent_category',)
 

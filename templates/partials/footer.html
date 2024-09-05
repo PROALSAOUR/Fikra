@@ -2,17 +2,18 @@
 <!-- Start Footer  -->
 <div class="footer">
     <div class="links">
-        <ul class="important-links">
-            <li><a href="{% url "blog:blog" %}"><i class="fa-solid fa-angles-left"></i> المدونة</a></li>
-            <li><a href="/templates/about-us.html"><i class="fa-solid fa-angles-left"></i> من نحن</a></li>
-            <li><a href="{% url "blog:qustions-page" %}"><i class="fa-solid fa-angles-left"></i> الاسئلة الشائعة</a></li>
-            <li><a href="/templates/my-orders.html"><i class="fa-solid fa-angles-left"></i> طلباتي السابقة</a></li>
+        <ul class="important-links"> 
+            {% if men_category %}<li><a href=" {% url "store:category" men_category.slug %}"><i class="fa-solid fa-angles-left"></i>المنتجات الرجالية</a></li>{% endif %}
+            {% if women_category %}<li><a href=" {% url "store:category" women_category.slug %}"><i class="fa-solid fa-angles-left"></i>المنتجات النسائية</a></li>{% endif %}
+            <li><a href="{% url "store:offer_page" %}"><i class="fa-solid fa-angles-left"></i>صفحة العروض</a></li>
+            <li><a href="#"><i class="fa-solid fa-angles-left"></i> طلباتي السابقة</a></li>
         </ul>
         <ul class="important-links">
-            <li><a href="/templates/privacy-policy.html"><i class="fa-solid fa-angles-left"></i> سياسة الخصوصية</a></li>
-            <li><a href=""><i class="fa-solid fa-angles-left"></i> شروط الاستبدال </a></li>
-            <li><a href=""><i class="fa-solid fa-angles-left"></i> تواصل معنا</a></li>
-            <li><a href=""><i class="fa-solid fa-angles-left"></i>مطور الموقع</a></li>
+            <li><a href="{% url "blog:blog" %}"><i class="fa-solid fa-angles-left"></i> المدونة</a></li>
+            {% if 'about-us' %}<li><a href="{% url "blog:page-details" 'about-us' %}"><i class="fa-solid fa-angles-left"></i> من نحن</a></li>{% endif %}
+            <li><a href="{% url "blog:questions-page" %}"><i class="fa-solid fa-angles-left"></i> الاسئلة الشائعة</a></li>
+            <li><a href="#"><i class="fa-solid fa-angles-left"></i> تواصل معنا</a></li>
+           
         </ul>
     </div>
     <div class="info">
