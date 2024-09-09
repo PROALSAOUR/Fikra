@@ -1,0 +1,205 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <div class='my-main-content' style='padding-top:100px;'> 
+        <!-- Start product details -->
+        <div class="product-details-page "  style='position:relative;'>
+            <a href="javascript:void(0);" onclick="goBack()">
+                <span class="exit-button"><i class="fa-solid fa-arrow-left"></i></span>
+            </a>
+            <div class="container">
+                <div class="product-details ">
+                    <div class="product-images">
+                        <!-- image-slider -->
+                        <div class="product-slider">
+                            <!-- السلايدر الرئيسي -->
+                            <div class="swiper-container main-slider">
+                                <a href="/templates/fav.html"><span class="add-to-fav"><button><i class="fa-regular fa-heart"></i></button></span></a>
+                                <div class="swiper-wrapper">
+
+                                    <div class="swiper-slide">
+                                        <img src="{{product.thumbnail_img.url}}" alt="{{product.name}}">
+                                    </div>
+
+                                    {% for image in product_images %}
+                                        <div class="swiper-slide">
+                                            <img src="{{image.image.url}}" alt="{{product.name}}">
+                                        </div>
+                                    {% endfor %}
+                                    
+                                </div>
+                            </div>
+                            <!-- السلايدر الثانوي -->
+                            <div class="swiper-container thumbnail-slider">
+                              <div class="swiper-wrapper">
+
+                                <div class="swiper-slide">
+                                  <img src="{{product.thumbnail_img.url}}" alt="{{product.name}}" class="thumbnail">
+                                </div>
+
+                                {% for image in product_images %}
+                                    <div class="swiper-slide">
+                                        <img src="{{image.image.url}}" alt="{{product.name}}" class="thumbnail" >
+                                    </div>
+                                {% endfor %}
+
+                              </div>
+                            </div>
+                        </div>
+                        <!-- image-slider -->
+                    </div>
+                    <div class="name-price">
+                        <h2>{{ product.name }}<span class="category" style="text-wrap:nowrap;"> {{product.category}} </span></h2>
+                        <h4 class="product-price {% if product.offer %}{% if product.payment_type == 'money' %} offer {% endif %} {% endif %}{% if product.payment_type == 'points' %} point {% endif %} ">
+                            <span class="offer-percient">تخفيض <span>{{product.get_offer_percentage}}%</span></span>
+                            <div class="buy-by-money"><span class="old"> {{product.price}} </span><span class="new"> | {{product.new_price|floatformat:0}} </span><span> دل </span></div>
+                            <div class="buy-by-points">{{product.point_price}} <i class="fa-solid fa-gem"></i></div>            
+                        </h4>
+                    </div>
+                    <div class="product-description">
+                        <p>
+                           {{ product.description }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="product-variants">
+                    <div class='form' >
+                        
+                        
+                        <!-- عرض المقاسات المتاحة -->
+                        <div class="size">
+                            <form method="POST" id="post-form">
+                                <input type="hidden" name="productid" id="productid" value="{{ product.id }}">
+                                <label for="size" class="size-title">المقاسات:</label>
+                                {% csrf_token %}
+                                <div id="size-options">
+                                    {% for size in sizes %}
+                                        <input type="radio" name="size" id="size-{{ forloop.counter }}" value="{{ size.id }}"  {% if variant and variant.size_id == size.id %} checked {% endif %}>
+                                        <label for="size-{{ forloop.counter }}">{{ size.value }}</label>
+                                    {% endfor %}
+                                </div>
+                            </form>                                                        
+                        </div>
+                    
+                        <!-- عرض الألوان المتاحة -->
+                        <div class="color">
+                            <form method="post" action="?q=selectvariant" id="post-color">
+                                {% csrf_token %}
+                                <div id="appendHere">
+                                    <input type="hidden" name="size" id="size" value="{{ size_id }}">
+                                        <label  class="color-title">اللون:</label>
+                                        {% for item in items %}
+                                            <input type="radio"  {% if variant and variant.id == item.id %} checked {% endif %} name="variantid" id="item-{{ forloop.counter }}" value="{{ item.id }}" onchange="this.form.submit();">
+                                            <label for="item-{{ forloop.counter }}" ><img src="{{ item.image.url }}" alt="{{ item.color }}"></label>
+                                        {% endfor %}
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- عرض الكمية المتاحة -->
+                        {% comment %} <div class="quantity-pd color">
+                            <label for="color" class="color-title">العدد:</label>
+
+                            <span class="quantity">
+                                <button type="button" class="minus" onclick=""><i class="fa-regular fa-square-minus"></i></button>
+                                <span id="quantity-value" data-stock="">1</span>
+                                <button type="button" class="plus" onclick=""><i class="fa-regular fa-square-plus"></i></button>
+                            </span>
+
+                            <div class="in-stock">متبقي <span id="" data-stock="">1</span> في المخزن</div>
+                        </div> {% endcomment %}
+
+                    
+                        <span class="get-points">عند شرائك لهذا المنتج سوف تحصل على {{product.bonus}} نقطة</span>
+                        <input type="submit" value="أضف إلى السلة" id="add-to-cart" class="add-cart-pop-link">
+                    </div>                    
+                </div>
+                
+                <script>
+                    {% comment %} $(document).on('change', '#post-form',function(e){ {% endcomment %}
+                    $(document).on('change', 'input[name="size"]', function(e){
+                        e.preventDefault();
+                        $.ajax({
+                            type:'POST',
+                            url:'{% url "store:ajaxcolor" %}',
+                            data:{
+                                productid:$('#productid').val(),
+                                // size:$('#size').val(),
+                                size: $('input[name="size"]:checked').val(), 
+                                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                                action: 'post'
+                            },
+                            data_type : 'html',
+                            success: function (data) {
+                                console.log("success");
+                                $('#appendHere').html(data.rendered_table);
+                            },
+                            error: function (data) {
+                                alert("Got an error dude " + data);
+                            }
+                        });
+                    });
+                </script>
+                
+                
+
+
+
+
+
+            </div>
+            <!-- Start Products Sections -->
+            {% if related_category_products %}
+                <hr class="sep">
+                <section  id="products">
+                        <a href="{% url "store:category" product.category.slug %}">
+                            <div class="title">
+                                <h2>منتجات مشابهة</h2>
+                                <i class="fa-solid fa-angles-left"></i>
+                            </div>
+                        </a>  
+                        <div class="swiper products-slider">
+                            <div class="swiper-wrapper">
+                                {% for product in related_category_products %}
+                                    {% include "common/product-card.html" %}
+                                {% endfor %}
+                            </div>
+                        </div> 
+                </section>
+            {% endif %}
+            {% if related_brand_products %}
+                <hr class="sep">
+                <section  id="products">
+                        <a href="{% url "store:brand" product.brand %}">
+                            <div class="title">
+                                <h2>منتجات من {{product.brand}}</h2>
+                                <i class="fa-solid fa-angles-left"></i>
+                            </div>
+                        </a>  
+                        <div class="swiper products-slider">
+                            <div class="swiper-wrapper">
+                                {% for product in related_brand_products %}
+                                    {% include "common/product-card.html" %}
+                                {% endfor %}
+                            </div>
+                        </div> 
+                </section>
+            {% endif %}
+            <!-- End Products Sections -->
+        </div>
+        <!-- End product details -->
+        <!-- Start add-cart-pop-page Section -->
+        <div class="Pop-up-page add-cart-pop-page">
+            <div class="logo">
+                <img src="{% static "/images/name logo.jpg" %}" alt="">
+            </div>
+            <p>تمت الإضافة إلى السلة بنجاح</p>
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <!-- End add-cart-pop-page Section -->
+    </div>
+
+{% endblock content %}

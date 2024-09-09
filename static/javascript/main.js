@@ -272,3 +272,43 @@ function toggleContent(element) {
   }
 }
 // =========================================================================================================
+// الدالة المسؤلة عن اعادة المستخدم الى الصفحة التي جاء منها في تفاصيل المنتج
+function goBack() {
+  window.history.back();
+}
+// =========================================================================================================
+// الدالة المسؤلة عن تغيير كمية المخزون بشكل ديناميكي
+
+// // قراءة الكمية من `data-attributes`
+// let stockElement = document.getElementById('stock-count');
+// let stock = parseInt(stockElement.getAttribute('data-stock'));
+
+// // وظيفة لتغيير الكمية
+// function changeQuantity(amount) {
+//     const quantityElement = document.getElementById('quantity-value');
+//     let quantity = parseInt(quantityElement.textContent);
+//     const newQuantity = quantity + amount;
+
+//     // تحقق من الكمية الجديدة لا تتجاوز المخزون
+//     if (newQuantity < 1 || newQuantity > stock) {
+//         return;
+//     }
+
+//     quantity = newQuantity;
+//     quantityElement.textContent = quantity;
+
+//     // تحديث الكمية المتبقية في المخزون
+//     updateStock(newQuantity);
+// }
+
+// // وظيفة لتحديث الكمية المتبقية في المخزون
+// function updateStock(selectedQuantity) {
+//     // تحديث الكمية المتبقية بناءً على الكمية المختارة
+//     let remainingStock = parseInt(stockElement.getAttribute('data-stock')) - selectedQuantity;
+
+//     // تحديث النص داخل العنصر `stock-count`
+//     stockElement.textContent = remainingStock;
+// }
+// ============================-------------------------------==========================
+
+// =====================================================================================

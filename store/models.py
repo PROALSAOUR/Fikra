@@ -158,10 +158,12 @@ class Product(models.Model):
     price = models.IntegerField(default=0) 
     new_price = models.DecimalField(decimal_places=2, max_digits=10, blank=True, null=True)
     point_price = models.IntegerField(blank=True, null=True)
+    bonus =  models.IntegerField(blank=True, null=True, default=20)
     offer = models.BooleanField(default=False)
     ready_to_sale = models.BooleanField(default=False)
     upload_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)     
+    
 
     def __str__(self) -> str:
         return self.name
@@ -173,7 +175,7 @@ class Product(models.Model):
     def get_offer_percentage(self):
         if self.new_price and self.new_price < self.price:
             discount_percentage = ((self.price - self.new_price) / self.price) * 100
-            return round(discount_percentage, 2)
+            return round(discount_percentage, 1)
         return 0
 
     def update_offer_status(self):

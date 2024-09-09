@@ -10,4 +10,6 @@ urlpatterns = [
     path("ad-details/<slug:slug>/", ads_page, name="ad_details"),
     path("offer/", offer_page, name="offer_page"),
     path("search/", search_page, name="search_page"),
-]
+    path("product/<pid>", product_details, name="product_details"),
+    path('ajaxcolor/', Ajaxcolor, name='ajaxcolor'),
+    ]

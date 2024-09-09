@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.http import JsonResponse
+from django.template.loader import render_to_string#+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from store.models import *
 
@@ -296,3 +297,70 @@ def search_page(request):
         'brands': brands,
         'products_count': products_count, 
     })
+
+def product_details(request, pid):
+    query = request.GET.get('q', '')
+    product = get_object_or_404(Product, id=pid)
+    category = product.category
+    brand = product.brand
+
+    related_category_products = Product.objects.filter(category=category).exclude(pk=pid)[:8]
+    related_brand_products = Product.objects.filter(brand=brand).exclude(pk=pid)[:8]
+
+    product_images = product.images.all()
+    
+    context = {
+        'product': product,
+        'product_images': product_images,
+        'related_category_products': related_category_products,
+        'related_brand_products': related_brand_products,
+    }
+
+    
+    if request.method == 'POST': #if we select color
+        variant_id = request.POST.get('variantid')
+        variant = get_object_or_404(ProductVariation, id=variant_id)  # جلب المتغير المحدد
+        # جلب جميع العناصر المتعلقة بالمنتج والمرتبطة بنفس المقاس
+        items = ProductItem.objects.filter(variations__size_id=variant.size_id, variations__product_item=variant.product_item).distinct()        
+        sizes = SizeOption.objects.filter(variations__product_item__product_id=product.id).distinct()
+        query += f"{variant.product_item.product.name} - Size: {variant.size} - Color: {variant.product_item.color}"
+    else:
+        # إذا لم يتم تحديد أي لون، عرض المتغيرات الافتراضية
+        variants = ProductVariation.objects.filter(product_item__product_id=product.id)
+        if variants.exists():
+            variant = variants[0]  # افتراض أول متغير
+            items = ProductItem.objects.filter(variations__size_id=variant.size_id, variations__product_item=variant.product_item).distinct()
+        else:
+            variant = None
+            items = []
+        sizes = SizeOption.objects.filter(variations__product_item__product_id=product.id).distinct()
+
+        
+    context.update({
+        'sizes': sizes,
+        'items': items,
+        'variant': variant,
+        'query': query,
+                    })
+    
+
+    return render(request, 'store/product-details.html', context)
+
+
+# لتغيير الوان المنتج المتاحة بشكل ديناميكي وفقا للمقاس
+def Ajaxcolor(request):
+    data = {}
+    if request.POST.get('action') == 'post':
+        size_id = request.POST.get('size')
+        productid = request.POST.get('productid')        
+        items = ProductItem.objects.filter(variations__size_id=size_id, variations__product_item__product_id=productid)  
+        
+        context = {
+            'size_id': size_id,
+            'productid': productid,
+            'items': items,
+        }
+        
+        data = {'rendered_table': render_to_string('color_list.html', context=context)}
+        return JsonResponse(data)
+    return JsonResponse(data)

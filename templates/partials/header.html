@@ -75,12 +75,11 @@
             </div>
             <div class="lower-part">
                 <div class="categories">
-                    <a class="category" href="#">عروض</a>    
-                    <a class="category" href="#">تصنيف</a>    
-                    <a class="category" href="#">تصنيف</a>    
-                    <a class="category" href="#">تصنيف</a>    
-                    <a class="category" href="#">تصنيف</a>    
-                    <a class="category" href="#">تصنيف</a>     
+                    <a class="category" href="{% url "store:offer_page" %}">عروض</a>
+                    {% if men_category %}<a class="category" href=" {% url "store:category" men_category.slug %}"> رجالي</a>{% endif %}
+                    {% if women_category %}<a class="category" href=" {% url "store:category" women_category.slug %}"> نسائي</a>{% endif %} 
+                    <a class="category" href="#">نقاطي</a>    
+
                 </div>
             </div>
         </div>
