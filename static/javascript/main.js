@@ -299,6 +299,9 @@ document.addEventListener('DOMContentLoaded', function() {
   function updateItemGroups() {
       var selectedSizeId = document.querySelector('.size-option:checked')?.value;
 
+      // إعادة تعيين الكمية إلى القيمة الافتراضية (1)
+      resetQuantity();
+
       itemGroups.forEach(function(group) {
           if (selectedSizeId && group.getAttribute('data-size-id') === selectedSizeId) {
               group.style.display = 'block';
@@ -317,25 +320,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
   colorOptions.forEach(function(colorOption) {
       colorOption.addEventListener('change', function() {
+          // إعادة تعيين الكمية إلى القيمة الافتراضية (1)
+          resetQuantity();
           getSelectedSizeAndColor();
       });
   });
 
   function updateStock(sizeId, sku) {
-      fetch(`/get-stock?size_id=${sizeId}&color=${encodeURIComponent(sku)}`)
-          .then(response => response.json())
-          .then(data => {
-              if (data.stock !== undefined) {
-                  availableStock = data.stock; // تخزين الكمية المتاحة
-                  var initialQuantity = parseInt(userQuantityInput.value);
-                  var adjustedStock = availableStock - initialQuantity; // ضبط الكمية بناءً على القيمة الافتراضية
-                  stockQuantityElement.textContent = adjustedStock; // تحديث الكمية المعروضة
-                  userQuantityInput.max = availableStock; // ضبط الحد الأقصى للكمية
-                  updateQuantityDisplay(); // تحديث الكمية الظاهرة بناءً على المخزون الجديد
-              }
-          })
-          .catch(error => console.error('Error fetching stock:', error));
-  }
+    fetch(`/get-stock?size_id=${sizeId}&color=${encodeURIComponent(sku)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.stock !== undefined) {
+                availableStock = data.stock; // تخزين الكمية المتاحة
+                var initialQuantity = parseInt(userQuantityInput.value);
+                stockQuantityElement.textContent = availableStock; // تحديث الكمية المعروضة دون طرح أي شيء
+                userQuantityInput.max = availableStock; // ضبط الحد الأقصى للكمية
+                updateQuantityDisplay(); // تحديث الكمية الظاهرة بناءً على المخزون الجديد
+            }
+        })
+        .catch(error => console.error('Error fetching stock:', error));
+}
+
 
   function getSelectedSizeAndColor() {
       var selectedSize = document.querySelector('.size-option:checked');
@@ -349,6 +354,11 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
           console.log('Size or SKU not selected');
       }
+  }
+
+  function resetQuantity() {
+      userQuantityInput.value = 1;  // إعادة تعيين الكمية إلى القيمة الافتراضية
+      adjustStock();  // إعادة ضبط المخزون بناءً على الكمية الجديدة
   }
 
   function updateQuantityDisplay() {
@@ -365,7 +375,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var initialQuantity = 1; // القيمة الافتراضية لمربع الإدخال
       var adjustedStock = availableStock - Math.max(userQuantity, initialQuantity); // التأكد من عدم حساب الكمية المبدئية أكثر من اللازم
       stockQuantityElement.textContent = adjustedStock;
-  } 
+  }
 
   plusButton.addEventListener('click', function(event) {
       event.preventDefault();  // منع تصرفات الزر الافتراضية

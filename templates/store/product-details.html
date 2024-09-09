@@ -82,8 +82,8 @@
                                     {% for size, items in size_item_map.items %}
                                         <div class="item-group" data-size-id="{{ size.id }}" style="display: {% if forloop.first %}block{% else %}none{% endif %};">
                                             {% for item in items %}
-                                                <input type="radio" name="item" id="item-{{ item.sku }}" value="{{ item.sku }}" class="item-option" {% if forloop.first %}checked{% endif %}>
-                                                <label for="item-{{ item.sku }}">
+                                                <input type="radio" name="item" id="item-{{ size.id }}-{{ item.sku }}" value="{{ item.sku }}" class="item-option" {% if forloop.first %}checked{% endif %}>
+                                                <label for="item-{{ size.id }}-{{ item.sku }}">
                                                     <img src="{{ item.image.url }}" alt="{{ item.color }}">        
                                                 </label>
                                             {% endfor %}

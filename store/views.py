@@ -307,9 +307,9 @@ def product_details(request, pid):
     related_brand_products = Product.objects.filter(brand=brand).exclude(pk=pid)[:8]
 
     product_images = product.images.all()
-    
-   # الحصول على جميع التغيرات المرتبطة بالمنتج
-    variants = ProductVariation.objects.filter(product_item__product_id=pid)
+
+    # تحسين استعلام المتغيرات باستخدام prefetch_related
+    variants = ProductVariation.objects.filter(product_item__product_id=pid).select_related('size', 'product_item')
 
     # الحصول على جميع الأحجام الفريدة المرتبطة بالمنتج
     sizes = SizeOption.objects.filter(variations__product_item__product_id=pid).distinct()
@@ -323,9 +323,7 @@ def product_details(request, pid):
             size_item_map[size] = []
         if item not in size_item_map[size]:
             size_item_map[size].append(item)
-    
-   
-    
+
     context = {
         'product': product,
         'product_images': product_images,
@@ -335,7 +333,6 @@ def product_details(request, pid):
         'sizes': sizes,
     }
 
-
     return render(request, 'store/product-details.html', context)
 
 def get_stock(request):
@@ -343,7 +340,7 @@ def get_stock(request):
     sku = request.GET.get('color')  # نستخدم color للإشارة إلى الـ SKU هنا
 
     try:
-        # الحصول على المتغير بناءً على الـ SKU والمقاس
+        # التحقق من وجود المتغير باستخدام sku و size_id
         variation = ProductVariation.objects.get(product_item__sku=sku, size_id=size_id)
         stock = variation.stock  # الكمية المتاحة في المخزون
         return JsonResponse({'stock': stock})
