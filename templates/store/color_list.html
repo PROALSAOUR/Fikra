@@ -1,7 +1,7 @@
-<input type="hidden" name="size" id="size" value="{{ size_id }}">
+{% comment %} <input type="hidden" name="size" id="size" value="{{ size_id }}">
 <label  class="color-title">اللون:</label>
 {% for item in items %}
     <input type="radio"  name="variantid" id="item-{{ forloop.counter }}" value="{{ item.id }}" onchange="this.form.submit();">
     <label for="item-{{ forloop.counter }}" ><img src="{{ item.image.url }}" alt="{{ item.color }}"></label>
 {% endfor %}
-
+ {% endcomment %}

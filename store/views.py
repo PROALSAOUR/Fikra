@@ -299,7 +299,6 @@ def search_page(request):
     })
 
 def product_details(request, pid):
-    query = request.GET.get('q', '')
     product = get_object_or_404(Product, id=pid)
     category = product.category
     brand = product.brand
@@ -309,58 +308,44 @@ def product_details(request, pid):
 
     product_images = product.images.all()
     
+   # الحصول على جميع التغيرات المرتبطة بالمنتج
+    variants = ProductVariation.objects.filter(product_item__product_id=pid)
+
+    # الحصول على جميع الأحجام الفريدة المرتبطة بالمنتج
+    sizes = SizeOption.objects.filter(variations__product_item__product_id=pid).distinct()
+
+    # تنظيم البيانات بحيث يتم تصنيف العناصر حسب المقاس
+    size_item_map = {}
+    for variant in variants:
+        size = variant.size
+        item = variant.product_item
+        if size not in size_item_map:
+            size_item_map[size] = []
+        if item not in size_item_map[size]:
+            size_item_map[size].append(item)
+    
+   
+    
     context = {
         'product': product,
         'product_images': product_images,
         'related_category_products': related_category_products,
         'related_brand_products': related_brand_products,
+        'size_item_map': size_item_map,
+        'sizes': sizes,
     }
 
-    
-    if request.method == 'POST': #if we select color
-        variant_id = request.POST.get('variantid')
-        variant = get_object_or_404(ProductVariation, id=variant_id)  # جلب المتغير المحدد
-        # جلب جميع العناصر المتعلقة بالمنتج والمرتبطة بنفس المقاس
-        items = ProductItem.objects.filter(variations__size_id=variant.size_id, variations__product_item=variant.product_item).distinct()        
-        sizes = SizeOption.objects.filter(variations__product_item__product_id=product.id).distinct()
-        query += f"{variant.product_item.product.name} - Size: {variant.size} - Color: {variant.product_item.color}"
-    else:
-        # إذا لم يتم تحديد أي لون، عرض المتغيرات الافتراضية
-        variants = ProductVariation.objects.filter(product_item__product_id=product.id)
-        if variants.exists():
-            variant = variants[0]  # افتراض أول متغير
-            items = ProductItem.objects.filter(variations__size_id=variant.size_id, variations__product_item=variant.product_item).distinct()
-        else:
-            variant = None
-            items = []
-        sizes = SizeOption.objects.filter(variations__product_item__product_id=product.id).distinct()
-
-        
-    context.update({
-        'sizes': sizes,
-        'items': items,
-        'variant': variant,
-        'query': query,
-                    })
-    
 
     return render(request, 'store/product-details.html', context)
 
+def get_stock(request):
+    size_id = request.GET.get('size_id')
+    sku = request.GET.get('color')  # نستخدم color للإشارة إلى الـ SKU هنا
 
-# لتغيير الوان المنتج المتاحة بشكل ديناميكي وفقا للمقاس
-def Ajaxcolor(request):
-    data = {}
-    if request.POST.get('action') == 'post':
-        size_id = request.POST.get('size')
-        productid = request.POST.get('productid')        
-        items = ProductItem.objects.filter(variations__size_id=size_id, variations__product_item__product_id=productid)  
-        
-        context = {
-            'size_id': size_id,
-            'productid': productid,
-            'items': items,
-        }
-        
-        data = {'rendered_table': render_to_string('color_list.html', context=context)}
-        return JsonResponse(data)
-    return JsonResponse(data)
+    try:
+        # الحصول على المتغير بناءً على الـ SKU والمقاس
+        variation = ProductVariation.objects.get(product_item__sku=sku, size_id=size_id)
+        stock = variation.stock  # الكمية المتاحة في المخزون
+        return JsonResponse({'stock': stock})
+    except ProductVariation.DoesNotExist:
+        return JsonResponse({'stock': 0})  # إذا لم يتم العثور على المتغير، رجع 0

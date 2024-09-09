@@ -5377,7 +5377,7 @@ input[type="number"] {
   -ms-border-radius: calc(var(--main-border-radius) - 4px);
   -o-border-radius: calc(var(--main-border-radius) - 4px);
 }
-.product-details-page .product-variants .color label:not(.color-title){
+.product-details-page .product-variants .color label:not(.color-title) {
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -5391,6 +5391,7 @@ input[type="number"] {
   -moz-border-radius: calc(var(--main-border-radius) - 4px);
   -ms-border-radius: calc(var(--main-border-radius) - 4px);
   -o-border-radius: calc(var(--main-border-radius) - 4px);
+  color: #000; /* لون نص افتراضي */
 }
 .product-variants .color label img{
   width: 100%;
@@ -5458,14 +5459,25 @@ input[type="number"] {
   color: #fff;
   border-color: var(--main-color);
 }
+
 .product-details-page .product-variants .quantity {
   justify-content: start;
   position: relative;
   background-color: transparent;
   padding: 5px 20px;
 }
-.product-details-page .product-variants .quantity span {
-  margin: 0 20px;
+.product-details-page .product-variants .quantity .q-number {
+  margin: 0 5px;
+  padding: 10px;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  text-align: center;
+  background-color: transparent;
+}
+.product-details-page .product-variants .quantity button {
+  border: none;
+  background-color: transparent;
 }
 .product-details-page .product-variants .quantity i {
   font-size: var(--lab-xl-size);

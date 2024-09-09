@@ -277,38 +277,123 @@ function goBack() {
   window.history.back();
 }
 // =========================================================================================================
-// الدالة المسؤلة عن تغيير كمية المخزون بشكل ديناميكي
+// الدالة المسؤلة عن تغيير لون المنتج و  كمية المخزون بشكل ديناميكي
 
-// // قراءة الكمية من `data-attributes`
-// let stockElement = document.getElementById('stock-count');
-// let stock = parseInt(stockElement.getAttribute('data-stock'));
+document.addEventListener('DOMContentLoaded', function() {
+  var sizeOptions = document.querySelectorAll('.size-option');
+  var itemGroups = document.querySelectorAll('.item-group');
+  var colorOptions = document.querySelectorAll('.item-option');
+  var stockQuantityElement = document.getElementById('stock-quantity');
+  var userQuantityInput = document.getElementById('user-quantity');
+  var plusButton = document.querySelector('.plus');
+  var minusButton = document.querySelector('.minus');
+  var availableStock = 0;  // الكمية المتاحة للمقاس واللون المختارين
 
-// // وظيفة لتغيير الكمية
-// function changeQuantity(amount) {
-//     const quantityElement = document.getElementById('quantity-value');
-//     let quantity = parseInt(quantityElement.textContent);
-//     const newQuantity = quantity + amount;
+  function selectFirstColor(group) {
+      var firstColor = group.querySelector('.item-option');
+      if (firstColor && !firstColor.checked) {
+          firstColor.checked = true;  // تحديد أول لون بشكل افتراضي إذا لم يكن محددًا
+      }
+  }
 
-//     // تحقق من الكمية الجديدة لا تتجاوز المخزون
-//     if (newQuantity < 1 || newQuantity > stock) {
-//         return;
-//     }
+  function updateItemGroups() {
+      var selectedSizeId = document.querySelector('.size-option:checked')?.value;
 
-//     quantity = newQuantity;
-//     quantityElement.textContent = quantity;
+      itemGroups.forEach(function(group) {
+          if (selectedSizeId && group.getAttribute('data-size-id') === selectedSizeId) {
+              group.style.display = 'block';
+              selectFirstColor(group);  // تحديد أول لون عند تغيير المقاس
+          } else {
+              group.style.display = 'none';
+          }
+      });
 
-//     // تحديث الكمية المتبقية في المخزون
-//     updateStock(newQuantity);
-// }
+      getSelectedSizeAndColor(); // تحديث المخزون عند تغيير المقاس
+  }
 
-// // وظيفة لتحديث الكمية المتبقية في المخزون
-// function updateStock(selectedQuantity) {
-//     // تحديث الكمية المتبقية بناءً على الكمية المختارة
-//     let remainingStock = parseInt(stockElement.getAttribute('data-stock')) - selectedQuantity;
+  sizeOptions.forEach(function(sizeOption) {
+      sizeOption.addEventListener('change', updateItemGroups);
+  });
 
-//     // تحديث النص داخل العنصر `stock-count`
-//     stockElement.textContent = remainingStock;
-// }
-// ============================-------------------------------==========================
+  colorOptions.forEach(function(colorOption) {
+      colorOption.addEventListener('change', function() {
+          getSelectedSizeAndColor();
+      });
+  });
 
-// =====================================================================================
+  function updateStock(sizeId, sku) {
+      fetch(`/get-stock?size_id=${sizeId}&color=${encodeURIComponent(sku)}`)
+          .then(response => response.json())
+          .then(data => {
+              if (data.stock !== undefined) {
+                  availableStock = data.stock; // تخزين الكمية المتاحة
+                  var initialQuantity = parseInt(userQuantityInput.value);
+                  var adjustedStock = availableStock - initialQuantity; // ضبط الكمية بناءً على القيمة الافتراضية
+                  stockQuantityElement.textContent = adjustedStock; // تحديث الكمية المعروضة
+                  userQuantityInput.max = availableStock; // ضبط الحد الأقصى للكمية
+                  updateQuantityDisplay(); // تحديث الكمية الظاهرة بناءً على المخزون الجديد
+              }
+          })
+          .catch(error => console.error('Error fetching stock:', error));
+  }
+
+  function getSelectedSizeAndColor() {
+      var selectedSize = document.querySelector('.size-option:checked');
+      var selectedSku = document.querySelector('.item-option:checked');
+
+      if (selectedSize && selectedSku) {
+          var sizeId = selectedSize.value;
+          var sku = selectedSku.value;  // استخدام الـ SKU الآن
+          console.log(`Selected size: ${sizeId}, SKU: ${sku}`);  // تأكيد القيم المختارة
+          updateStock(sizeId, sku);  // تمرير الـ SKU إلى دالة التحديث
+      } else {
+          console.log('Size or SKU not selected');
+      }
+  }
+
+  function updateQuantityDisplay() {
+      var userQuantity = parseInt(userQuantityInput.value);
+      if (isNaN(userQuantity) || userQuantity < 1) {
+          userQuantityInput.value = 1;
+      } else if (userQuantity > availableStock) {
+          userQuantityInput.value = availableStock;
+      }
+  }
+
+  function adjustStock() {
+      var userQuantity = parseInt(userQuantityInput.value);
+      var initialQuantity = 1; // القيمة الافتراضية لمربع الإدخال
+      var adjustedStock = availableStock - Math.max(userQuantity, initialQuantity); // التأكد من عدم حساب الكمية المبدئية أكثر من اللازم
+      stockQuantityElement.textContent = adjustedStock;
+  } 
+
+  plusButton.addEventListener('click', function(event) {
+      event.preventDefault();  // منع تصرفات الزر الافتراضية
+      var currentQuantity = parseInt(userQuantityInput.value);
+      if (currentQuantity < availableStock) {
+          userQuantityInput.value = currentQuantity + 1;
+      }
+      updateQuantityDisplay();
+      adjustStock();
+  });
+
+  minusButton.addEventListener('click', function(event) {
+      event.preventDefault();  // منع تصرفات الزر الافتراضية
+      var currentQuantity = parseInt(userQuantityInput.value);
+      if (currentQuantity > 1) {
+          userQuantityInput.value = currentQuantity - 1;
+      }
+      updateQuantityDisplay();
+      adjustStock();
+  });
+
+  userQuantityInput.addEventListener('input', function() {
+      updateQuantityDisplay();
+      adjustStock();
+  });
+
+  updateItemGroups(); // تحديث المجموعات والعناصر عند تحميل الصفحة لأول مرة
+});
+
+// =========================================================================================================
+
