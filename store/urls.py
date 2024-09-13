@@ -9,7 +9,9 @@ urlpatterns = [
     path("category/<slug:slug>/", category_page, name="category"),
     path("ad-details/<slug:slug>/", ads_page, name="ad_details"),
     path("offer/", offer_page, name="offer_page"),
+    path("points-products/", point_products_page, name="points_page"),
     path("search/", search_page, name="search_page"),
+    path("favourite/", favourite_page, name="favourite_page"),
     path("product/<pid>", product_details, name="product_details"),
     path('get-stock/', get_stock, name='get_stock'),  # مسار لجلب المخزون الخاص بالمنتج
 

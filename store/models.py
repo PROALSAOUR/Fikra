@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.utils.html import mark_safe
 from shortuuid.django_fields import ShortUUIDField
+from accounts.models import User
 import string
 
 # ======================== Product ======================================
@@ -271,4 +272,11 @@ class ProductVariation(models.Model):
         
 # ========================== Favourite ===================================
 
+class Favourite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favourites')
+    products = models.ManyToManyField(Product)
+    
+    def __str__(self):
+        return f"{self.user.phone_number}قائمة المفضلة الخاصة ب"
+    
 # ============================= Order ====================================

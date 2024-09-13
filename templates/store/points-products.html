@@ -1,0 +1,80 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="search-page">
+        <div class="search" style='padding-top:100px;'>
+            <div class="search-title" style='background-color:var(--main-color);'>
+                <div class="title-image">
+                    <img src="{% static "/images/p1.jpg" %}" alt="هدايا و مكافأت مجانية " >
+                </div>
+                <h2 style='color:#ffffff;'> شراء بالنقاط <span style='color:#ffffff;'>({{ products_count }})</span></h2>
+            </div>
+            <!-- Start Points Products  -->
+            <div id="products-container" class="searched-products">
+                <div class="container">
+                    <div class="products-cards">
+                        {% if points_products %}
+                            {% for product in points_products %}
+                                <!-- product-start -->
+                                <div class="specific">
+                                    {% include "common/product-card.html" with product=product %}
+                                </div>
+                                <!-- product-end -->
+                            {% endfor %}
+                        {% else %}
+                            {% include "common/no-result.html" %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- End Points Products  -->
+        </div>
+        <!-- Start Pagination -->
+        {% if points_products %}
+            <div class="pagination-container">
+                <div class="container">
+                    <div class="pagination">
+                        <!-- Previous Page Link -->
+                        {% if points_products.has_previous %}
+                            <a href="?page={{ points_products.previous_page_number }}" class="previous">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        {% else %}
+                            <div class="previous disapled">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                        {% endif %}
+
+                        <!-- Page Number Display -->
+                        <div class="page-number">
+                            <span class="in-page">{{ points_products.number }}</span>
+                            <span class="from">من</span>
+                            <span class="total-pages">{{ points_products.paginator.num_pages }}</span>
+                        </div>
+
+                        <!-- Next Page Link -->
+                        {% if points_products.has_next %}
+                            <a href="?page={{ points_products.next_page_number }}" class="next">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </a>
+                        {% else %}
+                            <div class="next disapled">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <!-- End Pagination -->
+    </div>
+{% endblock content %}
+
+        
+
+
+
+
+
+

@@ -1,0 +1,113 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="sign-page" style="position: relative;">
+    <div class="container">
+        <div class="sign-card">
+            <!-- نموذج تسجيل الدخول -->
+            <div class="log-in-face">
+                <div class="image">
+                    <img src="{% static "images/name logo.jpg" %}" alt="">
+                </div>
+                <h1>تسجيل الدخول</h1>
+                <form method='POST'>
+                    {% csrf_token %}
+                    <input type='hidden' name='form-type' value='log'>
+                    {% if login_form.errors %}
+                        <div class="error-messages">
+                            {% for field in login_form %}
+                                {% if field.errors %}
+                                    {{ field.errors }}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if messages %}
+                        <div class="error-messages">
+                            {% for message in messages %}
+                                <p>{{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="phone-number">
+                        <label for="phone-number">رقم الهاتف</label>
+                        {{ login_form.phone_number }}
+                    </div>
+                    <div class="phone-number">
+                        <label for="password">كلمة المرور</label>
+                        {{ login_form.password }}
+                        <a href="#" class="forget-password">هل نسيت كلمة المرور؟ </a>
+                    </div>
+                    <input type="submit" value="تسجيل الدخول">
+                </form>
+                <span class="flip">ليس لديك حساب؟ انشئ واحداً الأن.</span>
+            </div>
+            <!-- نموذج إنشاء حساب -->
+            <div class="sign-in-face">
+                <div class="image">
+                    <img src="{% static "images/name logo.jpg" %}" alt="محل ملابس بطبرق">
+                </div>
+                <h1>إنشاء حساب</h1>
+                <form method='POST'>
+                    {% csrf_token %}
+                    <input type='hidden' name='form-type' value='sign'>
+                    {% if sign_up_form.errors %}
+                        <div class="error-messages">
+                            {% for field in sign_up_form %}
+                                {% if field.errors %}
+                                    {{ field.errors }}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if messages %}
+                        <div class="error-messages">
+                            {% for message in messages %}
+                                <p>{{ message }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="name">
+                        <div class="first-name">
+                            <label for="user-first-name">الإسم الأول</label>
+                            {{ sign_up_form.first_name }}
+                        </div>
+                        <div class="last-name">
+                            <label for="user-last-name">اسم العائلة</label>
+                            {{ sign_up_form.last_name }}
+                        </div>
+                    </div>
+                    <div class="phone-number">
+                        <label for="user-phone">رقم الهاتف</label>
+                        {{ sign_up_form.phone_number }}
+                    </div>
+                    <div class="name">
+                        <div class="first-name">
+                            <label for="password1">كلمة المرور</label>
+                            {{ sign_up_form.password1 }}
+                        </div>
+                        <div class="last-name">
+                            <label for="password2">تأكيد كلمة المرور</label>
+                            {{ sign_up_form.password2 }}
+                        </div>
+                    </div>
+                    <input type="submit" value="إنشاء حساب">
+                </form>
+                <a class="read-policy" href="{% url "blog:page-details" 'policy' %}">شروط الخصوصية</a>
+                <span class="flip">لديك حساب بالفعل؟ سجل الدخول الأن.</span>
+            </div>
+        </div>
+    </div>
+    <div class="Pop-up-page verif-code">
+        <div class="logo">
+            <img src="{% static "images/name logo.jpg" %}" alt="">
+        </div>
+        <form action="">
+            <label for="code">ادخل رمز التحقق:</label>
+            <input type='number' name="" id="code" maxlength="4">
+            <input type="submit" value="تحقق" class="try-code">
+        </form>
+    </div>
+</div>
+{% endblock content %}

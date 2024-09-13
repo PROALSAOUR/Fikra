@@ -247,10 +247,22 @@ document.addEventListener('DOMContentLoaded', function() {
   const flipButtons = document.querySelectorAll('.flip');
   const signCard = document.querySelector('.sign-card');
   
+  // استرجاع حالة البطاقة من localStorage
+  const isFlipped = localStorage.getItem('isFlipped') === 'true';
+  
+  // تطبيق حالة البطاقة عند تحميل الصفحة
+  if (isFlipped) {
+    signCard.classList.add('rotate');
+  }
+  
   if (flipButtons.length > 0 && signCard) {
     flipButtons.forEach(button => {
       button.addEventListener('click', function() {
         signCard.classList.toggle('rotate');
+        
+        // حفظ الحالة الجديدة في localStorage
+        const isCurrentlyFlipped = signCard.classList.contains('rotate');
+        localStorage.setItem('isFlipped', isCurrentlyFlipped);
       });
     });
   }

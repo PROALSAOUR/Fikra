@@ -1,0 +1,158 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <div class="account-page" style="position: relative;">
+        <!-- Start Ponits Section -->
+        <div class="account-points">
+            <a href="">
+                <div class="container">
+                    <div class="my-points">
+                        <h3>نقاطي:</h3>
+                        <div class="points">
+                            <a href="">
+                                <span>26</span>
+                                <i class="fa-solid fa-gem"></i>                
+                            </a>
+                        </div>
+                    </div>
+                 </div>
+            </a>
+        </div>
+        <!-- End Ponits Section -->
+        <!-- Start Account Menu Section  -->
+        <div class="account-menu">
+            <div class="container">
+                <ul class="menu-items">
+                    <li>
+                        <a href="/templates/account-info.html">
+                            <div class="item">
+                                <i class="fa-regular fa-user"></i>
+                                <h5> بيانات حسابي </h5>
+                            </div>
+                            <i class="fa-solid fa-angles-left go-to"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/templates/sign.html"> <!-- مؤقت لاختبار صفحة تسجيل الدخول -->
+                            <div class="item">
+                                <i class="fa-solid fa-map-location-dot"></i>
+                                <h5>  عنواني الحالي </h5>
+                            </div>
+                            <i class="fa-solid fa-angles-left go-to"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/templates/my-orders.html">
+                            <div class="item">
+                                <i class="fa-solid fa-list-check"></i>
+                                <h5> طلباتي السابقة</h5>
+                            </div>
+                            <i class="fa-solid fa-angles-left go-to"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" id="share-icon" class="share-code-link">
+                            <div class="item">
+                                <i class="fa-solid fa-share"></i>
+                                <h5> رمز المشاركة</h5>
+                            </div>
+                            <i class="fa-solid fa-angles-left " ></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" class="download-fikra-link">
+                            <div class="item">
+                                <i class="fa-solid fa-download"></i>
+                                <h5> تحميل فكرة على جهازي </h5>
+                            </div>
+                            <i class="fa-solid fa-angles-left "></i>
+                        </a>
+                    </li>
+                    <li class="contact-us">
+                        <a href="" >
+                            <div class="item">
+                                <i class="fa-solid fa-headset"></i>
+                                <h5> تواصل معنا </h5>
+                            </div>
+                            <i class="fa-solid fa-angles-left "></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url "blog:blog" %}">
+                            <div class="item">
+                                <i class="fa-regular fa-circle-question"></i>
+                                <h5>  المدونة </h5>
+                            </div>
+                            <i class="fa-solid fa-angles-left "></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="">
+                            <div class="item">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                <h5>تسجيل الخروج </h5>
+                            </div>
+                            <i class="fa-solid fa-angles-left " ></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- End Account Menu Section  -->
+        <!-- Start Sign-Out Section -->
+        <div class="Pop-up-page sign-out">
+            <div class="logo">
+                <img src="{% static "images/name logo.jpg" %}" alt="">
+            </div>
+            <form method="POST" action="">
+                {% csrf_token %}
+                <p>هل انت متأكد انك تريد تسجيل الخروج من حسابك؟</p>
+                <div class="choices">
+                    <button type="button" class="back">تراجع</button>
+                    <button type="submit" name="logout" class="out">تسجيل الخروج</button>
+                </div>
+            </form>
+        </div>
+        <!-- End Sign-Out Section -->
+        <!-- Start Share-code Section -->
+        <div class="Pop-up-page share-code">
+            <div class="logo">
+                <img src="{% static "images/name logo.jpg" %}" alt="">
+            </div>
+            <p>قم بمشاركة الكود التالي مع اصدقاءك واحصل على النقاط كمكافئة!</p>
+            <code>nkws2j429gu3u213r<i class="fa-regular fa-copy"></i></code>
+        </div>
+        <!-- End Share-code Section -->
+        <!-- Start download-fikra Section -->
+        <div class="Pop-up-page download-fikra-page">
+            <div class="logo">
+                <img src="{% static "images/name logo.jpg" %}" alt="">
+            </div>
+            <p> لا يمكننا وصف سعادتنا لتحميلك تطبيقنا! من اعماق قلبنا شكراً لك</p>
+            <p style="color:var(--disaple-text-color); padding-bottom:20px">سوف يبدأ التحميل خلال ثواني </p>
+        </div>
+        <!-- End download-fikra Section -->
+        <!-- Start Products Section -->
+        <hr class="sep">
+        <section  id="products">
+            <a href="{% url "store:points_page" %}">
+                <div class="title">
+                    <h2> شراء بالنقاط</h2>
+                    <i class="fa-solid fa-angles-left"></i>
+                </div>
+            </a>  
+            <div class="swiper products-slider">
+                <div class="swiper-wrapper">
+                    {% for product in points_products %}
+                        {% include "common/product-card.html" %}
+                    {% endfor %}
+                </div>
+            </div> 
+        </section>
+        <!-- End Products Section -->
+    </div>
+
+{% endblock content %}
+    

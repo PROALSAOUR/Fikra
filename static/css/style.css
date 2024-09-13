@@ -4338,7 +4338,8 @@ hr.sep {
   position: relative;
   margin: 0 auto;
   width: 450px;
-  height: 500px;
+  min-height: 600px;
+  height: 650px;
   box-shadow: var(--main-shadow);
   transform-style: preserve-3d;
   transition: 1s transform;
@@ -4356,14 +4357,16 @@ hr.sep {
 @media (max-width: 768px) {
   .sign-page .sign-card {
     width: 400px;
-    height: 440px;
+    min-height: 550px;
+    height: 600px;
   }
 }
 /* mobile media */
 @media (max-width: 597px) {
   .sign-page .sign-card {
     width: 320px;
-    height: 380px;
+    min-height: 520px;
+    height: 560px;
   }
 }
 .sign-page .sign-card .sign-in-face, .sign-page .sign-card .log-in-face{
@@ -4400,7 +4403,7 @@ hr.sep {
 }
 .sign-page .sign-card .image {
   width: 250px;
-  margin: 0px auto 20px;
+  margin: 0px auto 15px;
   padding-top: 15px;
 }
 .sign-page .sign-card .image img{
@@ -4418,13 +4421,13 @@ hr.sep {
   width: 100%;
   text-align: center;
   font-size: var(--lab-l-size);
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 .sign-page .sign-card h1::after{
   content: "";
   position: absolute;
   bottom: -10px;
-  left: 42%;
+  left: 40%;
   background-color:var(--main-text-color);
   width: 20%;
   height: 3px;
@@ -4465,25 +4468,25 @@ hr.sep {
   display: flex;
   flex-direction: column;
   padding:0 20px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 .sign-page .sign-card form .name {
   flex-direction: row;
-  margin-top: 20px;
+  margin-top: 15px;
 }
 .sign-page .sign-card form .name .first-name, .sign-card form .name .last-name {
   display: flex;
   flex-direction: column;
 }
 .sign-page .sign-card form label {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   color: var(--main-color);
   font-size: var(--lab-xs-size);
 }
-.sign-page .sign-card form input[type='text'] , .sign-card form input[type='tel']{
+.sign-card form input:not([type="submit"]) {
   height: 40px;
   width: 95%;
-  margin: 0 auto ;
+  margin: 0 auto;
   color: var(--main-text-color);
   border:1px solid var(--seprator-color);
   padding: 10px;
@@ -4496,6 +4499,17 @@ hr.sep {
   width: 150px;
   margin: 15px auto;
   cursor: pointer;
+}
+.sign-card form .phone-number {
+  position: relative;
+}
+.sign-page .forget-password{
+  position: absolute;
+  left: 30px;
+  bottom: -20px;
+  font-size: calc(var(--mob-xs-size) - 2px);
+  text-decoration: underline;
+  color: var(--disaple-text-color);
 }
 /* Tab media */
 @media (max-width: 768px) {
@@ -4512,7 +4526,7 @@ hr.sep {
     font-size: var(--mob-s-size);
   }
   .sign-page .sign-card form .name , .sign-card form .phone-number{
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
   .sign-page .sign-card form label {
     font-size: var(--tab-xs-size);
@@ -4530,13 +4544,10 @@ hr.sep {
   }
   .sign-page .sign-card h1{
     font-size: var(--mob-l-size);
-    margin-bottom: 20px;
+    margin-bottom: 15px;
   }
   .sign-page .sign-card span{
     font-size: calc(var(--mob-s-size) - 2px);
-  }
-  .sign-page .sign-card form .name , .sign-card form .phone-number{
-    margin-bottom: 15px;
   }
   .sign-page .sign-card form label {
     font-size: var(--mob-xs-size);
@@ -4544,6 +4555,26 @@ hr.sep {
   .sign-page .sign-card form input[type='submit'] {
     font-size: var(--mob-xs-size);
     width: 120px;
+    margin-top: 30px;
+  }
+}
+.sign-page .error-messages {
+  background-color: #b43232;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: var(--tab-s-size);
+  padding: 10px;
+  margin: 0 20px 5px;
+  border-radius: 2px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+}
+/* mobile media */
+@media (max-width: 597px) {
+  .sign-page .error-messages {
+    font-size: var(--mob-s-size);
   }
 }
 /* End Sign page content  */

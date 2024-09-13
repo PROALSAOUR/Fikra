@@ -29,6 +29,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('store.urls')),
     path('blog/', include('blog.urls')),
+    path('accounts/', include('accounts.urls')),
 ] + debug_toolbar_urls()
 
 urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)

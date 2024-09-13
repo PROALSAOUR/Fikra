@@ -9,6 +9,7 @@ pillow = "*"
 django-jazzmin = "*"
 django-debug-toolbar = "*"
 psycopg2 = "*"
+phonenumbers = "*"
 
 [dev-packages]
 

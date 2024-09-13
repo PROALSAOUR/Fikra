@@ -15,12 +15,12 @@
                 <a href="{% url 'store:search_page' %}" id="search"><i class="fa-solid fa-magnifying-glass"></i></a>
                 <label for="search">البحث</label>
             </div>
-            <div class="nav-item  {% if request.path == '/favorites' %}active{% endif %}">
-                <a href="#" id="fav"><i class="fa-solid fa-bookmark"></i></a>
+            <div class="nav-item  {% if request.path == '/favourite' %}active{% endif %}">
+                <a href="{% url 'store:favourite_page' %}" id="fav"><i class="fa-solid fa-bookmark"></i></a>
                 <label for="fav">المفضلة</label>
             </div>
-            <div class="nav-item  {% if request.path == '/account' %}active{% endif %}">
-                <a href="#" id="account"><i class="fa-solid fa-circle-user"></i></a>
+            <div class="nav-item  {% if request.path == '/accounts/' %}active{% endif %}">
+                <a href="{% url 'accounts:account_page' %}" id="account"><i class="fa-solid fa-circle-user"></i></a>
                 <label for="account">حسابي</label>
             </div>
         </div>

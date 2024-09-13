@@ -1,0 +1,59 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="fav-page page">
+        <!-- Start Search Bar -->
+        <div class="fav-search">
+            <div class="search-bar">
+                <div class="container">
+                    <form action="" class="search">
+                        {% if products %}
+                            <input type="search" class="search-input" name="search-query" placeholder="ما الذي تبحث عنه؟">
+                            <button class="empty make-it-empty" ><span class="delete">إفراغ</span><span class="items-count">({{ products_count }})</span><i class="fa-regular fa-trash-can"></i></button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- End Search Bar -->
+        <!-- Start fav-products  -->
+        <div class="favorite">
+            <div class="searched-products">
+                <div class="container">
+                    <div class="products-cards">
+                        {% if products %}        
+                            {% for product in products %}
+                                <!-- product-start -->
+                                <div class="specific">
+                                    {% include "common/product-card.html" %}
+                                </div>
+                                <!-- product-end -->
+                            {% endfor %}
+                        {% else %}
+                            {% include "common/no-result.html" %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End fav-products  -->
+        <!-- Start make-it-empty Section -->
+        <div class="Pop-up-page empty-pop-page">
+            <div class="logo">
+                <img src="/images/name logo.jpg" alt="">
+            </div>
+            <p>هل انت متأكد انك تريد إزالة جميع المنتجات من المفضلة؟</p>
+            <div class="choices">
+                <button class="back">تراجع</button>
+                <button class="out"> افراغ</button>
+            </div>
+        </div>
+        <!-- End  make-it-empty  Section -->
+    </div>
+
+{% endblock content %}
+
+
+
+

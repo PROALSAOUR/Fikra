@@ -1,7 +1,8 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from django.db.models import Q
 from django.http import JsonResponse
-from django.template.loader import render_to_string#+
+from django.template.loader import render_to_string
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from store.models import *
 
@@ -12,6 +13,9 @@ def index(request):
     
     # جلب العلامات التجارية المميزة
     brands = Brand.objects.filter(featured=True).only('title', 'img')
+    
+    #جلب اسم المستخدم الاول اذا كان مسجل دخول 
+    user_name = request.user.first_name if request.user.is_authenticated else None
     
     # جلب الفئات المميزة والظاهرة فقط، وتحميل المنتجات التابعة لهذه الفئات
     categories = Category.objects.filter(
@@ -30,6 +34,7 @@ def index(request):
     context = {
         'ads': ads,
         'brands': brands,
+        'user_name': user_name,
         'categories': categories,
         'offered_products':offered_products,
     }
@@ -127,6 +132,31 @@ def brand_page(request, slug):
     }
     
     return render(request, 'store/brand.html', context)
+# صفحة  بيع المنتجات بالنقاط
+def point_products_page(request):
+    products = Product.objects.filter(ready_to_sale=True, payment_type='points').order_by('-new_price')
+    products_count = products.count()
+    
+    paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
+    page = request.GET.get('page', 1)
+
+    try:
+        points_products = paginator.page(page)
+    except PageNotAnInteger:
+        points_products = paginator.page(1)
+    except EmptyPage:
+        points_products = paginator.page(paginator.num_pages)
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        results_data = list(points_products.object_list.values())
+        return JsonResponse({'results': results_data})
+    
+    
+    context  ={
+        'points_products': points_products,
+        'products_count': products_count,
+    }
+    return render(request, 'store/points-products.html', context)
 # صفحة التصنيف
 def category_page(request, slug):
     
@@ -297,7 +327,7 @@ def search_page(request):
         'brands': brands,
         'products_count': products_count, 
     })
-
+# صفحة تفاصيل المنتج 
 def product_details(request, pid):
     product = get_object_or_404(Product, id=pid)
     category = product.category
@@ -334,7 +364,7 @@ def product_details(request, pid):
     }
 
     return render(request, 'store/product-details.html', context)
-
+# الدالة الخاصة بالحصول على كمية المنتج في صفحة  تفاصيل المنتج
 def get_stock(request):
     size_id = request.GET.get('size_id')
     sku = request.GET.get('color')  # نستخدم color للإشارة إلى الـ SKU هنا
@@ -346,3 +376,19 @@ def get_stock(request):
         return JsonResponse({'stock': stock})
     except ProductVariation.DoesNotExist:
         return JsonResponse({'stock': 0})  # إذا لم يتم العثور على المتغير، رجع 0
+# صفحة المفضلة
+@login_required
+def favourite_page(request):
+    favourite = Favourite.objects.get_or_create(user=request.user)
+    
+    if request.user.is_authenticated :
+        products = favourite.products.all().order_by('-updated_at')
+        products_count = products.count()
+    else:
+        return redirect('accounts:sign')
+    
+    context = {
+        'products': products,
+        'products_count': products_count
+    }
+    return render(request, 'store/favourite.html', context)

@@ -24,15 +24,24 @@
     
 </head>
 <body dir="rtl" class="" >
-    {% include "partials/header.html" %}
+    {% if request.path != '/accounts/sign/' %}
+        {% include "partials/header.html" %}
+    {% endif %}
     
-    {% include "partials/nav.html" %}
+    {% if request.path != '/accounts/sign/' %}
+        {% include "partials/nav.html" %}
+    {% endif %}
+
+    <!-- Start product details -->
     {% block content %}    
     
     {% endblock content %}
+    <!-- End product details -->
+
+    {% if request.path != '/accounts/sign/' %}
+        {% include "partials/footer.html" %}
+    {% endif %}   
     
-    {% include "partials/footer.html" %}
-        
     <!-- import Javascript files -->
     <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
