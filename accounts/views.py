@@ -11,11 +11,7 @@ def main_account_page(request):
     if request.method == 'POST' and 'logout' in request.POST: # التحقق من ضغط المستخدم على تسجيل الخروج
         logout(request)
         return redirect('store:home') # إعادة التوجيه بعد تسجيل الخروج
-    
-    if request.user.is_authenticated : # تحقق من ان المستخدم مسجل الدخول
-        pass
-    else: # ان لم يمكن مسجلا حوله لصفحة التسجيل
-        return redirect('accounts:sign')
+
     
     # استدعاء المنتجات التي ستعرض اسفل الصفحة
     points_products = Product.objects.filter(ready_to_sale=True, payment_type='points').order_by('updated_at')[:8]
@@ -25,7 +21,6 @@ def main_account_page(request):
     } 
     
     return render(request, 'accounts/account.html', context)
-
 
 def sign(request):
     """

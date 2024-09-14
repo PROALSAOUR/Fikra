@@ -14,20 +14,18 @@
                 <form method='POST'>
                     {% csrf_token %}
                     <input type='hidden' name='form-type' value='log'>
-                    {% if login_form.errors %}
-                        <div class="error-messages">
-                            {% for field in login_form %}
-                                {% if field.errors %}
-                                    {{ field.errors }}
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
                     {% if messages %}
                         <div class="error-messages">
                             {% for message in messages %}
-                                <p>{{ message }}</p>
+                                {{ message }}
                             {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if login_form.errors %}
+                        <div class="error-messages">
+                                {% for error in login_form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
                         </div>
                     {% endif %}
                     <div class="phone-number">
@@ -64,7 +62,7 @@
                     {% if messages %}
                         <div class="error-messages">
                             {% for message in messages %}
-                                <p>{{ message }}</p>
+                                {{ message }}
                             {% endfor %}
                         </div>
                     {% endif %}
