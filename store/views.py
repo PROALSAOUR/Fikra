@@ -379,16 +379,57 @@ def get_stock(request):
 # صفحة المفضلة
 @login_required
 def favourite_page(request):
-    favourite = Favourite.objects.get_or_create(user=request.user)
+    """
+        get_or_create يرجع tuple يحتوي على:
+        الكائن (favourite في هذه الحالة).   
+        قيمة True أو False (إذا تم إنشاء الكائن للتو)
+        لذا نستعمل created
+    """
+    favourite, created = Favourite.objects.get_or_create(user=request.user) # احصل أو أنشئ المفضلة للمستخدم
+    products = favourite.products.all() # احصل على جميع المنتجات المفضلة للمستخدم
+    products_count = products.count() # احسب عدد المنتجات في المفضلة
     
-    if request.user.is_authenticated :
-        products = favourite.products.all().order_by('-updated_at')
-        products_count = products.count()
+    # search query
+    query = request.GET.get('q', '')
+    filters = Q(ready_to_sale=True) # & Q(كيف اضيف شرط ان المنتج داخل السلة)
+    if query:
+        filters &= (Q(name__icontains=query) | Q(tag__name__icontains=query))
+        search_results = products.filter(filters).distinct()
     else:
-        return redirect('accounts:sign')
+        search_results = []
+    # ============
     
     context = {
         'products': products,
-        'products_count': products_count
+        'products_count': products_count,
+        'search_results': search_results,
     }
     return render(request, 'store/favourite.html', context)
+# دالة الاضافة الى المفضلة
+@login_required
+def add_to_favourites(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    favourite, created = Favourite.objects.get_or_create(user=request.user)
+    if product in favourite.products.all():
+        favourite.products.remove(product)
+        added = False
+    else:
+        favourite.products.add(product)
+        added = True
+
+    response_data = {
+        'added': added,
+        'product_id': product_id,
+    }
+
+    return JsonResponse(response_data)
+# دالة افراغ المفضلة
+@login_required
+def clear_favourites(request):
+    """
+    Clears all products from the user's favourites list.
+    """
+    favourite, created = Favourite.objects.get_or_create(user=request.user)
+    favourite.products.clear()  # Remove all products from the favourites
+    return redirect('store:favourite_page')  # Redirect back to the favourites page
+

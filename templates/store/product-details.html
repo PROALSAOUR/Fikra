@@ -16,7 +16,28 @@
                         <div class="product-slider">
                             <!-- السلايدر الرئيسي -->
                             <div class="swiper-container main-slider">
-                                <a href="/templates/fav.html"><span class="add-to-fav"><button><i class="fa-regular fa-heart"></i></button></span></a>
+
+                                {% if user.is_authenticated %}
+                                    <span class="add-to-fav">
+                                        <a href="{% url 'store:add_to_favourites' product.id %}" data-product-id="{{ product.id }}" class="add-to-fav-link">
+                                            <button>
+                                            {% if product.id in favourite_products %}
+                                                <i class="fa-solid fa-heart "></i>
+                                            {% else %}
+                                                <i class="fa-regular fa-heart"></i>
+                                            {% endif %}
+                                            </button>
+                                        </a>
+                                    </span>
+                                {% else %}
+                                    <span class="add-to-fav">
+                                        <a href="{% url 'accounts:sign' %}">
+                                            <button><i class="fa-regular fa-heart"></i></button>
+                                        </a>
+                                    </span>
+                                {% endif %}
+ 
+                                
                                 <div class="swiper-wrapper">
 
                                     <div class="swiper-slide">

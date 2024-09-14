@@ -418,4 +418,62 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // =========================================================================================================
+// دالة اضافة المنتج و ازالته من السلة
+$(document).ready(function() {
+  $('.add-to-fav-link').on('click', function(event) {
+      event.preventDefault(); // Prevent the default link behavior
 
+      var $this = $(this);
+      var url = $this.attr('href');
+      var productId = $this.data('product-id');
+
+      $.ajax({
+          url: url,
+          method: 'GET',
+          success: function(response) {
+              if (response.added) {
+                  $this.find('i').removeClass('fa-regular fa-heart').addClass('fa-solid fa-heart');
+              } else {
+                  $this.find('i').removeClass('fa-solid fa-heart').addClass('fa-regular fa-heart');
+              }
+
+              // Reload the page if the user is on the favourites page
+              if (window.location.pathname === '/favourite/') {
+                  location.reload();
+              }
+          },
+          error: function(xhr, status, error) {
+              console.error('Error adding to favourites:', error);
+          }
+      });
+  });
+});
+// =========================================================================================================
+// الدالة الخاصة بإفراغ المفضلة
+document.addEventListener('DOMContentLoaded', function() {
+  var clearBtn = document.getElementById('clear-favourites-btn');
+  if (clearBtn) {
+      clearBtn.addEventListener('click', function() {
+          fetch(clearFavouritesUrl, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': csrfToken
+              },
+              body: JSON.stringify({})
+          }).then(response => {
+              if (response.ok) {
+                  location.reload(); // إعادة تحميل الصفحة لتحديث المفضلة
+              } else {
+                  alert('حدث خطأ أثناء محاولة إفراغ المفضلة.');
+              }
+          }).catch(error => {
+              console.error('حدث خطأ:', error);
+              alert('حدث خطأ أثناء محاولة إفراغ المفضلة.');
+          });
+      });
+  }
+});
+
+// =========================================================================================================
+// =========================================================================================================

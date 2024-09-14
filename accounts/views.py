@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from store.models import Product
 
+# دالة صفحة الحساب الرئيسية
 @login_required
 def main_account_page(request):
     
@@ -22,6 +23,7 @@ def main_account_page(request):
     
     return render(request, 'accounts/account.html', context)
 
+# دالة تسجيل الدخول و انشاء الحساب
 def sign(request):
     """
     اولا تتحقق هذه الدالة من ان المستخدم غير مسجل للدخول والا تحوله الى صفحة الحساب
@@ -55,8 +57,6 @@ def sign(request):
             sign_up_form = UserSignUpForm(request.POST or None)
             if sign_up_form.is_valid():
                 new_user = sign_up_form.save()
-                first_name = sign_up_form.cleaned_data.get('first_name')
-                messages.success(request, f'مرحبا {first_name} لقد انشأت حسابك بنجاح')
                 new_user = authenticate(username=sign_up_form.cleaned_data['phone_number'],
                                         password=sign_up_form.cleaned_data['password1'])
                 if new_user:
@@ -71,6 +71,24 @@ def sign(request):
     }     
         
     return render(request, 'accounts/sign.html', context)
-    
+
+# دالة عرض معلومات الحساب 
+@login_required 
+def account_info(request):
+    user_name = str(request.user.first_name + ' ' + request.user.last_name)
+    phone_number = request.user.phone_number
+
+    context  = {
+        'user_name': user_name,
+        'phone_number': phone_number,
+    }
+    return render(request, 'accounts/account-info.html', context)
 
 
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        user = request.user
+        user.delete()  # حذف المستخدم
+        logout(request)  # تسجيل خروج المستخدم بعد الحذف
+    return redirect('store:home')  # إعادة توجيه إلى الصفحة الرئيسية

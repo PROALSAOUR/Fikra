@@ -16,7 +16,29 @@
             </h4>
         </div>
     </a> 
-    <span class="add-to-fav"><a href="/templates/fav.html"><i class="fa-regular fa-heart"></i></a></span>
+{% comment %} الكود الخاص  بزر اضافة الى المفضلة {% endcomment %}
+{% if user.is_authenticated %}
+    <span class="add-to-fav">
+            <a href="{% url 'store:add_to_favourites' product.id %}" class="add-to-fav-link" data-product-id="{{ product.id }}">
+                {% if request.path == '/favourite/' %}
+                        <i class="fa-regular fa-trash-can"></i>
+                {% else %}
+                    {% if product.id in favourite_products %}
+                        <i class="fa-solid fa-heart"></i>
+                    {% else %}
+                        <i class="fa-regular fa-heart"></i>
+                    {% endif %}
+                {% endif %}
+            </a>
+    </span>
+{% else %}
+    <span class="add-to-fav">
+        <a href="{% url 'accounts:sign' %}" class="add-to-fav-link" >
+                <i class="fa-regular fa-heart"></i>
+        </a>
+    </span>
+{% endif %}
+
     <span class="add-to-cart">
         <a href="/templates/cart.html"><span> إضافة الى السلة </span><i class="fa-solid fa-cart-shopping"></i> </a>
     </span>

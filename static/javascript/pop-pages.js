@@ -60,66 +60,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 // ====================================================================================================
-// الكود الخاص بإظهار صفحة افراغ السلة والمفضلة
-document.addEventListener('DOMContentLoaded', function () {
-    const menus = document.querySelectorAll('.empty-pop-page');
-    const links = document.querySelectorAll('.make-it-empty'); // إضافة النقطة المفقودة في الكلاس
-    const backButtons = document.querySelectorAll('.empty-pop-page .back');
-    const outButtons = document.querySelectorAll('.empty-pop-page .out');
-
-    // التحقق من وجود العناصر
-    if (menus.length > 0 && links.length > 0 && backButtons.length > 0 && outButtons.length > 0) {
-        function showMenu(menu) {
-            menu.style.display = 'block'; // يعرض العنصر
-            setTimeout(() => {
-                menu.style.visibility = 'visible'; // يجعل العنصر مرئيًا
-                menu.style.opacity = '1'; // يضبط الشفافية لتظهر بشكل كامل
-                menu.style.transform = 'translate(-50%, -50%) scale(1)'; // يضبط الحجم ليصل للحجم الطبيعي
-            }, 10); // التأخير لتطبيق التحول بشكل صحيح
-        }
-
-        function hideMenu(menu) {
-            menu.style.opacity = '0'; // يضبط الشفافية لتختفي
-            menu.style.transform = 'translate(-50%, -50%) scale(0.5)'; // يصغر الحجم مرة أخرى
-            setTimeout(() => {
-                menu.style.visibility = 'hidden'; // يخفي العنصر
-                menu.style.display = 'none'; // يزيل العنصر من التدفق الطبيعي للصفحة
-            }, 300); // يجب أن يتطابق مع مدة الـ transition في CSS
-        }
-
-        links.forEach((link, index) => {
-            if (menus[index]) { // تحقق من وجود العنصر قبل إضافة الحدث
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    if (menus[index].style.visibility === 'hidden' || menus[index].style.visibility === '') {
-                        showMenu(menus[index]);
-                    }
-                });
-            }
-        });
-
-        backButtons.forEach((button, index) => {
-            if (menus[index]) { // تحقق من وجود العنصر قبل إضافة الحدث
-                button.addEventListener('click', () => hideMenu(menus[index]));
-            }
-        });
-
-        outButtons.forEach((button, index) => {
-            if (menus[index]) { // تحقق من وجود العنصر قبل إضافة الحدث
-                button.addEventListener('click', () => hideMenu(menus[index]));
-            }
-        });
-
-        document.addEventListener('click', function (e) {
-            menus.forEach((menu, index) => {
-                if (menu.style.visibility === 'visible' && !menu.contains(e.target) && !links[index]?.contains(e.target)) {
-                    hideMenu(menu);
-                }
-            });
-        });
-    }
-});
-// ===================================================================================================
 // الكود الخاص بإظهار صفحة حذف الحساب
 document.addEventListener('DOMContentLoaded', function () {
     const deleteMenu = document.querySelector('.delete-account');
@@ -127,36 +67,69 @@ document.addEventListener('DOMContentLoaded', function () {
     const backButton = document.querySelector('.delete-account .back');
     const outButton = document.querySelector('.delete-account .delete');
 
-    // التحقق من وجود العناصر قبل إضافة الأحداث
+    // تحقق من وجود العناصر
     if (deleteMenu && deleteLink && backButton && outButton) {
+
+        // دالة لعرض النافذة المنبثقة
         function showDeleteMenu() {
-            deleteMenu.style.display = 'block'; // يعرض العنصر
+            deleteMenu.style.display = 'block';
             setTimeout(() => {
-                deleteMenu.style.visibility = 'visible'; // يجعل العنصر مرئيًا
-                deleteMenu.style.opacity = '1'; // يضبط الشفافية لتظهر بشكل كامل
-                deleteMenu.style.transform = 'translate(-50%, -50%) scale(1)'; // يضبط الحجم ليصل للحجم الطبيعي
-            }, 10); // التأخير لتطبيق التحول بشكل صحيح
+                deleteMenu.style.visibility = 'visible';
+                deleteMenu.style.opacity = '1';
+                deleteMenu.style.transform = 'translate(-50%, -50%) scale(1)';
+            }, 10);
         }
 
+        // دالة لإخفاء النافذة المنبثقة
         function hideDeleteMenu() {
-            deleteMenu.style.opacity = '0'; // يضبط الشفافية لتختفي
-            deleteMenu.style.transform = 'translate(-50%, -50%) scale(0.5)'; // يصغر الحجم مرة أخرى
+            deleteMenu.style.opacity = '0';
+            deleteMenu.style.transform = 'translate(-50%, -50%) scale(0.5)';
             setTimeout(() => {
-                deleteMenu.style.visibility = 'hidden'; // يخفي العنصر
-                deleteMenu.style.display = 'none'; // يزيل العنصر من التدفق الطبيعي للصفحة
-            }, 300); // يجب أن يتطابق مع مدة الـ transition في CSS
+                deleteMenu.style.visibility = 'hidden';
+                deleteMenu.style.display = 'none';
+            }, 300);
         }
 
+        // دالة لحذف الحساب
+        function deleteAccount() {
+            const deleteAccountUrl = window.deleteAccountUrl;  // استخدم الرابط من تاق script
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch(deleteAccountUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = "/";  // إعادة التوجيه مباشرة بعد الحذف
+                } else {
+                    console.error('حدث خطأ أثناء محاولة حذف الحساب.');
+                }
+            })
+            .catch(error => {
+                console.error('حدث خطأ:', error);
+            });
+        }
+
+        // عرض النافذة المنبثقة
         deleteLink.addEventListener('click', function (e) {
             e.preventDefault();
-            if (deleteMenu.style.visibility === 'hidden' || deleteMenu.style.visibility === '') {
-                showDeleteMenu();
-            }
+            showDeleteMenu();
         });
 
+        // إخفاء النافذة عند التراجع
         backButton.addEventListener('click', hideDeleteMenu);
-        outButton.addEventListener('click', hideDeleteMenu);
 
+        // تنفيذ الحذف عند النقر على زر "حذف حسابي"
+        outButton.addEventListener('click', function() {
+            hideDeleteMenu();
+            setTimeout(deleteAccount, 300);  // تنفيذ الحذف بعد إخفاء القائمة
+        });
+
+        // إخفاء النافذة عند النقر خارجها
         document.addEventListener('click', function (e) {
             if (deleteMenu.style.visibility === 'visible' && !deleteMenu.contains(e.target) && !deleteLink.contains(e.target)) {
                 hideDeleteMenu();

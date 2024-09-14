@@ -1,0 +1,73 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="account-info-page" style="position: relative;">
+        <!-- Start Ponits Section -->
+        <div class="account-points">
+            <a href="">
+                <div class="container">
+                    <div class="my-points">
+                        <h3>نقاطي:</h3>
+                        <div class="points">
+                            <a href="">
+                                <span>26</span>
+                                <i class="fa-solid fa-gem"></i>                
+                            </a>
+                        </div>
+                    </div>
+                 </div>
+            </a>
+        </div>
+        <!-- End Ponits Section -->
+        <!-- Start My Info Section  -->
+        <div class="my-info">
+            <div class="container">
+                <div class="my-info-title">
+                    <h2>بيانات حسابي</h2>
+                    <button class="show-delete-menu"><i class="fa-regular fa-trash-can"></i></button>
+                </div>
+                <div class="my-info-details">
+                    <div class="details-item">
+                        <div class="title"><p>اسم المستخدم</p><a href=""><i class="fa-solid fa-pen"></i></a></div>
+                        <div class="content">{{ user_name }}</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="title"><p>رقم الهاتف</p><a href=""><i class="fa-solid fa-pen"></i></a></div>
+                        <div class="content">{{ phone_number }}</div>
+                    </div>
+                    
+                </div>
+                <div class="notfication-section" id="notfications">
+                    <h2>التنبيهات</h2>
+                    <div class="notfication-message">
+                        <div class="title" onclick="toggleContent(this)">
+                            <p> اسم الرسالة </p>
+                            <span class="time">12:30 PM</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <p class="content">يظهر محتوى الرسالة هنايظهر محتوى الرسالة هنايظهر محتوى الرسالة هنايظهر محتوى الرسالة هنايظهر محتوى الرسالة هنايظهر محتوى الرسالة هنايظهر محتوى الرسالة هنايظهر محتوى الرسالة هنا </p>
+                    </div>    
+                        
+                </div>
+            </div>    
+            <!-- End My Info Section  -->
+            <!-- Start delete-account Section -->
+            <div class="Pop-up-page  delete-account">
+                <div class="logo">
+                    <img src="{% static "images/name logo.jpg" %}" alt="تخفيضات منتجات شي ان shein">
+                </div>
+                <p>هل انت متأكد انك تريد حذف حسابك بشكل نهائي؟</p>
+                <div class="choices">
+                    <button class="back" id="cancel-delete-btn">تراجع</button>
+                    <button class="delete" id="confirm-delete-btn">حذف حسابي </button>
+                </div>
+                <script>
+                    // هنا يمكنك تعيين رابط URL حذف الحساب
+                    window.deleteAccountUrl = "{% url 'accounts:delete_account' %}";
+                </script>
+            </div>
+            <!-- End delete-account Section -->
+        </div>
+    </div>
+{% endblock content %}

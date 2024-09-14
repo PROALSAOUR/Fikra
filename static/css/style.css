@@ -2619,6 +2619,24 @@ hr.sep {
 }
 /* End Search Bar */
 /* Start Search title  */
+.searched-product-counts {
+  text-align: center;
+  padding: 10px 10px 0;
+  font-size: var(--lab-xs-size);
+  color: var(--disaple-text-color);
+}
+/* phone */
+@media (max-width: 576px) {
+  .searched-product-counts {
+    font-size: var(--mob-xs-size);
+  }
+}
+.search .search-message .no-result {
+  background-color: var(--background-color);
+  box-shadow: none;
+  margin-bottom: 100px;
+  margin-top: 10px;
+}
 .search .search-title {
   position: relative;
   margin: 30px auto 10px;
@@ -5153,7 +5171,7 @@ input[type="number"] {
   right: 10px;
   top: 10px;
   background-color: var(--seprator-color);
-  color: var(--disaple-text-color);
+  color: var(--main-color);
   border: none;
   padding: 10px;
   display: flex;

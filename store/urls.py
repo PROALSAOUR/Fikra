@@ -12,6 +12,8 @@ urlpatterns = [
     path("points-products/", point_products_page, name="points_page"),
     path("search/", search_page, name="search_page"),
     path("favourite/", favourite_page, name="favourite_page"),
+    path('add-to-favourites/<int:product_id>/', add_to_favourites, name='add_to_favourites'),
+    path('favourite/clear/', clear_favourites, name='clear_favourites'),
     path("product/<pid>", product_details, name="product_details"),
     path('get-stock/', get_stock, name='get_stock'),  # مسار لجلب المخزون الخاص بالمنتج
 
