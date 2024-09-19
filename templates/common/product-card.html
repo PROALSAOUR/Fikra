@@ -10,10 +10,19 @@
         <div class="product-info">
             <h4 class="product-name"> {{ product.name|slice:":20" }}{% if product.name|length > 20 %}...{% endif %}</h4> <!-- اقصى طول 20 حرف -->
             <p class="product-description"> {{ product.description|slice:":50" }}{% if product.description|length > 50 %}...{% endif %}</p> <!-- اقل طول 42 حرف اقصى طول 50 حرف -->
-            <h4 class="product-price {% if product.payment_type == 'points' %} point {% endif %}"> <!-- اضف كلاس بوينت اذا كان سعر اليع نقاط- -->
-                <div class="buy-by-money"><span class="old"> {{ product.price }} </span><span class="new"> | {{ product.new_price |floatformat:0 }} </span><span> دل </span></div>
-                <div class="buy-by-points"> {{ product.point_price }} <i class="fa-solid fa-gem"></i></div>        
-            </h4>
+            
+            {% if product.get_total_stock > 0 %}
+                <h4 class="product-price {% if product.payment_type == 'points' %} point {% endif %}"> <!-- اضف كلاس بوينت اذا كان سعر البيع نقاط- -->
+                    <div class="buy-by-money"><span class="old"> {{ product.price }} </span><span class="new"> | {{ product.new_price |floatformat:0 }} </span><span> دل </span></div>
+                    <div class="buy-by-points"> {{ product.point_price }} <i class="fa-solid fa-gem"></i></div>        
+                </h4>
+            {% else %}
+                <h4 class="product-price" style='color:#9D2121;text-wrap:nowrap;'>
+                    نفذت الكمية 
+                </h4>
+            {% endif %}
+
+
         </div>
     </a> 
 {% comment %} الكود الخاص  بزر اضافة الى المفضلة {% endcomment %}

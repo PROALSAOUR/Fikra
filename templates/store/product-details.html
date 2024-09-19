@@ -73,11 +73,17 @@
                     </div>
                     <div class="name-price">
                         <h2>{{ product.name }}<span class="category" style="text-wrap:nowrap;"> {{product.category}} </span></h2>
-                        <h4 class="product-price {% if product.offer %}{% if product.payment_type == 'money' %} offer {% endif %} {% endif %}{% if product.payment_type == 'points' %} point {% endif %} ">
-                            <span class="offer-percient">تخفيض <span>{{product.get_offer_percentage}}%</span></span>
-                            <div class="buy-by-money"><span class="old"> {{product.price}} </span><span class="new"> | {{product.new_price|floatformat:0}} </span><span> دل </span></div>
-                            <div class="buy-by-points">{{product.point_price}} <i class="fa-solid fa-gem"></i></div>            
-                        </h4>
+                        {% if product.get_total_stock > 0 %}
+                            <h4 class="product-price {% if product.offer %}{% if product.payment_type == 'money' %} offer {% endif %} {% endif %}{% if product.payment_type == 'points' %} point {% endif %} ">
+                                <span class="offer-percient">تخفيض <span>{{product.get_offer_percentage}}%</span></span>
+                                <div class="buy-by-money"><span class="old"> {{product.price}} </span><span class="new"> | {{product.new_price|floatformat:0}} </span><span> دل </span></div>
+                                <div class="buy-by-points">{{product.point_price}} <i class="fa-solid fa-gem"></i></div>            
+                            </h4>
+                        {% else %}
+                            <h4 class="product-price" style='color:#9D2121;text-wrap:nowrap;'>
+                                نفذت الكمية 
+                            </h4>
+                        {% endif %}
                     </div>
                     <div class="product-description">
                         <p>
@@ -87,50 +93,54 @@
                 </div>
 
                 <div class="product-variants">
-                    <form action="" class='form'>
-                        <div class="size">
-                            <label for="size" class="size-title">المقاسات:</label>
-                            {% for size in sizes %}
-                                <input type="radio" name="size" id="size-{{ forloop.counter }}" value="{{ size.id }}" {% if forloop.counter == 1 %} checked {% endif %} class="size-option">
-                                <label for="size-{{ forloop.counter }}">{{ size.value }}</label>
-                            {% endfor %}
-                        </div>                     
-                
-                        <div class="color">
-                            <label for="color" class="color-title">اللون:</label>
-                            <div id="color-options">
-                                {% if size_item_map %}
-                                    {% for size, items in size_item_map.items %}
-                                        <div class="item-group" data-size-id="{{ size.id }}" style="display: {% if forloop.first %}block{% else %}none{% endif %};">
-                                            {% for item in items %}
-                                                <input type="radio" name="item" id="item-{{ size.id }}-{{ item.sku }}" value="{{ item.sku }}" class="item-option" {% if forloop.first %}checked{% endif %}>
-                                                <label for="item-{{ size.id }}-{{ item.sku }}">
-                                                    <img src="{{ item.image.url }}" alt="{{ item.color }}">        
-                                                </label>
-                                            {% endfor %}
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
+                    {% if product.get_total_stock > 0 %}
+                        <form action="" class='form'>
+                            <div class="size">
+                                <label for="size" class="size-title">المقاسات:</label>
+                                {% for size in sizes %}
+                                    <input type="radio" name="size" id="size-{{ forloop.counter }}" value="{{ size.id }}" {% if forloop.counter == 1 %} checked {% endif %} class="size-option">
+                                    <label for="size-{{ forloop.counter }}">{{ size.value }}</label>
+                                {% endfor %}
+                            </div>                     
+                    
+                            <div class="color">
+                                <label for="color" class="color-title">اللون:</label>
+                                <div id="color-options">
+                                    {% if size_item_map %}
+                                        {% for size, items in size_item_map.items %}
+                                            <div class="item-group" data-size-id="{{ size.id }}" style="display: {% if forloop.first %}block{% else %}none{% endif %};">
+                                                {% for item in items %}
+                                                    <input type="radio" name="item" id="item-{{ size.id }}-{{ item.sku }}" value="{{ item.sku }}" class="item-option" {% if forloop.first %}checked{% endif %}>
+                                                    <label for="item-{{ size.id }}-{{ item.sku }}">
+                                                        <img src="{{ item.image.url }}" alt="{{ item.color }}">        
+                                                    </label>
+                                                {% endfor %}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
                             </div>
+                    
+                            <div class="quantity-pd color">
+                                <label class="color-title">العدد:</label>
+                                <span class="quantity">
+                                    <button class="minus"><i class="fa-regular fa-square-minus"></i></button>
+                                    <input type="number" id="user-quantity" value="1" min="1" class='q-number'/>
+                                    <button class="plus"><i class="fa-regular fa-square-plus"></i></button>
+                                </span>
+                                <div class="in-stock">متبقي (<span id="stock-quantity">0</span>) في المخزن</div>
+                            </div> 
+                    
+                            <span class="get-points">عند شرائك لهذا المنتج سوف تحصل على {{ product.bonus }} نقطة</span>
+                            <input type="submit" value="أضف إلى السلة" id="add-to-cart" class="add-cart-pop-link">
+                        </form>
+                    {% else %}
+                        <div  class='form' style='padding:20px 20px 40px;text-align:center;'>
+                            <p>نعتذر هذا المنتج  غير متاح حاليا</p>
                         </div>
-                
-                        <div class="quantity-pd color">
-                            <label class="color-title">العدد:</label>
-                            <span class="quantity">
-                                <button class="minus"><i class="fa-regular fa-square-minus"></i></button>
-                                <input type="number" id="user-quantity" value="1" min="1" class='q-number'/>
-                                <button class="plus"><i class="fa-regular fa-square-plus"></i></button>
-                            </span>
-                            <div class="in-stock">متبقي (<span id="stock-quantity">0</span>) في المخزن</div>
-                        </div> 
-                
-                        <span class="get-points">عند شرائك لهذا المنتج سوف تحصل على {{ product.bonus }} نقطة</span>
-                        <input type="submit" value="أضف إلى السلة" id="add-to-cart" class="add-cart-pop-link">
-                    </form>
+                    {% endif %}
                 </div>
-                
-                
-                
+                  
             </div>
             <!-- Start Products Sections -->
             {% if related_category_products %}

@@ -189,6 +189,16 @@ class Product(models.Model):
             self.offer = False
         self.save()
         
+    def get_total_stock(self):
+        """
+        تستعمل هذه الدالة للتحقق من ان المنتج متاح بالمخزن والا فبدلا من عرض السعر في بطاقة المنتج سيتم عرض نفذت الكمية
+        """
+        total_stock = 0
+        for item in self.items.all():
+            for variation in item.variations.all():
+                total_stock += variation.stock
+        return total_stock
+    
     class Meta:
         verbose_name = 'منتج'
         verbose_name_plural = 'المنتجات'
@@ -224,7 +234,6 @@ class ProductVariation(models.Model):
     product_item = models.ForeignKey(ProductItem, related_name='variations', on_delete=models.PROTECT,)
     size = models.ForeignKey(SizeOption, related_name='variations', on_delete=models.PROTECT)
     stock = models.IntegerField(default=0)  # الكمية المتاحة
-    reserved = models.IntegerField(default=0)  # الكمية المحجوزة
     sold = models.IntegerField(default=0)  # الكمية المباعة
 
     def __str__(self):
@@ -240,27 +249,8 @@ class ProductVariation(models.Model):
         else:
             raise ValueError("مخزون غير كاف!")
 
-    def reserve_stock(self, quantity):
-        """
-        Reserve stock when an item is added to a cart.
-        """
-        if self.stock >= quantity:
-            self.stock -= quantity
-            self.reserved += quantity
-            self.save()
-        else:
-            raise ValueError("لا يوجد مخزون كاف متاح للحجز.")
-
     def sell(self, quantity):
-        """
-        Confirm the sale of reserved stock.
-        """
-        if self.reserved >= quantity:
-            self.reserved -= quantity
-            self.sold += quantity
-            self.save()
-        else:
-            raise ValueError("Not enough reserved stock to sell.")
+       pass
 
     @property
     def item_thumbnail(self):

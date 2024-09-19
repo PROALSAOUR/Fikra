@@ -67,8 +67,8 @@
                     <img src="{% static 'images/name logo.jpg' %}" alt="Fikra Store Name">
                 </div>
                 <div class="points">
-                    <a href="/templates/account.html#points-products">
-                        <span>26</span>
+                    <a href="{% url "accounts:account_page" %}">
+                        <span>{{ user_points }}</span>
                         <i class="fa-solid fa-gem"></i>                
                     </a>
                 </div>
@@ -78,7 +78,7 @@
                     <a class="category" href="{% url "store:offer_page" %}">عروض</a>
                     {% if men_category %}<a class="category" href=" {% url "store:category" men_category.slug %}"> رجالي</a>{% endif %}
                     {% if women_category %}<a class="category" href=" {% url "store:category" women_category.slug %}"> نسائي</a>{% endif %} 
-                    <a class="category" href="#">نقاطي</a>    
+                    <a class="category" href="{% url "store:points_page" %}">هدايا</a>    
 
                 </div>
             </div>

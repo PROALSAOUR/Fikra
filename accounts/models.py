@@ -42,21 +42,23 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
-class UserPoints(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    points = models.IntegerField(default=0)
-
-    def __str__(self):
-        return f"{self.user} - {self.points} points"
+    class Meta:
+        verbose_name = 'مستخدم'
+        verbose_name_plural = 'مستخدمين'
     
 class Message(models.Model):
     subject = models.CharField(max_length=250)
     content = models.TextField()
     is_read = models.BooleanField(default=False)
     timestamp = models.DateTimeField(default=timezone.now) 
+
     
     def __str__(self):
         return self.subject
+    
+    class Meta:
+        verbose_name = 'رسالة'
+        verbose_name_plural = 'رسائل'
 
 class Inbox(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='inbox')
@@ -65,10 +67,19 @@ class Inbox(models.Model):
     def __str__(self):
         return f"Inbox for {self.user}"
     
+    class Meta:
+        verbose_name = 'البريد'
+        verbose_name_plural = 'البريد'
+    
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    user_points = models.OneToOneField(UserPoints, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    points = models.IntegerField(default=0)
     inbox = models.OneToOneField(Inbox, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.first_name
+         
+    class Meta:
+        verbose_name = 'بروفايل'
+        verbose_name_plural = 'بروفايل'
+    

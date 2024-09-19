@@ -1,7 +1,6 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.db.models import Q
 from django.http import JsonResponse
-from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from store.models import *
@@ -338,9 +337,8 @@ def product_details(request, pid):
 
     product_images = product.images.all()
 
-    # تحسين استعلام المتغيرات باستخدام prefetch_related
     variants = ProductVariation.objects.filter(product_item__product_id=pid).select_related('size', 'product_item')
-
+    
     # الحصول على جميع الأحجام الفريدة المرتبطة بالمنتج
     sizes = SizeOption.objects.filter(variations__product_item__product_id=pid).distinct()
 

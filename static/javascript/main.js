@@ -418,7 +418,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // =========================================================================================================
-// دالة اضافة المنتج و ازالته من السلة
+// دالة اضافة المنتج و ازالته من المفضلة
 $(document).ready(function() {
   $('.add-to-fav-link').on('click', function(event) {
       event.preventDefault(); // Prevent the default link behavior

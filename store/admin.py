@@ -44,9 +44,9 @@ class ProductImagesInline(admin.TabularInline):
     fields = ('image',)
      
 class ProductVariationAdmin(admin.ModelAdmin):
-    list_display = ('item_thumbnail' ,'product_item' ,'size', 'stock', 'reserved', 'sold',)
+    list_display = ('item_thumbnail' ,'product_item' ,'size', 'stock', 'sold',)
     search_fields = ('product_item',)
-    exclude = ('reserved', 'sold',)
+    exclude = ('sold',)
       
 class ProductItemInline(admin.TabularInline):
     model = ProductItem
