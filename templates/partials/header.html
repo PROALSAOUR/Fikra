@@ -61,7 +61,12 @@
                         </div>      
                     </div>  
                     <!-- end mega-menu  -->
-                    <a href="/templates/account-info.html#notfications" style="position: relative;"><i class="fa-regular fa-bell bell"></i><span class="has-new-notif">.</span></a><!-- اذا كان هنالك رسائل جديدة اظهر السبان والا اخفيه  -->
+                    <a href="{% url "accounts:account_info" %}#go_to_notfications" style="position: relative;">
+                        <i class="fa-regular fa-bell bell"></i>
+                        {% if unread_messages_count > 0 %}  <!-- اذا كان هنالك رسائل جديدة اظهر السبان والا اخفيه  -->
+                            <span class="has-new-notif"></span>
+                        {% endif %}
+                    </a>
                 </div>
                 <div class="logo">
                     <img src="{% static 'images/name logo.jpg' %}" alt="Fikra Store Name">

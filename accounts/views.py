@@ -1,9 +1,12 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from accounts.forms import UserSignUpForm, UserLogInForm
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from store.models import Product
+from accounts.models import Inbox, Message
 
 # دالة صفحة الحساب الرئيسية
 @login_required
@@ -75,15 +78,27 @@ def sign(request):
 # دالة عرض معلومات الحساب 
 @login_required 
 def account_info(request):
-    user_name = str(request.user.first_name + ' ' + request.user.last_name)
-    phone_number = request.user.phone_number
-
+    user = request.user
+    user_name = str(user.first_name + ' ' + user.last_name)
+    phone_number = user.phone_number
+    
+    inbox = get_object_or_404(Inbox, user=user)
+    messages = inbox.messages.all().order_by('is_read', '-timestamp')
+    
     context  = {
         'user_name': user_name,
         'phone_number': phone_number,
+        'messages': messages,
     }
     return render(request, 'accounts/account-info.html', context)
 
+# دالة تحديث حالة الرسالة
+@require_POST
+def mark_as_read(request, message_id):
+    message = get_object_or_404(Message, id=message_id)
+    message.is_read = True
+    message.save()
+    return JsonResponse({'status': 'success'})
 
 @login_required
 def delete_account(request):

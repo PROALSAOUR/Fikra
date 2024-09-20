@@ -27,7 +27,7 @@
                     <h2>بيانات حسابي</h2>
                     <button class="show-delete-menu"><i class="fa-regular fa-trash-can"></i></button>
                 </div>
-                <div class="my-info-details">
+                <div class="my-info-details" id='go_to_notfications'>
                     <div class="details-item">
                         <div class="title"><p>اسم المستخدم</p><a href=""><i class="fa-solid fa-pen"></i></a></div>
                         <div class="content">{{ user_name }}</div>
@@ -40,15 +40,18 @@
                 </div>
                 <div class="notfication-section" id="notfications">
                     <h2>التنبيهات</h2>
-                    <div class="notfication-message">
-                        <div class="title" onclick="toggleContent(this)">
-                            <p> اسم الرسالة </p>
-                            <span class="time">12:30 PM</span>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </div>
-                        <p class="content">يظهر محتوى الرسالة هنايظهر محتوى الرسالة هنايظهر محتوى الرسالة هنايظهر محتوى الرسالة هنايظهر محتوى الرسالة هنايظهر محتوى الرسالة هنايظهر محتوى الرسالة هنايظهر محتوى الرسالة هنا </p>
-                    </div>    
-                        
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="notfication-message {% if message.is_read %}read{% endif %}">
+                                <div class="title" onclick="toggleContent(this); markMessageAsRead('{% url 'accounts:mark-as-read' message.id %}', this);">
+                                    <p> {{ message.subject }} </p>
+                                    <span class="time"> {{ message.timestamp|date:"Y/m/d , h:i a "  }} </span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                                <p class="content"> {{ message.content }} </p>
+                            </div>    
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>    
             <!-- End My Info Section  -->

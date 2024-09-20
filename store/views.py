@@ -238,7 +238,7 @@ def category_page(request, slug):
     return render(request, 'store/category.html', context)
 # صفحة العروض
 def offer_page(request):
-    products = Product.objects.filter(offer=True, ready_to_sale=True, payment_type='money').order_by('-new_price')
+    products = Product.objects.filter(offer=True, ready_to_sale=True, payment_type='money', ).order_by('-new_price')
     products_count = products.count()
     
     paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة

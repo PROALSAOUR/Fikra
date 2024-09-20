@@ -16,11 +16,13 @@
                     <div class="products-cards">
                         {% if offerd_products %}
                             {% for product in offerd_products %}
-                                <!-- product-start -->
-                                <div class="specific">
-                                    {% include "common/product-card.html" with product=product %}
-                                </div>
-                                <!-- product-end -->
+                                {% if product.get_total_stock > 0 %}
+                                    <!-- product-start -->
+                                    <div class="specific">
+                                        {% include "common/product-card.html" with product=product %}
+                                    </div>
+                                    <!-- product-end -->
+                                {% endif %}
                             {% endfor %}
                         {% else %}
                             {% include "common/no-result.html" %}

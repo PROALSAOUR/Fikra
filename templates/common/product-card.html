@@ -3,7 +3,9 @@
     <a href="{% url "store:product_details" product.id %}">
         <div class="product-image">
             <div class="off-holder">
-                <span>تخفيض </span>
+                {% if product.get_total_stock > 0 %}
+                    <span>تخفيض </span>
+                {% endif %}
             </div>
             <img src="{{ product.thumbnail_img.url }}" alt="{{ product.name}}">
         </div>
@@ -47,9 +49,11 @@
         </a>
     </span>
 {% endif %}
-
+{% if product.get_total_stock > 0 %}
     <span class="add-to-cart">
         <a href="/templates/cart.html"><span> إضافة الى السلة </span><i class="fa-solid fa-cart-shopping"></i> </a>
     </span>
+{% endif %}
+
 </div>
 <!-- product-end -->

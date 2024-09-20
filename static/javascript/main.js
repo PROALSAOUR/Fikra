@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 // =========================================================================================================
-// كود صفحة الاسئلة الشائعة
+// كود اظهار المحتوى في صفحة الاسئلة الشائعة و رسائل المستخدم
 function toggleContent(element) {
   const content = element.nextElementSibling;
   const icon = element.querySelector('i');
@@ -284,13 +284,55 @@ function toggleContent(element) {
   }
 }
 // =========================================================================================================
+//  كود  تغيير حالة الرسالة الى مقروئة عند النقر عليها
+function markMessageAsRead(markUrl, element) {
+  const notificationMessage = element.parentElement;
+
+  // تحقق مما إذا كانت الرسالة قد قرئت مسبقًا
+  if (!notificationMessage.classList.contains('read')) {
+      // أضف كلاس 'read' لتغيير حالة الرسالة
+      notificationMessage.classList.add('read');
+
+      // إرسال طلب AJAX إلى الخادم لتحديث حالة الرسالة
+      fetch(markUrl, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCookie('csrftoken') // تضمين CSRF token
+          },
+      })
+      .then(response => {
+          if (!response.ok) {
+              console.error('Failed to mark as read.');
+          }
+      })
+      .catch(error => {
+          console.error('Error:', error);
+      });
+  }
+}
+// دالة لجلب الـ CSRF token من الكوكيز
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+          }
+      }
+  }
+  return cookieValue;
+}
+// =========================================================================================================
 // الدالة المسؤلة عن اعادة المستخدم الى الصفحة التي جاء منها في تفاصيل المنتج
 function goBack() {
   window.history.back();
 }
 // =========================================================================================================
 // الدالة المسؤلة عن تغيير لون المنتج و  كمية المخزون بشكل ديناميكي
-
 document.addEventListener('DOMContentLoaded', function() {
   var sizeOptions = document.querySelectorAll('.size-option');
   var itemGroups = document.querySelectorAll('.item-group');
@@ -416,7 +458,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   updateItemGroups(); // تحديث المجموعات والعناصر عند تحميل الصفحة لأول مرة
 });
-
 // =========================================================================================================
 // دالة اضافة المنتج و ازالته من المفضلة
 $(document).ready(function() {

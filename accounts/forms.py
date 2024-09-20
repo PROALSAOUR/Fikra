@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from accounts.models import Message, Inbox, User
+from accounts.models import User
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 import phonenumbers
@@ -41,19 +41,3 @@ class UserLogInForm(forms.Form):
             raise forms.ValidationError("رقم الهاتف أو كلمة المرور غير صحيحة.")
         return self.cleaned_data
     
-class SendMessageForm(forms.ModelForm):
-    class Meta:
-        model = Message
-        fields = ['subject', 'content']
-
-    user = forms.ModelChoiceField(queryset=User.objects.all(), label="Select User")
-
-    def save(self, commit=True):
-        message = super().save(commit=False)
-        if commit:
-            message.save()
-            # إضافة الرسالة إلى صندوق بريد المستخدم
-            user = self.cleaned_data['user']
-            inbox = user.inbox  # الحصول على صندوق بريد المستخدم
-            inbox.messages.add(message)  # إضافة الرسالة إلى صندوق البريد
-        return message
