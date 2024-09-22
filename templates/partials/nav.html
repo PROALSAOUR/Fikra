@@ -1,29 +1,44 @@
 
-<!-- Start Nav -->
-<nav>
-    <div class="container">
-        <div class="nav">
-            <div class="nav-item {% if request.path == '/' %}active{% endif %}">
-                <a href=" {% url 'store:home' %} " id="home" ><i class="fa-solid fa-store"></i></a>
-                <label for="home">الرئيسية</label>
-            </div>
-            <div class="nav-item {% if request.path == '/cart/' %}active{% endif %}">
-                <a href="#" id="cart"><i class="fa-solid fa-bag-shopping"></i></a>
-                <label for="cart">حقيبتي</label>
-            </div>
-            <div class="nav-item  {% if request.path == '/search/' %}active{% endif %}">
-                <a href="{% url 'store:search_page' %}" id="search"><i class="fa-solid fa-magnifying-glass"></i></a>
-                <label for="search">البحث</label>
-            </div>
-            <div class="nav-item  {% if request.path == '/favourite/' %}active{% endif %}">
-                <a href="{% url 'store:favourite_page' %}" id="fav"><i class="fa-solid fa-bookmark"></i></a>
-                <label for="fav">المفضلة</label>
-            </div>
-            <div class="nav-item  {% if request.path == '/accounts/' %}active{% endif %}">
-                <a href="{% url 'accounts:account_page' %}" id="account"><i class="fa-solid fa-circle-user"></i></a>
-                <label for="account">حسابي</label>
+
+    <!-- Start Nav -->
+    <nav>
+        <div class="container">
+            {% if request.path == '/cart/' %}
+                <div class="go-confirm-order">
+                    <div class="order">
+                        <div class="price">
+                            <span>السعر الإجمالي</span>
+                            <span>{{ total_price|floatformat:0 }} دل</span>
+                        </div>
+                        <div class="show-receipt">
+                            <input type="checkbox" name="" id="show" class="show">
+                            <label for="show">عرض الفاتورة</label>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="nav">
+                <div class="nav-item {% if request.path == '/' %}active{% endif %}">
+                    <a href=" {% url 'store:home' %} " id="home" ><i class="fa-solid fa-store"></i></a>
+                    <label for="home">الرئيسية</label>
+                </div>
+                <div class="nav-item {% if request.path == '/cart/' %}active{% endif %}">
+                    <a href="{% url 'store:cart_page' %}" id="cart"><i class="fa-solid fa-bag-shopping"></i></a>
+                    <label for="cart">حقيبتي</label>
+                </div>
+                <div class="nav-item  {% if request.path == '/search/' %}active{% endif %}">
+                    <a href="{% url 'store:search_page' %}" id="search"><i class="fa-solid fa-magnifying-glass"></i></a>
+                    <label for="search">البحث</label>
+                </div>
+                <div class="nav-item  {% if request.path == '/favourite/' %}active{% endif %}">
+                    <a href="{% url 'store:favourite_page' %}" id="fav"><i class="fa-solid fa-bookmark"></i></a>
+                    <label for="fav">المفضلة</label>
+                </div>
+                <div class="nav-item  {% if request.path == '/accounts/' %}active{% endif %}">
+                    <a href="{% url 'accounts:account_page' %}" id="account"><i class="fa-solid fa-circle-user"></i></a>
+                    <label for="account">حسابي</label>
+                </div>
             </div>
         </div>
-    </div>
-</nav>
-<!-- End Nav -->
+    </nav>
+    <!-- End Nav -->

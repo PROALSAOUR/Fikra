@@ -18,10 +18,10 @@ def main_account_page(request):
 
     
     # استدعاء المنتجات التي ستعرض اسفل الصفحة
-    points_products = Product.objects.filter(ready_to_sale=True, payment_type='points').order_by('updated_at')[:8]
+    products = Product.objects.filter(ready_to_sale=True).order_by('updated_at')[:8]
     
     context = {
-        'points_products' : points_products ,
+        'products' : products ,
     } 
     
     return render(request, 'accounts/account.html', context)

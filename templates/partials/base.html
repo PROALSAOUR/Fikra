@@ -33,11 +33,12 @@
         {% include "partials/nav.html" %}
     {% endif %}
 
-    <!-- Start product details -->
+    
     {% block content %}    
     
     {% endblock content %}
-    <!-- End product details -->
+    
+    {% include "common/added-to-cart.html" %}
 
     {% if request.path != '/accounts/sign/' %}
         {% include "partials/footer.html" %}
@@ -47,8 +48,8 @@
     <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src=" {% static "/javascript/main.js" %}"></script>
     <script src=" {% static "/javascript/pop-pages.js" %}"></script>
+    <script src=" {% static "/javascript/main.js" %}"></script>
     <script src=" {% static "/javascript/live-search.js" %}"></script>
 </body>
 </html>

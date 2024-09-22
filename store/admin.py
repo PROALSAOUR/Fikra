@@ -61,7 +61,7 @@ class ProductItemAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('product_thumbnail', 'name', 'category', 'brand', 'ready_to_sale', 'offer')
     search_fields = ('name', )
-    list_filter = ('category', 'brand', 'ready_to_sale', 'payment_type', 'price', 'point_price', 'featured' , 'offer')
+    list_filter = ('category', 'brand', 'ready_to_sale', 'price', 'featured' , 'offer')
     ordering = ('updated_at',)   
     inlines = (ProductImagesInline, ProductItemInline,)
 

@@ -1,6 +1,8 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.db.models import Q
 from django.http import JsonResponse
+import json
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from store.models import *
@@ -39,6 +41,7 @@ def index(request):
     }
     
     return render(request, 'store/index.html', context)
+# ===================================================
 # صفحة الاعلان
 def ads_page(request, slug):
     ad = get_object_or_404(AdsSlider, slug=slug)
@@ -49,6 +52,7 @@ def ads_page(request, slug):
         'ad': ad,
     }
     return render(request, 'store/ads-details.html', context)
+# ===================================================
 # صفحة العلامة التجارية
 def brand_page(request, slug):
     brand = get_object_or_404(Brand, title=slug)
@@ -82,15 +86,15 @@ def brand_page(request, slug):
     if price_min and price_min.isdigit():
         price_min = int(price_min)
         filters &= Q(
-            Q(new_price__gte=price_min, payment_type='money') | 
-            (Q(offer=False) & Q(price__gte=price_min, payment_type='money'))
+            Q(new_price__gte=price_min) | 
+            (Q(offer=False) & Q(price__gte=price_min))
         )
         
     if price_max and price_max.isdigit():
         price_max = int(price_max)
         filters &= Q(
-            Q(new_price__lte=price_max, payment_type='money') | 
-            (Q(offer=False) & Q(price__lte=price_max, payment_type='money'))
+            Q(new_price__lte=price_max) | 
+            (Q(offer=False) & Q(price__lte=price_max))
         )
     
     if category_id:
@@ -131,31 +135,33 @@ def brand_page(request, slug):
     }
     
     return render(request, 'store/brand.html', context)
+# ===================================================
 # صفحة  بيع المنتجات بالنقاط
-def point_products_page(request):
-    products = Product.objects.filter(ready_to_sale=True, payment_type='points').order_by('-new_price')
-    products_count = products.count()
+# def point_products_page(request):
+    # products = Product.objects.filter(ready_to_sale=True,).order_by('-new_price')
+    # products_count = products.count()
     
-    paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
-    page = request.GET.get('page', 1)
+    # paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
+    # page = request.GET.get('page', 1)
 
-    try:
-        points_products = paginator.page(page)
-    except PageNotAnInteger:
-        points_products = paginator.page(1)
-    except EmptyPage:
-        points_products = paginator.page(paginator.num_pages)
+    # try:
+    #     points_products = paginator.page(page)
+    # except PageNotAnInteger:
+    #     points_products = paginator.page(1)
+    # except EmptyPage:
+    #     points_products = paginator.page(paginator.num_pages)
 
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        results_data = list(points_products.object_list.values())
-        return JsonResponse({'results': results_data})
+    # if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+    #     results_data = list(points_products.object_list.values())
+    #     return JsonResponse({'results': results_data})
     
     
-    context  ={
-        'points_products': points_products,
-        'products_count': products_count,
-    }
-    return render(request, 'store/points-products.html', context)
+    # context  ={
+    #     'points_products': points_products,
+    #     'products_count': products_count,
+    # }
+    # return render(request, 'store/points-products.html', context)
+# ===================================================
 # صفحة التصنيف
 def category_page(request, slug):
     
@@ -194,15 +200,15 @@ def category_page(request, slug):
     if price_min and price_min.isdigit():
         price_min = int(price_min)
         filters &= Q(
-            Q(new_price__gte=price_min, payment_type='money') | 
-            (Q(offer=False) & Q(price__gte=price_min, payment_type='money'))
+            Q(new_price__gte=price_min) | 
+            (Q(offer=False) & Q(price__gte=price_min))
         )
         
     if price_max and price_max.isdigit():
         price_max = int(price_max)
         filters &= Q(
-            Q(new_price__lte=price_max, payment_type='money') | 
-            (Q(offer=False) & Q(price__lte=price_max, payment_type='money'))
+            Q(new_price__lte=price_max) | 
+            (Q(offer=False) & Q(price__lte=price_max))
         )
     
     if brand_id:
@@ -236,9 +242,10 @@ def category_page(request, slug):
         'products': products,  # عرض المنتجات التي تم فلترتها
     }
     return render(request, 'store/category.html', context)
+# ===================================================
 # صفحة العروض
 def offer_page(request):
-    products = Product.objects.filter(offer=True, ready_to_sale=True, payment_type='money', ).order_by('-new_price')
+    products = Product.objects.filter(offer=True, ready_to_sale=True).order_by('-new_price')
     products_count = products.count()
     
     paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
@@ -261,6 +268,7 @@ def offer_page(request):
         'products_count': products_count,
     }
     return render(request, 'store/offer-products.html', context)
+# ===================================================
 # صفحة البحث
 def search_page(request):
     query = request.GET.get('q', '')
@@ -277,15 +285,15 @@ def search_page(request):
     if price_min and price_min.isdigit():
         price_min = int(price_min)
         filters &= Q(
-            Q(new_price__gte=price_min, payment_type='money') | 
-            (Q(offer=False) & Q(price__gte=price_min, payment_type='money'))
+            Q(new_price__gte=price_min) | 
+            (Q(offer=False) & Q(price__gte=price_min))
         )
         
     if price_max and price_max.isdigit():
         price_max = int(price_max)
         filters &= Q(
-            Q(new_price__lte=price_max, payment_type='money') | 
-            (Q(offer=False) & Q(price__lte=price_max, payment_type='money'))
+            Q(new_price__lte=price_max) | 
+            (Q(offer=False) & Q(price__lte=price_max))
         )
         
     if category_id:
@@ -326,6 +334,7 @@ def search_page(request):
         'brands': brands,
         'products_count': products_count, 
     })
+# ===================================================
 # صفحة تفاصيل المنتج 
 def product_details(request, pid):
     product = get_object_or_404(Product, id=pid)
@@ -337,10 +346,10 @@ def product_details(request, pid):
 
     product_images = product.images.all()
 
-    variants = ProductVariation.objects.filter(product_item__product_id=pid).select_related('size', 'product_item')
+    variants = ProductVariation.objects.filter(product_item__product_id=pid, stock__gt=0).select_related('size', 'product_item')
     
     # الحصول على جميع الأحجام الفريدة المرتبطة بالمنتج
-    sizes = SizeOption.objects.filter(variations__product_item__product_id=pid).distinct()
+    sizes = SizeOption.objects.filter(variations__product_item__product_id=pid, variations__stock__gt=0).distinct()
 
     # تنظيم البيانات بحيث يتم تصنيف العناصر حسب المقاس
     size_item_map = {}
@@ -374,6 +383,7 @@ def get_stock(request):
         return JsonResponse({'stock': stock})
     except ProductVariation.DoesNotExist:
         return JsonResponse({'stock': 0})  # إذا لم يتم العثور على المتغير، رجع 0
+# ===================================================
 # صفحة المفضلة
 @login_required
 def favourite_page(request):
@@ -430,4 +440,153 @@ def clear_favourites(request):
     favourite, created = Favourite.objects.get_or_create(user=request.user)
     favourite.products.clear()  # Remove all products from the favourites
     return redirect('store:favourite_page')  # Redirect back to the favourites page
+# ===================================================
+# صفحة السلة 
+@login_required
+def cart_page(request):
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    cart_items = cart.items.prefetch_related('cart_item__product_item__variations__size').select_related('cart_item__product_item__product').all()  # احصل على جميع المنتجات في سلة المستخدم
+
+    available_items = []
+    unavailable_items = []
+    
+    total_qty = 0  # عدد المنتجات الاجمالي
+    total_price = 0  # حساب السعر الاجمالي 
+    total_bonus = 0  # حساب مجموع الـ bonus
+
+    for item in cart_items:
+        # تحقق من وجود المخزون للمتغير المرتبط بالمنتج
+        stock = item.cart_item.product_item.variations.first().stock if item.cart_item.product_item.variations.exists() else 0
+
+        if stock > 0:
+            available_items.append({
+                'product': item.cart_item.product_item.product,
+                'product_item': item.cart_item.product_item,
+                'size': item.cart_item.product_item.variations.first().size.value if item.cart_item.product_item.variations.exists() else None,
+                'color': item.cart_item.product_item.color,
+                'qty': item.qty,
+                'cart_item': item,
+            })
+            # تحديث العدد والسعر بناءً على العناصر المتاحة
+            total_qty += item.qty
+            total_price += item.cart_item.product_item.product.get_price() * item.qty
+            total_bonus += item.cart_item.product_item.product.bonus * item.qty
+        else:
+            unavailable_items.append({
+                'product': item.cart_item.product_item.product,
+                'product_item': item.cart_item.product_item,
+                'size': item.cart_item.product_item.variations.first().size.value if item.cart_item.product_item.variations.exists() else None,
+                'color': item.cart_item.product_item.color,
+                'qty': item.qty,
+                'cart_item': item,
+            })
+
+    av_count =  len(available_items)
+    unav_count =  len(unavailable_items)
+    
+    context = {
+        'cart_items': cart_items,
+        'available_items': available_items,
+        'unavailable_items': unavailable_items,
+        'av_count': av_count,
+        'unav_count': unav_count,
+        'total_qty': total_qty,
+        'total_price': total_price,
+        'total_bonus': total_bonus,
+    }
+
+    return render(request, 'store/cart.html', context)
+
+# دالة الاضافة الى السلة من صفحة تفاصيل المنتج 
+@login_required
+def add_to_cart(request):
+    if request.method == 'POST':
+        size_id = request.POST.get('size')
+        sku = request.POST.get('item')
+        quantity = int(request.POST.get('qty', 1))
+
+        # التحقق من وجود المستخدم وسلة التسوق
+        cart, created = Cart.objects.get_or_create(user=request.user)
+
+        try:
+            variation = ProductVariation.objects.get(product_item__sku=sku, size_id=size_id)
+
+            if variation.stock >= quantity:
+                # إضافة العنصر إلى السلة
+                cart_item, created = CartItem.objects.get_or_create(
+                    cart=cart,
+                    cart_item=variation,
+                    defaults={'qty': quantity}
+                )
+
+                if not created:  # إذا كان العنصر موجودًا بالفعل في السلة، نقوم بتحديث الكمية
+                    cart_item.qty += quantity
+                    cart_item.save()
+
+                # # تحديث المخزون
+                # variation.update_stock(-quantity)
+
+                return JsonResponse({'status': 'success', 'message': 'تم إضافة العنصر إلى السلة'})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'مخزون غير كاف'})
+
+        except ProductVariation.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'المتغير غير موجود'})
+
+    return JsonResponse({'status': 'error', 'message': 'طلب غير صالح'})
+
+# دالة الاضافة الى السلة من بطاقة المنتج 
+@login_required
+def add_to_cart2(request, pid):
+    if request.method == 'POST':
+        product = get_object_or_404(Product, pid=pid)
+
+        product_item = product.items.first()
+        if not product_item:
+            return JsonResponse({'success': False, 'error': 'لا يوجد متغيرات للمنتج.'})
+
+        variation = product_item.variations.first()
+        if not variation:
+            return JsonResponse({'success': False, 'error': 'لا يوجد متغيرات متاحة.'})
+
+        if variation.stock <= 0:
+            return JsonResponse({'success': False, 'error': 'المخزون غير متاح.'})
+
+        cart, created = Cart.objects.get_or_create(user=request.user)
+
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, cart_item=variation)
+
+        if not created:
+            cart_item.qty += 1
+        else:
+            cart_item.qty = 1
+
+        cart_item.save()
+
+        return JsonResponse({'success': True, 'message': 'تم إضافة المنتج إلى السلة.'})
+
+    return JsonResponse({'success': False, 'error': 'الطلب غير صحيح.'})
+
+# دالة الازالة من السلة
+@login_required
+def remove_from_cart(request, cart_item_id):
+    if request.method == 'POST':
+        try:
+            cart_item = get_object_or_404(CartItem, id=cart_item_id, cart__user=request.user)
+            cart_item.delete()  # احذف العنصر
+
+            # إعداد البيانات للعودة إلى العميل
+            return JsonResponse({
+                'success': True,
+                'message': 'Item removed from cart'
+            })
+        except CartItem.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'CartItem does not exist'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+# ===================================================
+
 

@@ -1,5 +1,5 @@
 <!-- product-start -->
-<div class="swiper-slide product-box {% if product.offer %}{% if product.payment_type == 'money' %} offer {% endif %} {% endif %}"> <!-- اضف كلاس اوفر اذا كان هنالك تخفيض- -->
+<div class="swiper-slide product-box {% if product.offer %} offer {% endif %}"> <!-- اضف كلاس اوفر اذا كان هنالك تخفيض- -->
     <a href="{% url "store:product_details" product.id %}">
         <div class="product-image">
             <div class="off-holder">
@@ -11,12 +11,11 @@
         </div>
         <div class="product-info">
             <h4 class="product-name"> {{ product.name|slice:":20" }}{% if product.name|length > 20 %}...{% endif %}</h4> <!-- اقصى طول 20 حرف -->
-            <p class="product-description"> {{ product.description|slice:":50" }}{% if product.description|length > 50 %}...{% endif %}</p> <!-- اقل طول 42 حرف اقصى طول 50 حرف -->
-            
+                <p class="product-description"> {{ product.description|slice:":50" }}{% if product.description|length > 50 %}...{% endif %}</p> <!-- اقل طول 42 حرف اقصى طول 50 حرف -->
+
             {% if product.get_total_stock > 0 %}
-                <h4 class="product-price {% if product.payment_type == 'points' %} point {% endif %}"> <!-- اضف كلاس بوينت اذا كان سعر البيع نقاط- -->
+                <h4 class="product-price">
                     <div class="buy-by-money"><span class="old"> {{ product.price }} </span><span class="new"> | {{ product.new_price |floatformat:0 }} </span><span> دل </span></div>
-                    <div class="buy-by-points"> {{ product.point_price }} <i class="fa-solid fa-gem"></i></div>        
                 </h4>
             {% else %}
                 <h4 class="product-price" style='color:#9D2121;text-wrap:nowrap;'>
@@ -27,6 +26,7 @@
 
         </div>
     </a> 
+
 {% comment %} الكود الخاص  بزر اضافة الى المفضلة {% endcomment %}
 {% if user.is_authenticated %}
     <span class="add-to-fav">
@@ -49,10 +49,18 @@
         </a>
     </span>
 {% endif %}
-{% if product.get_total_stock > 0 %}
-    <span class="add-to-cart">
-        <a href="/templates/cart.html"><span> إضافة الى السلة </span><i class="fa-solid fa-cart-shopping"></i> </a>
-    </span>
+
+{% comment %} الكود الخاص  بزر اضافة الى السلة {% endcomment %}
+{% if request.path == '/search/' or  request.path == '/favourite/' %} {% comment %} لتحسين الاداء وتقليل الاستعلامات الغير ضرورية {% endcomment %}
+    {% if product.get_total_stock > 0 %}
+
+        <span class="add-to-cart">
+            <a href="{% url 'store:add_to_cart2' product.pid %}" class="add-to-cart-link">
+                <span> إضافة الى السلة </span><i class="fa-solid fa-cart-shopping"></i> 
+            </a>
+        </span>
+
+    {% endif %}
 {% endif %}
 
 </div>

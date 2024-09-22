@@ -323,49 +323,32 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 // ===================================================================================================
 // الكود الخاص بعرض النافذة الخاصة بإضافة إلى السلة
-document.addEventListener('DOMContentLoaded', function () {
+let hideTimeout;
+function showAddToCartMenu() {
     const menu = document.querySelector('.add-cart-pop-page');
-    const link = document.querySelector('.add-cart-pop-link');
+    if (!menu) return; // تأكد من وجود القائمة
 
-    if (menu && link) { // تحقق من وجود العنصرين قبل إضافة الأحداث
-        let hideTimeout; // متغير لتخزين مؤقت الإخفاء
+    menu.style.display = 'block';
+    setTimeout(() => {
+        menu.style.visibility = 'visible';
+        menu.style.opacity = '1';
+        menu.style.transform = 'translate(-50%, -40%) scale(1)';
+    }, 10);
 
-        function showMenu() {
-            menu.style.display = 'block'; // عرض القائمة
-            setTimeout(() => {
-                menu.style.visibility = 'visible';
-                menu.style.opacity = '1';
-                menu.style.transform = 'translate(-50%, -40%) scale(1)';
-            }, 10);
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(hideMenu, 3000);
+}
+function hideMenu() {
+    const menu = document.querySelector('.add-cart-pop-page');
+    if (!menu) return; // تأكد من وجود القائمة
 
-            // إعداد مؤقت للإخفاء بعد 3 ثوانٍ من ظهور القائمة
-            clearTimeout(hideTimeout);
-            hideTimeout = setTimeout(hideMenu, 3000);
-        }
-
-        function hideMenu() {
-            menu.style.opacity = '0';
-            menu.style.transform = 'translate(-50%, -40%) scale(0.5)';
-            setTimeout(() => {
-                menu.style.visibility = 'hidden';
-                menu.style.display = 'none';
-            }, 300);
-        }
-
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (menu.style.visibility === 'hidden' || menu.style.visibility === '') {
-                showMenu();
-            }
-        });
-
-        document.addEventListener('click', function (e) {
-            if (menu.style.visibility === 'visible' && !menu.contains(e.target) && !link.contains(e.target)) {
-                hideMenu();
-            }
-        });
-    }
-});
+    menu.style.opacity = '0';
+    menu.style.transform = 'translate(-50%, -40%) scale(0.5)';
+    setTimeout(() => {
+        menu.style.visibility = 'hidden';
+        menu.style.display = 'none';
+    }, 300);
+}
 // ===================================================================================================
 // الكود الخاص بعرض النافذة الخاصة بإتمام عملية الطلب بنجاح
 document.addEventListener('DOMContentLoaded', function () {
@@ -421,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (showCheckbox && receipt && confirmButton) { // تحقق من وجود العناصر قبل إضافة الأحداث
         // وظيفة لتحديث حالة الفاتورة بناءً على عرض الشاشة
         function updateReceiptVisibility() {
-            if (window.innerWidth <= 893) {
+            if (window.innerWidth <= 992) {
                 // استعادة حالة التشيك بوكس من localStorage عند تحميل الصفحة
                 if (localStorage.getItem('showCheckboxState') === 'checked') {
                     showCheckbox.checked = true;

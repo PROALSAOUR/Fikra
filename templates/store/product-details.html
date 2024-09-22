@@ -74,7 +74,7 @@
                     <div class="name-price">
                         <h2>{{ product.name }}<span class="category" style="text-wrap:nowrap;"> {{product.category}} </span></h2>
                         {% if product.get_total_stock > 0 %}
-                            <h4 class="product-price {% if product.offer %}{% if product.payment_type == 'money' %} offer {% endif %} {% endif %}{% if product.payment_type == 'points' %} point {% endif %} ">
+                            <h4 class="product-price {% if product.offer %} offer {% endif %}">
                                 <span class="offer-percient">تخفيض <span>{{product.get_offer_percentage}}%</span></span>
                                 <div class="buy-by-money"><span class="old"> {{product.price}} </span><span class="new"> | {{product.new_price|floatformat:0}} </span><span> دل </span></div>
                                 <div class="buy-by-points">{{product.point_price}} <i class="fa-solid fa-gem"></i></div>            
@@ -94,7 +94,8 @@
 
                 <div class="product-variants">
                     {% if product.get_total_stock > 0 %}
-                        <form action="" class='form'>
+                        <form action="{% url 'store:add_to_cart' %}" method="post" class='form'>
+
                             <div class="size">
                                 <label for="size" class="size-title">المقاسات:</label>
                                 {% for size in sizes %}
@@ -124,9 +125,9 @@
                             <div class="quantity-pd color">
                                 <label class="color-title">العدد:</label>
                                 <span class="quantity">
-                                    <button class="minus"><i class="fa-regular fa-square-minus"></i></button>
-                                    <input type="number" id="user-quantity" value="1" min="1" class='q-number'/>
-                                    <button class="plus"><i class="fa-regular fa-square-plus"></i></button>
+                                    <button type="button" class="minus"><i class="fa-regular fa-square-minus"></i></button>
+                                    <input type="number" name="qty" id="user-quantity" value="1" min="1" class='q-number'/>
+                                    <button type="button" class="plus"><i class="fa-regular fa-square-plus"></i></button>
                                 </span>
                                 <div class="in-stock">متبقي (<span id="stock-quantity">0</span>) في المخزن</div>
                             </div> 
@@ -182,15 +183,7 @@
             <!-- End Products Sections -->
         </div>
         <!-- End product details -->
-        <!-- Start add-cart-pop-page Section -->
-        <div class="Pop-up-page add-cart-pop-page">
-            <div class="logo">
-                <img src="{% static "/images/name logo.jpg" %}" alt="">
-            </div>
-            <p>تمت الإضافة إلى السلة بنجاح</p>
-            <i class="fa-solid fa-circle-check"></i>
-        </div>
-        <!-- End add-cart-pop-page Section -->
+
     </div>
 
 {% endblock content %}

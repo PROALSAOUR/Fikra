@@ -49,7 +49,6 @@ if (mainSwiper) {
     });
   });
 }
-
 // =================================================================================================== 
 document.addEventListener('DOMContentLoaded', function() {
   const toggle = document.getElementById('them');
@@ -311,6 +310,7 @@ function markMessageAsRead(markUrl, element) {
       });
   }
 }
+// =========================================================================================================
 // دالة لجلب الـ CSRF token من الكوكيز
 function getCookie(name) {
   let cookieValue = null;
@@ -332,7 +332,7 @@ function goBack() {
   window.history.back();
 }
 // =========================================================================================================
-// الدالة المسؤلة عن تغيير لون المنتج و  كمية المخزون بشكل ديناميكي
+// الدالة المسؤلة عن تغيير لون المنتج و  كمية المخزون بشكل ديناميكي واضافة المنتج الى السلة من الصفحة
 document.addEventListener('DOMContentLoaded', function() {
   var sizeOptions = document.querySelectorAll('.size-option');
   var itemGroups = document.querySelectorAll('.item-group');
@@ -381,20 +381,18 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   function updateStock(sizeId, sku) {
-    fetch(`/get-stock?size_id=${sizeId}&color=${encodeURIComponent(sku)}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.stock !== undefined) {
-                availableStock = data.stock; // تخزين الكمية المتاحة
-                var initialQuantity = parseInt(userQuantityInput.value);
-                stockQuantityElement.textContent = availableStock; // تحديث الكمية المعروضة دون طرح أي شيء
-                userQuantityInput.max = availableStock; // ضبط الحد الأقصى للكمية
-                updateQuantityDisplay(); // تحديث الكمية الظاهرة بناءً على المخزون الجديد
-            }
-        })
-        .catch(error => console.error('Error fetching stock:', error));
-}
-
+      fetch(`/get-stock?size_id=${sizeId}&color=${encodeURIComponent(sku)}`)
+          .then(response => response.json())
+          .then(data => {
+              if (data.stock !== undefined) {
+                  availableStock = data.stock; // تخزين الكمية المتاحة
+                  stockQuantityElement.textContent = availableStock; // تحديث الكمية المعروضة دون طرح أي شيء
+                  userQuantityInput.max = availableStock; // ضبط الحد الأقصى للكمية
+                  updateQuantityDisplay(); // تحديث الكمية الظاهرة بناءً على المخزون الجديد
+              }
+          })
+          .catch(error => console.error('Error fetching stock:', error));
+  }
 
   function getSelectedSizeAndColor() {
       var selectedSize = document.querySelector('.size-option:checked');
@@ -456,6 +454,31 @@ document.addEventListener('DOMContentLoaded', function() {
       adjustStock();
   });
 
+  document.querySelector('.form').addEventListener('submit', function(e) {
+      e.preventDefault(); // منع النموذج من الإرسال التلقائي
+
+      var formData = new FormData(this); // استخدام FormData لجمع البيانات
+      var url = this.action; // URL للدالة
+
+      fetch(url, {
+          method: 'POST',
+          body: formData,
+          headers: {
+              'X-CSRFToken': getCookie('csrftoken') 
+          }
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.status === 'success') {
+              showAddToCartMenu();
+              // يمكنك تحديث واجهة المستخدم أو سلة التسوق هنا
+          } else {
+              alert(data.message);
+          }
+      })
+      .catch(error => console.error('Error:', error));
+  });
+
   updateItemGroups(); // تحديث المجموعات والعناصر عند تحميل الصفحة لأول مرة
 });
 // =========================================================================================================
@@ -515,6 +538,147 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   }
 });
+// =========================================================================================================
+//  دالة ازالة المنتج من السلة
+document.querySelectorAll('.add-to-trash a').forEach(function(button) {
+  button.addEventListener('click', function(event) {
+      event.preventDefault();  // منع إعادة تحميل الصفحة
+
+      const cartItemId = this.dataset.cartItemId;  // الحصول على معرف عنصر السلة
+      const url = this.getAttribute('href');  // الرابط الخاص بحذف العنصر من السلة
+
+      // استخدام دالة getCookie لجلب توكن CSRF من الكوكيز
+      const csrftoken = getCookie('csrftoken');
+
+      // إرسال طلب Ajax لحذف العنصر
+      fetch(url, {
+          method: 'POST',
+          headers: {
+              'X-CSRFToken': csrftoken,  // إضافة توكن CSRF
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'  // تأكد من أن الطلب يعتبر طلب Ajax
+          },
+          body: JSON.stringify({
+              'cart_item_id': cartItemId,  // إرسال معرف عنصر السلة
+          })
+      })
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.json();
+      })
+      .then(data => {
+          if (data.success) {
+              // إعادة تحميل الصفحة بعد الحذف
+              location.reload();  // أو يمكنك استخدام window.location.reload();
+          } else {
+              console.error('Error removing item:', data.error);
+          }
+      })
+      .catch(error => console.error('Error:', error));
+  });
+});
+// =========================================================================================================
+// دالة اضافة المنتج الى السلة من البطاقة الخاصة به
+$(document).ready(function() {
+  $('.add-to-cart-link').click(function(e) {
+      e.preventDefault(); // منع الانتقال إلى الرابط
+
+      var url = $(this).attr('href'); // الحصول على الرابط من عنصر الارتباط
+
+      $.ajax({
+          type: 'POST',
+          url: url,
+          data: {
+              csrfmiddlewaretoken: getCookie('csrftoken'), // استخدام الدالة لجلب رمز CSRF
+          },
+          success: function(response) {
+              if (response.success) {
+                  showAddToCartMenu(); // عرض النافذة المنبثقة عند النجاح
+              } else {
+                  alert(response.error); // عرض رسالة الخطأ
+              }
+          },
+          error: function() {
+              alert('حدث خطأ أثناء إرسال الطلب.');
+          }
+      });
+  });
+});
+// =========================================================================================================
+// 
+document.addEventListener('DOMContentLoaded', function() {
+  // دالة لتحديث عرض الكمية
+  function updateQuantityDisplay(cartItemId) {
+      const quantityValue = document.querySelector(`span[data-cartitem-id="${cartItemId}"] .quantity-value`);
+      const availableStock = parseInt(document.querySelector(`span[data-cartitem-id="${cartItemId}"] .stock-quantity`).textContent);
+
+      let userQuantity = parseInt(quantityValue.textContent);
+      if (isNaN(userQuantity) || userQuantity < 1) {
+          quantityValue.textContent = 1;
+      } else if (userQuantity > availableStock) {
+          quantityValue.textContent = availableStock;
+      }
+  }
+
+  // دالة لجلب المخزون من الخادم
+  function fetchStock(cartItemId) {
+      fetch(`/get-stock?cartitem_id=${cartItemId}`)
+          .then(response => response.json())
+          .then(data => {
+              if (data.stock !== undefined) {
+                  document.querySelector(`span[data-cartitem-id="${cartItemId}"] .stock-quantity`).textContent = data.stock;
+                  updateQuantityDisplay(cartItemId); // تحديث عرض الكمية بعد الحصول على المخزون
+              }
+          })
+          .catch(error => console.error('Error fetching stock:', error));
+  }
+
+  // دالة لتعديل الكمية بناءً على الأزرار
+  function adjustStock(cartItemId, change) {
+      const quantityValue = document.querySelector(`span[data-cartitem-id="${cartItemId}"] .quantity-value`);
+      let userQuantity = parseInt(quantityValue.textContent);
+      const availableStock = parseInt(document.querySelector(`span[data-cartitem-id="${cartItemId}"] .stock-quantity`).textContent);
+
+      if (change === 'plus') {
+          if (userQuantity < availableStock) {
+              userQuantity++;
+          }
+      } else if (change === 'minus') {
+          if (userQuantity > 1) {
+              userQuantity--;
+          }
+      }
+
+      quantityValue.textContent = userQuantity; // تحديث عرض الكمية
+      updateQuantityDisplay(cartItemId); // تأكد من ضبط الكمية المعروضة
+  }
+
+  // إضافة أحداث للأزرار في السلة
+  document.querySelectorAll('.plus').forEach(button => {
+      button.addEventListener('click', function(event) {
+          event.preventDefault();
+          const cartItemId = this.getAttribute('data-cartitem-id');
+          adjustStock(cartItemId, 'plus');
+      });
+  });
+
+  document.querySelectorAll('.minus').forEach(button => {
+      button.addEventListener('click', function(event) {
+          event.preventDefault();
+          const cartItemId = this.getAttribute('data-cartitem-id');
+          adjustStock(cartItemId, 'minus');
+      });
+  });
+
+  // تحديث عرض الكمية عند تحميل الصفحة
+  document.querySelectorAll('.quantity').forEach(quantityElement => {
+      const cartItemId = quantityElement.getAttribute('data-cartitem-id');
+      fetchStock(cartItemId); // جلب المخزون عند تحميل الصفحة
+  });
+});
+
 
 // =========================================================================================================
-// =========================================================================================================
+ 

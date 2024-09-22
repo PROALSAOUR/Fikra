@@ -11,10 +11,10 @@ import string
 class AdsSlider(models.Model):
     
     ads_options = [
-        ('category', 'Category Ads'),
-        ('one_product', 'One Product Ads'),
-        ('special_products', 'Special Products Ads'),
-        ('just_show', 'Just For Show'),
+        ('category', 'اعلان لتصنيف'),
+        ('one_product', 'اعلان لمنتج معين'),
+        ('special_products', 'اعلان لعدة منتجات خاصة'),
+        ('just_show', 'منظر فقط'),
     ]
     
     title = models.CharField(max_length=255)
@@ -100,8 +100,8 @@ class SizeOption(models.Model):
 
 class Category(models.Model):
     status_choices = [
-        ('visible', 'Visible'),
-        ('hiddin', 'Hiddin'),
+        ('visible', 'ظاهر'),
+        ('hiddin', 'مخفي'),
     ]
     
     name = models.CharField(max_length=100)
@@ -148,17 +148,8 @@ class Product(models.Model):
     tag = models.ManyToManyField(Tag, related_name='products')
     thumbnail_img = models.ImageField(upload_to='store/Products/thumbnails')
     featured = models.BooleanField(default=False)   
-    payment_type = models.CharField(
-        max_length=10,
-        choices=[
-            ('money', 'نقود'),
-            ('points', 'نقاط'),
-        ],
-        default='money'
-    )
     price = models.IntegerField(default=0) 
     new_price = models.DecimalField(decimal_places=2, max_digits=10, blank=True, null=True)
-    point_price = models.IntegerField(blank=True, null=True)
     bonus =  models.IntegerField(blank=True, null=True, default=20)
     offer = models.BooleanField(default=False)
     ready_to_sale = models.BooleanField(default=False)
@@ -179,16 +170,13 @@ class Product(models.Model):
             return round(discount_percentage, 1)
         return 0
 
-    def update_offer_status(self):
-        """
-        Update the offer status based on the presence of a new price.
-        """
-        if self.new_price and self.new_price < self.price:
-            self.offer = True
+    def get_price(self):
+        """تعيد السعر المنتج وفقا لحالة التخفيض """
+        if self.offer :
+            return self.new_price
         else:
-            self.offer = False
-        self.save()
-        
+            return self.price
+            
     def get_total_stock(self):
         """
         تستعمل هذه الدالة للتحقق من ان المنتج متاح بالمخزن والا فبدلا من عرض السعر في بطاقة المنتج سيتم عرض نفذت الكمية
@@ -270,3 +258,38 @@ class Favourite(models.Model):
         return f"{self.user.phone_number}قائمة المفضلة الخاصة ب"
     
 # ============================= Order ====================================
+
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts')
+    
+    def __str__(self) -> str:
+        return f'سلة : {self.user.first_name} {self.user.last_name}'
+    
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    cart_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='cart_variations')
+    qty = models.PositiveIntegerField(default=1)
+    
+class Order(models.Model):
+    
+    ORDER_STATUS = [
+        ('pending', 'جاري المعالجة'),
+        ('shipped', 'تم الشحن'),
+        ('delivered', 'تم التسليم'),
+        ('canceled', 'تم الإلغاء'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending')
+    total_price = models.PositiveIntegerField()
+    order_date = models.DateTimeField(auto_now_add=True)
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
+    order_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='order_items')
+    qty = models.PositiveIntegerField(default=1)
+    price = models.PositiveIntegerField()
+
+
+
+

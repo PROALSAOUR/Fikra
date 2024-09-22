@@ -11,7 +11,7 @@
                     <div class="my-points">
                         <h3>نقاطي:</h3>
                         <div class="points">
-                            <a href="{% url "store:points_page" %}">
+                            <a href="">
                                 <span>{{ user_points }}</span>
                                 <i class="fa-solid fa-gem"></i>                
                             </a>
@@ -137,15 +137,15 @@
         <!-- Start Products Section -->
         <hr class="sep">
         <section  id="products">
-            <a href="{% url "store:points_page" %}">
+            <a href="{% url 'store:category' 'all' %}">
                 <div class="title">
-                    <h2> شراء بالنقاط</h2>
+                    <h2> منتجات من اجلك</h2>
                     <i class="fa-solid fa-angles-left"></i>
                 </div>
             </a>  
             <div class="swiper products-slider">
                 <div class="swiper-wrapper">
-                    {% for product in points_products %}
+                    {% for product in products %}
                         {% include "common/product-card.html" %}
                     {% endfor %}
                 </div>

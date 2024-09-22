@@ -83,7 +83,7 @@
                     <a class="category" href="{% url "store:offer_page" %}">عروض</a>
                     {% if men_category %}<a class="category" href=" {% url "store:category" men_category.slug %}"> رجالي</a>{% endif %}
                     {% if women_category %}<a class="category" href=" {% url "store:category" women_category.slug %}"> نسائي</a>{% endif %} 
-                    <a class="category" href="{% url "store:points_page" %}">هدايا</a>    
+                    {% comment %} <a class="category" href="{% url "store:points_page" %}">هدايا</a>     {% endcomment %}
 
                 </div>
             </div>

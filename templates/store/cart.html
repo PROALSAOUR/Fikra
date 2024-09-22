@@ -1,0 +1,218 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <div class="cart-page page">
+        
+        <!-- Start cart-products  -->
+        <div class="cart" style='padding-top:100px;'>
+            <div class="favorite">
+                <div class="searched-products">
+                    <div class="container">
+                        {% if cart_items %}
+                            <div class="products-cards">
+                                
+                                {% if available_items %}
+
+                                    <div class="av-status">
+                                        <p> المنتجات المتوفرة ( {{av_count}} )</p>
+                                        <hr>
+                                    </div>
+
+                                    {% for item in available_items %}
+
+                                        <!-- product-start -->
+                                        <div class="specific">
+                                            <div class="swiper-slide product-box {% if item.product.offer %} offer {% endif %}"> <!-- اضف كلاس اوفر اذا كان هنالك تخفيض- -->
+                                                
+                                                <a href="{% url "store:product_details" item.product.id  %}">
+                                                    <div class="product-image">
+                                                        <div class="off-holder">
+                                                            {% if item.product.get_total_stock > 0 %}
+                                                                <span>تخفيض</span>
+                                                            {% endif %}
+                                                        </div>
+                                                        <img src="{{ item.product_item.image.url }}" alt="{{ item.product.name }}">
+                                                    </div>
+                                                    <div class="product-info">
+                                                        <h4 class="product-name"> {{ item.product.name|slice:":20" }}{% if item.product.name|length > 20 %}...{% endif %}</h4><!-- اقصى طول 20 حرف -->
+                                                        
+                                                        <h4 class="product-size ">المقاس: <span>{{ item.size }}</span></h4>
+                                                        <h4 class="product-color ">اللون: <span>{{ item.color }}</span></h4>
+
+                                                        {% if item.product.get_total_stock > 0 %}
+                                                            <h4 class="product-price">
+                                                                <div class="buy-by-money"><span class="old">{{ item.product.price }}</span><span class="new"> | {{ item.product.new_price|floatformat:0 }}</span><span class='currency'>دل</span></div>
+                                                            </h4>
+                                                        {% else %}
+                                                            <h4 class="product-price" style='color:#9D2121;text-wrap:nowrap;'>
+                                                                نفذت الكمية 
+                                                            </h4>
+                                                        {% endif %}
+
+                                                    </div>
+                                                </a> 
+
+                                                {% comment %} الكود الخاص  بزر ازالة من السلة {% endcomment %}
+                                                
+                                                <span class="add-to-trash add-to-fav">
+                                                    <a href="{% url 'store:remove_from_cart' item.cart_item.id %}" data-cart-item-id="{{ item.cart_item.id }}">
+                                                        <i class="fa-regular fa-trash-can"></i>
+                                                    </a>
+                                                </span>
+                                            
+
+                                                {% comment %} الكود الخاص  بزر اضافة الى المفضلة {% endcomment %}
+                                                <span class="add-to-fav">
+                                                    <a href="{% url 'store:add_to_favourites'  item.product.id %}" class="add-to-fav-link" data-product-id="{{  item.cart_item.product_item.product.id }}">
+
+                                                        {% if  item.product.id in favourite_products %}
+                                                            <i class="fa-solid fa-heart"></i>
+                                                        {% else %}
+                                                            <i class="fa-regular fa-heart"></i>
+                                                        {% endif %}
+                                                    
+                                                    </a>
+                                                </span>  
+
+                                                {% comment %} الكود الخاص  بزر تغيير  الكمية داخل السلة {% endcomment %}
+                                                <span class="quantity" data-cartitem-id="{{ item.id }}">
+                                                    <div class="cont">
+                                                        <div class="in-stock">متبقي (<span class="stock-quantity">{{ item.stock }}</span>) في المخزن</div>
+                                                    </div>
+                                                    <button class="minus" data-cartitem-id="{{ item.id }}">
+                                                        <i class="fa-regular fa-square-minus"></i>
+                                                    </button>
+                                                    <span class="quantity-value">{{ item.qty }}</span>
+                                                    <button class="plus" data-cartitem-id="{{ item.id }}">
+                                                        <i class="fa-regular fa-square-plus"></i>
+                                                    </button>
+                                                </span>
+
+                                                <script>
+                                                    {% comment %} const updateCartUrl = "{% url 'store:update_cart_quantity' %}";  // تأكد من استخدام اسم URL الصحيح {% endcomment %}
+                                                </script>
+                                                
+                                            </div>          
+                                        </div>
+                                        <!-- product-end -->
+
+                                    {% endfor %}
+
+                                {% endif %}
+
+                                {% if unavailable_items %}
+
+                                    <div class="av-status">
+                                        <p>المنتجات الغير متوفرة حاليا ( {{unav_count}} ) </p>
+                                        <hr>
+                                    </div>
+
+                                    {% for item in unavailable_items %}
+
+                                        <!-- product-start -->
+                                        <div class="specific">
+                                            <div class="swiper-slide product-box" > <!-- اضف كلاس اوفر اذا كان هنالك تخفيض- -->
+                                                
+                                                <a href="{% url "store:product_details" item.product.id  %}" style='opacity: 0.6;'>
+                                                    <div class="product-image">
+                                                        <div class="off-holder">
+                                                                <span>تخفيض</span>
+                                                        </div>
+                                                        <img src="{{ item.product_item.image.url }}" alt="{{ item.product.name }}"  style='opacity: 0.5;'>
+                                                    </div>
+                                                    <div class="product-info">
+                                                        <h4 class="product-name"> {{ item.product.name|slice:":20" }}{% if item.product.name|length > 20 %}...{% endif %}</h4><!-- اقصى طول 20 حرف -->
+                                                        
+                                                        <h4 class="product-size ">المقاس: <span>{{ item.size }}</span></h4>
+                                                        <h4 class="product-color ">اللون: <span>{{ item.color }}</span></h4>
+                                                        <h4 class="product-price" style='color:#9D2121;text-wrap:nowrap;'>
+                                                            نفذت الكمية 
+                                                        </h4>
+
+                                                    </div>
+                                                </a> 
+
+                                                {% comment %} الكود الخاص  بزر ازالة من السلة {% endcomment %}
+                                                <span class="add-to-trash add-to-fav"  style='opacity: 0.8;'>
+                                                    <a href="{% url 'store:remove_from_cart' item.cart_item.id %}" data-cart-item-id="{{ item.cart_item.id }}">
+                                                        <i class="fa-regular fa-trash-can"></i>
+                                                    </a>
+                                                </span>
+
+                                                {% comment %} الكود الخاص  بزر اضافة الى المفضلة {% endcomment %}
+                                                <span class="add-to-fav" style='opacity: 0.8;'>
+                                                    <a href="{% url 'store:add_to_favourites'  item.product.id %}" class="add-to-fav-link" data-product-id="{{  item.cart_item.product_item.product.id }}">
+
+                                                        {% if  item.product.id in favourite_products %}
+                                                            <i class="fa-solid fa-heart"></i>
+                                                        {% else %}
+                                                            <i class="fa-regular fa-heart"></i>
+                                                        {% endif %}
+                                                    
+                                                    </a>
+                                                </span>  
+                                            
+                                            </div>          
+                                        </div>
+                                        <!-- product-end -->
+
+                                    {% endfor %}
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="receipt "> <!-- اضف كلاس اوفر في حال وجود تخفيض- -->
+                                <span class="total-quantity"> {{ total_qty }} <br> قطعة</span>
+                                <div class="total-price">
+                                    <h3>السعر الإجمالي:</h3>
+                                    <h4 class="price "><span class="old"> {{ total_price|floatformat:0 }} </span><span class="new"> | 28 </span><span> دل</span></h4>
+                                </div>
+                                <div class="points">
+                                    <h3>النقاط  المكتسبة:</h3>
+                                    <h4>+ {{ total_bonus }} <i class="fa-solid fa-gem"></i></h4>
+                                </div>
+                                <form action="" class="discount">
+                                    <p>هل لديك لديك كوبون خصم؟</p>
+                                    <div class="check-code">
+                                        <input type="text" name="" id="" placeholder="اكتبه هنا">
+                                        <input type="submit" value="" id="check">
+                                        <label for="check"><i class="fa-solid fa-clipboard-check"></i></label>
+                                    </div>
+                                    <input type="submit" value="إتمام الطلب" class="confirm ordered-done-link">
+                                </form>
+                            </div>
+                            
+                        {% else %}
+                            <div class="products-cards">
+                                {% include "common/no-result.html" %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End cart-products  -->
+        <!-- Start add-cart-pop-page Section -->
+        <div class="Pop-up-page ordered-done-pop-page">
+            <div class="logo">
+                <img src="{% static "images/name logo.jpg" %}" alt="">
+            </div>
+            <p> طلبك في طريقه إليك</p>
+            <i class="fa-solid fa-boxes-packing"></i>
+            <p class="confirm-order-message">سوف نتصل بك لتأكيد الطلب بأقرب وقت ممكن</p>
+        </div>
+        <!-- End add-cart-pop-page Section -->
+    </div>
+   
+ 
+{% endblock content %}
+
+
+
+
+
+
+
