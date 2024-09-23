@@ -341,25 +341,29 @@ document.addEventListener('DOMContentLoaded', function() {
   var userQuantityInput = document.getElementById('user-quantity');
   var plusButton = document.querySelector('.plus');
   var minusButton = document.querySelector('.minus');
-  var availableStock = 0;  // الكمية المتاحة للمقاس واللون المختارين
+  var availableStock = 0; // الكمية المتاحة للمقاس واللون المختارين
+
+  // تحقق من وجود العناصر
+  if (!sizeOptions.length || !itemGroups.length || !colorOptions.length || !stockQuantityElement || !userQuantityInput || !plusButton || !minusButton) {
+      return; // إذا كان هناك عنصر مفقود، نخرج من الدالة
+  }
 
   function selectFirstColor(group) {
       var firstColor = group.querySelector('.item-option');
       if (firstColor && !firstColor.checked) {
-          firstColor.checked = true;  // تحديد أول لون بشكل افتراضي إذا لم يكن محددًا
+          firstColor.checked = true; // تحديد أول لون بشكل افتراضي إذا لم يكن محددًا
       }
   }
 
   function updateItemGroups() {
       var selectedSizeId = document.querySelector('.size-option:checked')?.value;
 
-      // إعادة تعيين الكمية إلى القيمة الافتراضية (1)
-      resetQuantity();
+      resetQuantity(); // إعادة تعيين الكمية إلى القيمة الافتراضية (1)
 
       itemGroups.forEach(function(group) {
           if (selectedSizeId && group.getAttribute('data-size-id') === selectedSizeId) {
               group.style.display = 'block';
-              selectFirstColor(group);  // تحديد أول لون عند تغيير المقاس
+              selectFirstColor(group); // تحديد أول لون عند تغيير المقاس
           } else {
               group.style.display = 'none';
           }
@@ -374,8 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   colorOptions.forEach(function(colorOption) {
       colorOption.addEventListener('change', function() {
-          // إعادة تعيين الكمية إلى القيمة الافتراضية (1)
-          resetQuantity();
+          resetQuantity(); // إعادة تعيين الكمية إلى القيمة الافتراضية (1)
           getSelectedSizeAndColor();
       });
   });
@@ -385,8 +388,8 @@ document.addEventListener('DOMContentLoaded', function() {
           .then(response => response.json())
           .then(data => {
               if (data.stock !== undefined) {
-                  availableStock = data.stock; // تخزين الكمية المتاحة
-                  stockQuantityElement.textContent = availableStock; // تحديث الكمية المعروضة دون طرح أي شيء
+                  availableStock = data.stock ; // تخزين الكمية المتاحة
+                  stockQuantityElement.textContent = availableStock -1 ; // تحديث الكمية المعروضة
                   userQuantityInput.max = availableStock; // ضبط الحد الأقصى للكمية
                   updateQuantityDisplay(); // تحديث الكمية الظاهرة بناءً على المخزون الجديد
               }
@@ -400,17 +403,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
       if (selectedSize && selectedSku) {
           var sizeId = selectedSize.value;
-          var sku = selectedSku.value;  // استخدام الـ SKU الآن
-          console.log(`Selected size: ${sizeId}, SKU: ${sku}`);  // تأكيد القيم المختارة
-          updateStock(sizeId, sku);  // تمرير الـ SKU إلى دالة التحديث
+          var sku = selectedSku.value; // استخدام الـ SKU الآن
+          console.log(`Selected size: ${sizeId}, SKU: ${sku}`); // تأكيد القيم المختارة
+          updateStock(sizeId, sku); // تمرير الـ SKU إلى دالة التحديث
       } else {
           console.log('Size or SKU not selected');
       }
   }
 
   function resetQuantity() {
-      userQuantityInput.value = 1;  // إعادة تعيين الكمية إلى القيمة الافتراضية
-      adjustStock();  // إعادة ضبط المخزون بناءً على الكمية الجديدة
+      userQuantityInput.value = 1; // إعادة تعيين الكمية إلى القيمة الافتراضية
+      adjustStock(); // إعادة ضبط المخزون بناءً على الكمية الجديدة
   }
 
   function updateQuantityDisplay() {
@@ -425,12 +428,12 @@ document.addEventListener('DOMContentLoaded', function() {
   function adjustStock() {
       var userQuantity = parseInt(userQuantityInput.value);
       var initialQuantity = 1; // القيمة الافتراضية لمربع الإدخال
-      var adjustedStock = availableStock - Math.max(userQuantity, initialQuantity); // التأكد من عدم حساب الكمية المبدئية أكثر من اللازم
+      var adjustedStock = availableStock - Math.max(userQuantity, initialQuantity);
       stockQuantityElement.textContent = adjustedStock;
   }
 
   plusButton.addEventListener('click', function(event) {
-      event.preventDefault();  // منع تصرفات الزر الافتراضية
+      event.preventDefault(); // منع تصرفات الزر الافتراضية
       var currentQuantity = parseInt(userQuantityInput.value);
       if (currentQuantity < availableStock) {
           userQuantityInput.value = currentQuantity + 1;
@@ -440,7 +443,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   minusButton.addEventListener('click', function(event) {
-      event.preventDefault();  // منع تصرفات الزر الافتراضية
+      event.preventDefault(); // منع تصرفات الزر الافتراضية
       var currentQuantity = parseInt(userQuantityInput.value);
       if (currentQuantity > 1) {
           userQuantityInput.value = currentQuantity - 1;
@@ -607,78 +610,6 @@ document.querySelectorAll('.add-to-trash a').forEach(function(button) {
   });
 });
 // =========================================================================================================
-document.addEventListener('DOMContentLoaded', function() {
-  var plusButton = document.querySelector('.plus');
-  var minusButton = document.querySelector('.minus');
-  var userQuantityInput = document.getElementById('user-quantity');
-  var stockQuantityElement = document.getElementById('stock-quantity');
-  var availableStock = parseInt(stockQuantityElement.textContent); // تعيين الكمية المتاحة
-  var cartItemId = document.querySelector('.quantity').dataset.cartItemId; // الحصول على ID العنصر من البيانات
-
-  function updateQuantityDisplay() {
-      var currentQuantity = parseInt(userQuantityInput.value);
-      if (isNaN(currentQuantity) || currentQuantity < 1) {
-          userQuantityInput.value = 1; // إعادة تعيين القيمة إلى 1
-      } else if (currentQuantity > availableStock) {
-          userQuantityInput.value = availableStock; // ضبط القيمة إلى الحد الأقصى
-      }
-  }
-
-  function adjustStock() {
-      var currentQuantity = parseInt(userQuantityInput.value);
-      stockQuantityElement.textContent = availableStock - currentQuantity; // تحديث المخزون المتبقي
-  }
-
-  function updateCart() {
-      var newQty = userQuantityInput.value;
-      fetch(updateCartUrl, {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': getCookie('csrftoken') // تأكد من إرسال CSRF token
-          },
-          body: JSON.stringify({ cart_item_id: cartItemId, qty: newQty })
-      })
-      .then(response => response.json())
-      .then(data => {
-          if (data.status === 'success') {
-              console.log('Cart updated successfully');
-          } else {
-              console.error(data.message);
-          }
-      });
-  }
-
-  plusButton.addEventListener('click', function(event) {
-      event.preventDefault();
-      var currentQuantity = parseInt(userQuantityInput.value);
-      if (currentQuantity < availableStock) {
-          userQuantityInput.value = currentQuantity + 1; // زيادة الكمية
-          updateCart(); // تحديث السلة في قاعدة البيانات
-      }
-      updateQuantityDisplay();
-      adjustStock();
-  });
-
-  minusButton.addEventListener('click', function(event) {
-      event.preventDefault();
-      var currentQuantity = parseInt(userQuantityInput.value);
-      if (currentQuantity > 1) {
-          userQuantityInput.value = currentQuantity - 1; // تقليل الكمية
-          updateCart(); // تحديث السلة في قاعدة البيانات
-      }
-      updateQuantityDisplay();
-      adjustStock();
-  });
-
-  userQuantityInput.addEventListener('input', function() {
-      updateQuantityDisplay();
-      adjustStock();
-      updateCart(); // تحديث السلة في قاعدة البيانات
-  });
-});
-
-
 
 
 // =========================================================================================================

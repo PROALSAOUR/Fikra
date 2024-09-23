@@ -588,24 +588,30 @@ def remove_from_cart(request, cart_item_id):
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 # ===================================================
+from django.views.decorators.csrf import csrf_exempt
+
 
 @login_required
+@csrf_exempt
 def update_cart(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        cart_item_id = data.get('cart_item_id')
-        new_qty = data.get('qty')
-
         try:
-            cart_item = CartItem.objects.get(id=cart_item_id)
-            cart_item.qty = int(new_qty)  # تأكد من تحويل الكمية إلى عدد صحيح
-            cart_item.save()
-
-            return JsonResponse({'status': 'success'})
+            cart_item_id = request.POST.get('cart_item_id')
+            new_qty = int(request.POST.get('qty'))
+            
+            # Fetch the cart item
+            cart_item = CartItem.objects.get(id=cart_item_id, user=request.user)
+            
+            # Validate quantity
+            stock_quantity = cart_item.get_stock_quantity()
+            if new_qty >= 1 and new_qty <= stock_quantity:
+                cart_item.qty = new_qty
+                cart_item.save()
+                
+                return JsonResponse({'status': 'success', 'new_qty': new_qty})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid quantity'}, status=400)
         except CartItem.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Item not found'}, status=404)
-
+            return JsonResponse({'status': 'error', 'message': 'Cart item not found'}, status=404)
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
-
-
 
