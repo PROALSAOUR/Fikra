@@ -3401,7 +3401,13 @@ hr.sep {
   -ms-border-radius: calc(var(--main-border-radius) - 4px);
   -o-border-radius: calc(var(--main-border-radius) - 4px);
 }
-
+.cart .quantity .quantity-value {
+  width: 30px;
+  height: 30px;
+  background-color: transparent;
+  text-align: center;
+  padding: 5px 0 ;
+}
 .quantity .cont {
   position: relative;
 }
@@ -3434,6 +3440,11 @@ hr.sep {
   .quantity .cont .in-stock {
     top: -35px;
     font-size: var(--mob-s-size);
+  }
+  .cart .quantity .quantity-value {
+    width: 25px;
+    height: 20px;
+    padding: 5px 0 ;
   }
 }
 /* phone */
@@ -3472,6 +3483,13 @@ hr.sep {
   .quantity .cont .in-stock {
     font-size:  7px;
     top: -28px;
+  }
+  .cart .quantity .quantity-value {
+    width: 20px;
+    height: 20px;
+    padding: 2px  ;
+    font-size: 14px;
+    margin-bottom: 0px;
   }
 }
 /* End change quantity button  */

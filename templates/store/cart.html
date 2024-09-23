@@ -77,21 +77,23 @@
                                                 </span>  
 
                                                 {% comment %} الكود الخاص  بزر تغيير  الكمية داخل السلة {% endcomment %}
-                                                <span class="quantity" data-cartitem-id="{{ item.id }}">
+                                                <span class="quantity" data-cart-item-id="{{ item.cart_item.id }}">
                                                     <div class="cont">
-                                                        <div class="in-stock">متبقي (<span class="stock-quantity">{{ item.stock }}</span>) في المخزن</div>
+                                                        <div class="in-stock">
+                                                            متبقي (<span id="stock-quantity">{{item.cart_item.get_stock_quantity}}</span>) في المخزن
+                                                        </div>
                                                     </div>
-                                                    <button class="minus" data-cartitem-id="{{ item.id }}">
+                                                    <button type="button" class="minus" >
                                                         <i class="fa-regular fa-square-minus"></i>
                                                     </button>
-                                                    <span class="quantity-value">{{ item.qty }}</span>
-                                                    <button class="plus" data-cartitem-id="{{ item.id }}">
+                                                    <input type="number" name="qty" id="user-quantity" value="{{item.qty}}" min="1" class='quantity-value'/>
+                                                    <button type="button" class="plus">
                                                         <i class="fa-regular fa-square-plus"></i>
                                                     </button>
                                                 </span>
 
-                                                <script>
-                                                    {% comment %} const updateCartUrl = "{% url 'store:update_cart_quantity' %}";  // تأكد من استخدام اسم URL الصحيح {% endcomment %}
+                                                <script type="text/javascript">
+                                                    const updateCartUrl = "{% url 'store:update_cart' %}";
                                                 </script>
                                                 
                                             </div>          

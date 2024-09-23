@@ -2,10 +2,11 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.db.models import Q
 from django.http import JsonResponse
 import json
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from store.models import *
+from django.views.decorators.http import require_POST
+
 
 # الصفحة الرئيسية
 def index(request):
@@ -586,7 +587,25 @@ def remove_from_cart(request, cart_item_id):
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
-
 # ===================================================
+
+@login_required
+def update_cart(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        cart_item_id = data.get('cart_item_id')
+        new_qty = data.get('qty')
+
+        try:
+            cart_item = CartItem.objects.get(id=cart_item_id)
+            cart_item.qty = int(new_qty)  # تأكد من تحويل الكمية إلى عدد صحيح
+            cart_item.save()
+
+            return JsonResponse({'status': 'success'})
+        except CartItem.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Item not found'}, status=404)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
 
 

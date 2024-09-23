@@ -30,8 +30,7 @@ class AdsSlider(models.Model):
         if self.ads_for == 'category':
             return reverse('store:category', kwargs={'slug': self.category.slug})
         elif self.ads_for == 'one_product':
-            # return reverse('store:product_detail', kwargs={'slug': self.one_product.slug})
-            pass
+            return reverse('store:product_details', kwargs={'pid': self.one_product.id})
         elif self.ads_for == 'special_products':
             return reverse('store:ad_details', kwargs={'slug': self.slug})
         else:
@@ -269,6 +268,13 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     cart_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='cart_variations')
     qty = models.PositiveIntegerField(default=1)
+    
+    def get_stock_quantity(self):
+        """
+        تعيد الكمية المتاحة في المخزون بناءً على الكمية المطلوبة.
+        إذا كانت الكمية المطلوبة أكبر من المخزون المتاح، تعيد 0.
+        """
+        return self.cart_item.stock - self.qty if self.qty < self.cart_item.stock else 0
     
 class Order(models.Model):
     
