@@ -460,13 +460,16 @@ def cart_page(request):
         stock = item.cart_item.product_item.variations.first().stock if item.cart_item.product_item.variations.exists() else 0
 
         if stock > 0:
+            product_variation = item.cart_item.product_item.variations.first()
             available_items.append({
+                # اريد تمرير الكمية stock هنا المرتبطة بالمتغير المرتبط ب cartitem
                 'product': item.cart_item.product_item.product,
                 'product_item': item.cart_item.product_item,
                 'size': item.cart_item.product_item.variations.first().size.value if item.cart_item.product_item.variations.exists() else None,
                 'color': item.cart_item.product_item.color,
                 'qty': item.qty,
                 'cart_item': item,
+                'stock': product_variation.stock if product_variation else 0,  # إضافة الكمية المتاحة
             })
             # تحديث العدد والسعر بناءً على العناصر المتاحة
             total_qty += item.qty
@@ -480,6 +483,7 @@ def cart_page(request):
                 'color': item.cart_item.product_item.color,
                 'qty': item.qty,
                 'cart_item': item,
+                'stock': 0,
             })
 
     av_count =  len(available_items)
@@ -588,30 +592,46 @@ def remove_from_cart(request, cart_item_id):
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 # ===================================================
-from django.views.decorators.csrf import csrf_exempt
 
 
 @login_required
-@csrf_exempt
-def update_cart(request):
+def update_cart_item_qty(request):
     if request.method == 'POST':
+        cart_item_id = request.POST.get('cart_item_id')
+        new_qty = request.POST.get('qty')
+        # تحقق من أن cart_item_id و new_qty غير فارغين
+        if not cart_item_id or not new_qty:
+            return JsonResponse({'error': 'يرجى تقديم بيانات صحيحة.'}, status=400)
+
         try:
-            cart_item_id = request.POST.get('cart_item_id')
-            new_qty = int(request.POST.get('qty'))
+            # جلب العنصر من السلة
+            cart_item = CartItem.objects.get(id=cart_item_id)
+            product_variation = cart_item.cart_item  # تأكد من أن هذا هو الكائن الصحيح
+
+            # تحقق من الكمية الجديدة
+            new_qty = int(new_qty)  # تحويل الكمية إلى عدد صحيح
+            if new_qty < 1:
+                new_qty = 1
+            elif new_qty > product_variation.stock:
+                return JsonResponse({'error': 'الكمية المطلوبة أكبر من المتاحة في المخزون.'}, status=400)
+
+            # تحديث الكمية وحفظ التغييرات
+            cart_item.qty = new_qty
+            cart_item.save()
             
-            # Fetch the cart item
-            cart_item = CartItem.objects.get(id=cart_item_id, user=request.user)
-            
-            # Validate quantity
-            stock_quantity = cart_item.get_stock_quantity()
-            if new_qty >= 1 and new_qty <= stock_quantity:
-                cart_item.qty = new_qty
-                cart_item.save()
-                
-                return JsonResponse({'status': 'success', 'new_qty': new_qty})
-            else:
-                return JsonResponse({'status': 'error', 'message': 'Invalid quantity'}, status=400)
+            # إرجاع الكمية الجديدة والمخزون المتبقي
+            return JsonResponse({
+                'new_qty': new_qty,
+                'stock_quantity': product_variation.get_stock_quantity()
+            })
         except CartItem.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Cart item not found'}, status=404)
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+            return JsonResponse({'error': 'العنصر غير موجود في السلة.'}, status=404)
+        except ValueError:
+            return JsonResponse({'error': 'الكمية يجب أن تكون عددًا صحيحًا.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500) # المشكلة تأتي من هنا
+
+    return JsonResponse({'error': 'طريقة غير صحيحة، يجب أن تكون POST.'}, status=400)
+
+
 

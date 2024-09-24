@@ -238,7 +238,7 @@ class ProductVariation(models.Model):
 
     def sell(self, quantity):
        pass
-
+    
     @property
     def item_thumbnail(self):
         return self.product_item.item_image # استرجع صورة المصغرة من المنتج
@@ -274,8 +274,17 @@ class CartItem(models.Model):
         تعيد الكمية المتاحة في المخزون بناءً على الكمية المطلوبة.
         إذا كانت الكمية المطلوبة أكبر من المخزون المتاح، تعيد 0.
         """
-        return self.cart_item.stock - self.qty if self.qty < self.cart_item.stock else 0
+        available_stock = self.cart_item.stock
+        return max(0, available_stock - self.qty)
     
+    def update_qty(self, new_qty):
+        if new_qty < 1:
+            raise ValueError("الكمية يجب أن تكون أكبر من 0.")
+        if new_qty > self.cart_item.stock:
+            raise ValueError("الكمية المطلوبة أكبر من المخزون المتاح.")
+        self.qty = new_qty
+        self.save()
+        
 class Order(models.Model):
     
     ORDER_STATUS = [

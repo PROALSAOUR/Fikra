@@ -610,7 +610,103 @@ document.querySelectorAll('.add-to-trash a').forEach(function(button) {
   });
 });
 // =========================================================================================================
+// كود زر تغيير الكمية داخل السلة 
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.cart-q').forEach(quantityElem => {
+      const minusButton = quantityElem.querySelector('.minus');
+      const plusButton = quantityElem.querySelector('.plus-cart');
+      const quantityInput = quantityElem.querySelector('.quantity-value');
+      const stockQuantityElem = quantityElem.querySelector('.stock-quantity-h');
+      const itemId = quantityElem.dataset.cartItemId; // افترض وجود data-cart-item-id في الـ HTML
 
+      // عند النقر على زر الناقص
+      minusButton.addEventListener('click', () => {
+          let currentQty = parseInt(quantityInput.value);
+          if (currentQty > 1) {
+              quantityInput.value = currentQty - 1;
+              updateStockDisplay();
+              updateCartItem(itemId, quantityInput.value);
+          }
+      });
 
+      // عند النقر على زر الزائد
+      plusButton.addEventListener('click', () => {
+          let currentQty = parseInt(quantityInput.value);
+          const stockQuantity = parseInt(stockQuantityElem.value);
+          if (currentQty < stockQuantity) {
+              quantityInput.value = currentQty + 1;
+              updateStockDisplay();
+              updateCartItem(itemId, quantityInput.value);
+          }
+      });
+
+      // تحديث العرض الخاص بالمخزون
+      function updateStockDisplay() {
+        // الحصول على العنصر الجذري (الذي يحمل class "cart-q") للسياق الحالي
+        const cartItemElement = quantityInput.closest('.cart-q');
+        const stockQuantityElem = cartItemElement.querySelector('.stock-quantity-h'); // استخدم العنصر الخاص بالمخزون في السياق الحالي
+        const stockQuantityDisplay = cartItemElement.querySelector('.stock-quantity'); // استخدم العنصر الذي يعرض الكمية المتبقية
+
+        const currentQty = parseInt(quantityInput.value);
+        const stockQuantity = parseInt(stockQuantityElem.value);
+        
+        // تحديث المخزون المتبقي بناءً على الكمية الحالية
+        const newStockQuantity = stockQuantity - currentQty;
+
+        // تحديث العنصر الذي يعرض الكمية المتبقية في المخزون
+        if (stockQuantityDisplay) {
+            stockQuantityDisplay.textContent = newStockQuantity;
+        } else {
+            console.error('Element with class "stock-quantity" not found.');
+        }
+    }
+
+      // عند فقدان التركيز على مربع الكمية
+      quantityInput.addEventListener('blur', () => {
+          const currentQty = parseInt(quantityInput.value);
+          const stockQuantity = parseInt(stockQuantityElem.value);
+
+          if (currentQty < 1) {
+              quantityInput.value = 1;
+              updateCartItem(itemId, 1);
+              updateStockDisplay();
+          } else if (currentQty > stockQuantity) {
+              quantityInput.value = stockQuantity;
+              updateCartItem(itemId, stockQuantity);
+              updateStockDisplay();
+          }
+      });
+
+      // عند تغيير القيمة في مربع الكمية
+      quantityInput.addEventListener('change', () => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => {
+              updateCartItem(itemId, parseInt(quantityInput.value));
+          }, 2000);
+      });
+
+      let timeout;
+
+      // دالة رفع التغييرات إلى السيرفر
+      function updateCartItem(cartItemId, newQty) {
+          $.ajax({
+              url: updateCartUrl, // استخدام المتغير الممرر من الـ HTML
+              method: 'POST',
+              data: {
+                  cart_item_id: cartItemId,
+                  qty: newQty,
+                  csrfmiddlewaretoken: getCookie('csrftoken') // استخدام دالة جلب الـ CSRF token
+              },
+              success: function(response) {
+                  stockQuantityElem.value = response.new_stock; // تحديث الكمية المتاحة
+              },
+              error: function(xhr) {
+                  console.error(xhr.responseText);
+              }
+          });
+      }
+  });
+});
 // =========================================================================================================
- 
+
+

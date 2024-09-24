@@ -77,33 +77,32 @@
                                                 </span>  
 
                                                 {% comment %} الكود الخاص  بزر تغيير  الكمية داخل السلة {% endcomment %}
-                                                <span class="quantity " data-cart-item-id="{{ item.cart_item.id }}">
+                                                <span class="quantity cart-q" data-cart-item-id="{{ item.cart_item.id }}">
                                                     <div class="cont">
                                                         <div class="in-stock">
-                                                            <input type="hidden" id="hidden-stock-quantity" value="{{ item.cart_item.stock }}"/>
-                                                            متبقي (<span id="stock-quantity" >{{item.cart_item.get_stock_quantity}}</span>) في المخزن
+                                                            <input type="hidden" class="stock-quantity-h" value="{{ item.stock }}"/>
+                                                            متبقي (<span class="stock-quantity">{{ item.cart_item.get_stock_quantity }}</span>) في المخزن
                                                         </div>
                                                     </div>
-                                                    <button type="button"   id='decrease-button'>
+                                                    <button type="button" class="minus">
                                                         <i class="fa-regular fa-square-minus"></i>
                                                     </button>
-                                                    <input type="number" name="qty" id="user-quantity" value="{{item.qty}}" min="1" class='quantity-value'/>
-                                                    <button type="button" id='increase-button'>
+                                                    <input type="number" name="qty" class="quantity-value" value="{{ item.qty }}" min="1" />
+                                                    <button type="button" class="plus-cart">
                                                         <i class="fa-regular fa-square-plus"></i>
                                                     </button>
                                                 </span>
-
-                                                
-                                                
                                                 
                                             </div>          
                                         </div>
                                         <!-- product-end -->
 
                                     {% endfor %}
+
                                     <script type="text/javascript">
-                                        const updateCartUrl = "{% url 'store:update_cart' %}";
+                                        const updateCartUrl = "{% url 'store:update_cart_item_qty' %}";
                                     </script>
+                                  
 
                                 {% endif %}
 
