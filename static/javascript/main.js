@@ -622,6 +622,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const itemId = quantityElem.dataset.cartItemId; // افترض وجود data-cart-item-id في الـ HTML
 
+      // تحقق من قيمة qty عند تحميل الصفحة
+      const initialQty = parseInt(quantityInput.value);
+      const stockQuantity = parseInt(stockQuantityElem.value);
+
+      if (initialQty < 1) {
+        quantityInput.value = 1;
+        updateCartItem(itemId, 1);
+        updateStockDisplay(quantityElem);
+        schedulePageRefresh();
+      } else if (initialQty > stockQuantity) {
+        quantityInput.value = stockQuantity;
+        updateCartItem(itemId, stockQuantity);
+        updateStockDisplay(quantityElem);
+        schedulePageRefresh();
+      }
+
       // عند النقر على زر الناقص
       minusButton.addEventListener('click', () => {
           let currentQty = parseInt(quantityInput.value);

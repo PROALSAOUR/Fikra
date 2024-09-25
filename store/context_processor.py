@@ -8,13 +8,13 @@ def globals(request):
     
     user = request.user
     
-    about_us =  BlogPage.objects.get(slug='about-us')
+    about_us = get_object_or_404(BlogPage.objects.only('slug'), slug='about-us')
    
     men_category =  Category.objects.get(slug='men')
     women_category =  Category.objects.get(slug='women')
-    
-    men_categories = Category.objects.filter(parent_category=men_category, status='visible').annotate(product_count=Count('products')).order_by('-product_count')[:5]
-    women_categories = Category.objects.filter(parent_category=women_category).annotate(product_count=Count('products')).order_by('-product_count')[:5]
+     
+    men_categories = Category.objects.filter(parent_category=men_category, status='visible').annotate(product_count=Count('products')).order_by('-product_count').only('slug', 'name')[:5]
+    women_categories = Category.objects.filter(parent_category=women_category, status='visible').annotate(product_count=Count('products')).order_by('-product_count')[:5]
     
     if user.is_authenticated:
         
@@ -32,7 +32,7 @@ def globals(request):
         user_points = profile.points
         
         inbox = Inbox.objects.get(user=user)
-        unread_messages = inbox.messages.filter(is_read=False)
+        unread_messages = inbox.messages.filter(is_read=False).only('id')
         unread_messages_count = unread_messages.count()
         
             

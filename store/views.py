@@ -1,11 +1,9 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.db.models import Q
 from django.http import JsonResponse
-import json
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from store.models import *
-from django.views.decorators.http import require_POST
 
 
 # الصفحة الرئيسية
@@ -14,7 +12,7 @@ def index(request):
     ads = AdsSlider.objects.filter(show=True)
     
     # جلب العلامات التجارية المميزة
-    brands = Brand.objects.filter(featured=True).only('title', 'img')
+    brands = Brand.objects.filter(featured=True)
     
     #جلب اسم المستخدم الاول اذا كان مسجل دخول 
     user_name = request.user.first_name if request.user.is_authenticated else None
@@ -29,9 +27,9 @@ def index(request):
     ).filter(
         products__featured=True,
         products__ready_to_sale=True,
-    ).distinct()[:10] # عدد اقسام المنتجات المطلوب عرضها بالصفحة الرئيسية
+    ).distinct()[:8] # عدد اقسام المنتجات المطلوب عرضها بالصفحة الرئيسية
     
-    offered_products = Product.objects.filter(offer = True)[:10]
+    offered_products = Product.objects.filter(offer=True)[:8]
     
     context = {
         'ads': ads,
@@ -465,7 +463,7 @@ def cart_page(request):
                 # اريد تمرير الكمية stock هنا المرتبطة بالمتغير المرتبط ب cartitem
                 'product': item.cart_item.product_item.product,
                 'product_item': item.cart_item.product_item,
-                'size': item.cart_item.product_item.variations.first().size.value if item.cart_item.product_item.variations.exists() else None,
+                'size': product_variation.size.value if product_variation else 0,
                 'color': item.cart_item.product_item.color,
                 'qty': item.qty,
                 'cart_item': item,
@@ -527,8 +525,6 @@ def add_to_cart(request):
                     cart_item.qty += quantity
                     cart_item.save()
 
-                # # تحديث المخزون
-                # variation.update_stock(-quantity)
 
                 return JsonResponse({'status': 'success', 'message': 'تم إضافة العنصر إلى السلة'})
             else:
@@ -544,20 +540,28 @@ def add_to_cart2(request, pid):
     if request.method == 'POST':
         product = get_object_or_404(Product, pid=pid)
 
-        product_item = product.items.first()
-        if not product_item:
-            return JsonResponse({'success': False, 'error': 'لا يوجد متغيرات للمنتج.'})
+        # الحصول على جميع عناصر المنتج
+        product_items = product.items.all()
+        available_variation = None
+        
+        # البحث عن متغير متوفر له مخزون في جميع عناصر المنتج
+        for product_item in product_items:
+            variations = product_item.variations.all()
+            for variation in variations:
+                if variation.stock > 0:
+                    available_variation = variation
+                    break  # إنهاء الحلقة إذا وجدنا متغيرًا متاحًا
 
-        variation = product_item.variations.first()
-        if not variation:
-            return JsonResponse({'success': False, 'error': 'لا يوجد متغيرات متاحة.'})
+            if available_variation:  # إذا وجدنا متغير متاح، نخرج من الحلقة
+                break
 
-        if variation.stock <= 0:
-            return JsonResponse({'success': False, 'error': 'المخزون غير متاح.'})
+        if available_variation is None:
+            return JsonResponse({'success': False, 'error': 'لا يوجد مخزون متاح لأي من المتغيرات التابعة للمنتج.'})
 
+        # إضافة المتغير المتاح إلى السلة
         cart, created = Cart.objects.get_or_create(user=request.user)
 
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, cart_item=variation)
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, cart_item=available_variation)
 
         if not created:
             cart_item.qty += 1
@@ -569,6 +573,7 @@ def add_to_cart2(request, pid):
         return JsonResponse({'success': True, 'message': 'تم إضافة المنتج إلى السلة.'})
 
     return JsonResponse({'success': False, 'error': 'الطلب غير صحيح.'})
+
 # دالة الازالة من السلة
 @login_required
 def remove_from_cart(request, cart_item_id):

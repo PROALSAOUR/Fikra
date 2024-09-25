@@ -51,7 +51,7 @@
 {% endif %}
 
 {% comment %} الكود الخاص  بزر اضافة الى السلة {% endcomment %}
-{% if request.path == '/search/' or  request.path == '/favourite/' %} {% comment %} لتحسين الاداء وتقليل الاستعلامات الغير ضرورية {% endcomment %}
+{% if request.path == '/search/' or  request.path == '/favourite/'%} {% comment %} لتحسين الاداء وتقليل الاستعلامات الغير ضرورية {% endcomment %}
     {% if product.get_total_stock > 0 %}
 
         <span class="add-to-cart">
