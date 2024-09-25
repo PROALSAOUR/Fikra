@@ -457,10 +457,11 @@ def cart_page(request):
 
     for item in cart_items:
         # تحقق من وجود المخزون للمتغير المرتبط بالمنتج
-        stock = item.cart_item.product_item.variations.first().stock if item.cart_item.product_item.variations.exists() else 0
-
+        product_variation = item.cart_item
+        stock = product_variation.stock if product_variation else 0  # الكمية المتاحة
+        print(stock)
+        
         if stock > 0:
-            product_variation = item.cart_item.product_item.variations.first()
             available_items.append({
                 # اريد تمرير الكمية stock هنا المرتبطة بالمتغير المرتبط ب cartitem
                 'product': item.cart_item.product_item.product,
@@ -469,7 +470,7 @@ def cart_page(request):
                 'color': item.cart_item.product_item.color,
                 'qty': item.qty,
                 'cart_item': item,
-                'stock': product_variation.stock if product_variation else 0,  # إضافة الكمية المتاحة
+                'stock': int(stock)  # إضافة الكمية المتاحة
             })
             # تحديث العدد والسعر بناءً على العناصر المتاحة
             total_qty += item.qty
@@ -607,14 +608,13 @@ def update_cart_item_qty(request):
             # جلب العنصر من السلة
             cart_item = CartItem.objects.get(id=cart_item_id)
             product_variation = cart_item.cart_item  # تأكد من أن هذا هو الكائن الصحيح
-
             # تحقق من الكمية الجديدة
             new_qty = int(new_qty)  # تحويل الكمية إلى عدد صحيح
             if new_qty < 1:
                 new_qty = 1
             elif new_qty > product_variation.stock:
-                return JsonResponse({'error': 'الكمية المطلوبة أكبر من المتاحة في المخزون.'}, status=400)
-
+                new_qty = product_variation.stock 
+                
             # تحديث الكمية وحفظ التغييرات
             cart_item.qty = new_qty
             cart_item.save()

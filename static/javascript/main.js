@@ -640,9 +640,7 @@ document.addEventListener('DOMContentLoaded', function() {
             quantityInput.value = currentQty + 1;  // زيادة الكمية
             updateStockDisplay(quantityElem);  // تحديث عرض الكمية المتبقية
             updateCartItem(itemId, quantityInput.value);  // تحديث الكمية في الخادم
-        } else {
-            alert("الكمية المطلوبة أكبر من المتاحة في المخزون."); // رسالة تنبيه في حالة تجاوز المخزون
-        }
+        } 
     });
     
       // تحديث العرض الخاص بالمخزون
