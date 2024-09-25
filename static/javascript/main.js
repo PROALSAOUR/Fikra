@@ -617,6 +617,8 @@ document.addEventListener('DOMContentLoaded', function() {
       const plusButton = quantityElem.querySelector('.plus-cart');
       const quantityInput = quantityElem.querySelector('.quantity-value');
       const stockQuantityElem = quantityElem.querySelector('.stock-quantity-h');
+      const leftInStock = quantityElem.querySelector('.stock-quantity'); // تأكد من أن leftInStock مرتبط بكل عنصر
+
       const itemId = quantityElem.dataset.cartItemId; // افترض وجود data-cart-item-id في الـ HTML
 
       // عند النقر على زر الناقص
@@ -624,42 +626,39 @@ document.addEventListener('DOMContentLoaded', function() {
           let currentQty = parseInt(quantityInput.value);
           if (currentQty > 1) {
               quantityInput.value = currentQty - 1;
-              updateStockDisplay();
+              updateStockDisplay(quantityElem);
               updateCartItem(itemId, quantityInput.value);
           }
       });
 
       // عند النقر على زر الزائد
       plusButton.addEventListener('click', () => {
-          let currentQty = parseInt(quantityInput.value);
-          const stockQuantity = parseInt(stockQuantityElem.value);
-          if (currentQty < stockQuantity) {
-              quantityInput.value = currentQty + 1;
-              updateStockDisplay();
-              updateCartItem(itemId, quantityInput.value);
-          }
-      });
-
-      // تحديث العرض الخاص بالمخزون
-      function updateStockDisplay() {
-        // الحصول على العنصر الجذري (الذي يحمل class "cart-q") للسياق الحالي
-        const cartItemElement = quantityInput.closest('.cart-q');
-        const stockQuantityElem = cartItemElement.querySelector('.stock-quantity-h'); // استخدم العنصر الخاص بالمخزون في السياق الحالي
-        const stockQuantityDisplay = cartItemElement.querySelector('.stock-quantity'); // استخدم العنصر الذي يعرض الكمية المتبقية
-
         const currentQty = parseInt(quantityInput.value);
-        const stockQuantity = parseInt(stockQuantityElem.value);
+        const stockQuantity = parseInt(stockQuantityElem.value); 
+        // تحقق مما إذا كانت الكمية الحالية أقل من المخزون المتاح لهذا العنصر
+        if (currentQty < stockQuantity) {
+            quantityInput.value = currentQty + 1;  // زيادة الكمية
+            updateStockDisplay(quantityElem);  // تحديث عرض الكمية المتبقية
+            updateCartItem(itemId, quantityInput.value);  // تحديث الكمية في الخادم
+        } else {
+            alert("الكمية المطلوبة أكبر من المتاحة في المخزون."); // رسالة تنبيه في حالة تجاوز المخزون
+        }
+    });
+    
+      // تحديث العرض الخاص بالمخزون
+      function updateStockDisplay(elem) {
+        const currentQty = parseInt(elem.querySelector('.quantity-value').value);
+        const stockQuantity = parseInt(elem.querySelector('.stock-quantity-h').value);
         
         // تحديث المخزون المتبقي بناءً على الكمية الحالية
         const newStockQuantity = stockQuantity - currentQty;
 
         // تحديث العنصر الذي يعرض الكمية المتبقية في المخزون
+        const stockQuantityDisplay = elem.querySelector('.stock-quantity');
         if (stockQuantityDisplay) {
             stockQuantityDisplay.textContent = newStockQuantity;
-        } else {
-            console.error('Element with class "stock-quantity" not found.');
         }
-    }
+      }
 
       // عند فقدان التركيز على مربع الكمية
       quantityInput.addEventListener('blur', () => {
@@ -673,7 +672,7 @@ document.addEventListener('DOMContentLoaded', function() {
           } else if (currentQty > stockQuantity) {
               quantityInput.value = stockQuantity;
               updateCartItem(itemId, stockQuantity);
-              updateStockDisplay();
+              updateStockDisplay(quantityElem);
           }
       });
 
@@ -698,7 +697,8 @@ document.addEventListener('DOMContentLoaded', function() {
                   csrfmiddlewaretoken: getCookie('csrftoken') // استخدام دالة جلب الـ CSRF token
               },
               success: function(response) {
-                  stockQuantityElem.value = response.new_stock; // تحديث الكمية المتاحة
+                  // تحديث الكمية المتبقية في المخزون في العنصر الصحيح
+                  leftInStock.innerText = response.stock_quantity;
               },
               error: function(xhr) {
                   console.error(xhr.responseText);
@@ -707,6 +707,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
   });
 });
+
 // =========================================================================================================
 
 

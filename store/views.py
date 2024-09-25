@@ -622,7 +622,7 @@ def update_cart_item_qty(request):
             # إرجاع الكمية الجديدة والمخزون المتبقي
             return JsonResponse({
                 'new_qty': new_qty,
-                'stock_quantity': product_variation.get_stock_quantity()
+                'stock_quantity': cart_item.get_stock_quantity()
             })
         except CartItem.DoesNotExist:
             return JsonResponse({'error': 'العنصر غير موجود في السلة.'}, status=404)
