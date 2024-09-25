@@ -459,7 +459,6 @@ def cart_page(request):
         # تحقق من وجود المخزون للمتغير المرتبط بالمنتج
         product_variation = item.cart_item
         stock = product_variation.stock if product_variation else 0  # الكمية المتاحة
-        print(stock)
         
         if stock > 0:
             available_items.append({
@@ -502,7 +501,6 @@ def cart_page(request):
     }
 
     return render(request, 'store/cart.html', context)
-
 # دالة الاضافة الى السلة من صفحة تفاصيل المنتج 
 @login_required
 def add_to_cart(request):
@@ -540,7 +538,6 @@ def add_to_cart(request):
             return JsonResponse({'status': 'error', 'message': 'المتغير غير موجود'})
 
     return JsonResponse({'status': 'error', 'message': 'طلب غير صالح'})
-
 # دالة الاضافة الى السلة من بطاقة المنتج 
 @login_required
 def add_to_cart2(request, pid):
@@ -572,7 +569,6 @@ def add_to_cart2(request, pid):
         return JsonResponse({'success': True, 'message': 'تم إضافة المنتج إلى السلة.'})
 
     return JsonResponse({'success': False, 'error': 'الطلب غير صحيح.'})
-
 # دالة الازالة من السلة
 @login_required
 def remove_from_cart(request, cart_item_id):
@@ -591,10 +587,7 @@ def remove_from_cart(request, cart_item_id):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
-
-# ===================================================
-
-
+# دالة زر تغيير الكمية داخل السلة
 @login_required
 def update_cart_item_qty(request):
     if request.method == 'POST':
@@ -618,11 +611,11 @@ def update_cart_item_qty(request):
             # تحديث الكمية وحفظ التغييرات
             cart_item.qty = new_qty
             cart_item.save()
-            
+                        
             # إرجاع الكمية الجديدة والمخزون المتبقي
             return JsonResponse({
                 'new_qty': new_qty,
-                'stock_quantity': cart_item.get_stock_quantity()
+                'stock_quantity': cart_item.get_stock_quantity(),
             })
         except CartItem.DoesNotExist:
             return JsonResponse({'error': 'العنصر غير موجود في السلة.'}, status=404)
@@ -632,6 +625,10 @@ def update_cart_item_qty(request):
             return JsonResponse({'error': str(e)}, status=500) # المشكلة تأتي من هنا
 
     return JsonResponse({'error': 'طريقة غير صحيحة، يجب أن تكون POST.'}, status=400)
+
+# ===================================================
+
+
 
 
 

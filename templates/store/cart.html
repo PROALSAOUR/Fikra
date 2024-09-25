@@ -98,12 +98,7 @@
                                         <!-- product-end -->
 
                                     {% endfor %}
-
-                                    <script type="text/javascript">
-                                        const updateCartUrl = "{% url 'store:update_cart_item_qty' %}";
-                                    </script>
                                   
-
                                 {% endif %}
 
                                 {% if unavailable_items %}
@@ -176,7 +171,7 @@
                                 </div>
                                 <div class="points">
                                     <h3>النقاط  المكتسبة:</h3>
-                                    <h4>+ {{ total_bonus }} <i class="fa-solid fa-gem"></i></h4>
+                                    <h4 class='total-bouns'>+ <span class='total_bonus_value' >{{ total_bonus }}</span><i class="fa-solid fa-gem"></i></h4>
                                 </div>
                                 <form action="" class="discount">
                                     <p>هل لديك لديك كوبون خصم؟</p>
@@ -188,6 +183,10 @@
                                     <input type="submit" value="إتمام الطلب" class="confirm ordered-done-link">
                                 </form>
                             </div>
+                            
+                            <script type="text/javascript">
+                                const updateCartUrl = "{% url 'store:update_cart_item_qty' %}";
+                            </script>
                             
                         {% else %}
                             <div class="products-cards">

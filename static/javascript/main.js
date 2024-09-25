@@ -612,6 +612,7 @@ document.querySelectorAll('.add-to-trash a').forEach(function(button) {
 // =========================================================================================================
 // كود زر تغيير الكمية داخل السلة 
 document.addEventListener('DOMContentLoaded', function() {
+
   document.querySelectorAll('.cart-q').forEach(quantityElem => {
       const minusButton = quantityElem.querySelector('.minus');
       const plusButton = quantityElem.querySelector('.plus-cart');
@@ -628,6 +629,7 @@ document.addEventListener('DOMContentLoaded', function() {
               quantityInput.value = currentQty - 1;
               updateStockDisplay(quantityElem);
               updateCartItem(itemId, quantityInput.value);
+              schedulePageRefresh();
           }
       });
 
@@ -640,8 +642,9 @@ document.addEventListener('DOMContentLoaded', function() {
             quantityInput.value = currentQty + 1;  // زيادة الكمية
             updateStockDisplay(quantityElem);  // تحديث عرض الكمية المتبقية
             updateCartItem(itemId, quantityInput.value);  // تحديث الكمية في الخادم
+            schedulePageRefresh();
         } 
-    });
+      });
     
       // تحديث العرض الخاص بالمخزون
       function updateStockDisplay(elem) {
@@ -657,7 +660,7 @@ document.addEventListener('DOMContentLoaded', function() {
             stockQuantityDisplay.textContent = newStockQuantity;
         }
       }
-
+    
       // عند فقدان التركيز على مربع الكمية
       quantityInput.addEventListener('blur', () => {
           const currentQty = parseInt(quantityInput.value);
@@ -667,10 +670,12 @@ document.addEventListener('DOMContentLoaded', function() {
               quantityInput.value = 1;
               updateCartItem(itemId, 1);
               updateStockDisplay();
+              schedulePageRefresh();
           } else if (currentQty > stockQuantity) {
               quantityInput.value = stockQuantity;
               updateCartItem(itemId, stockQuantity);
               updateStockDisplay(quantityElem);
+              schedulePageRefresh();
           }
       });
 
@@ -679,6 +684,7 @@ document.addEventListener('DOMContentLoaded', function() {
           clearTimeout(timeout);
           timeout = setTimeout(() => {
               updateCartItem(itemId, parseInt(quantityInput.value));
+              schedulePageRefresh();
           }, 2000);
       });
 
@@ -703,9 +709,16 @@ document.addEventListener('DOMContentLoaded', function() {
               }
           });
       }
+
+      // دالة لتحديث الصفحة بعد ثانية واحدة
+      function schedulePageRefresh() {
+        setTimeout(() => {
+            location.reload(); // تحديث الصفحة
+        }, 200); // التأخير بالميللي ثانية
+    }
   });
 });
-
 // =========================================================================================================
+
 
 
