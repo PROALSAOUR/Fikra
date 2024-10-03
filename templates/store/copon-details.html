@@ -43,7 +43,7 @@
                     {% if user.is_authenticated %}
                         {% if  user_points >= copon.price %}
 
-                            <a href="{% url "store:buy-copon" copon.id %}" class="buy-done-link">
+                            <a href="{% url "store:buy-copon" copon.id %}" class="copon-buy-done-link">
                                 إتمام عملية الشراء
                             </a>     
 

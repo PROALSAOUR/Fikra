@@ -2,12 +2,16 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.db.models import Q
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
 from itertools import chain
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from store.models import *
 from accounts.models import UserProfile
+from django.views.decorators.csrf import csrf_exempt
+import json
+from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
+
 
 
 # الصفحة الرئيسية
@@ -552,7 +556,6 @@ def add_to_cart2(request, pid):
         return JsonResponse({'success': True, 'message': 'تم إضافة المنتج إلى السلة.'})
 
     return JsonResponse({'success': False, 'error': 'الطلب غير صحيح.'})
-
 # دالة الازالة من السلة
 @login_required
 def remove_from_cart(request, cart_item_id):
@@ -611,11 +614,11 @@ def update_cart_item_qty(request):
     return JsonResponse({'error': 'طريقة غير صحيحة، يجب أن تكون POST.'}, status=400)
 
 # ===================================================
-
+# صفحة متجر البطاقات
 def cards_store(request):
     #  خاص بالهدايا
         
-    gifts_list = Gift.objects.filter(is_active=True).only('name','value','img','price')
+    gifts_list = Gift.objects.filter(is_active=True).only('name','value','img','price').order_by('-sales_count')
     
     paginator_all = Paginator(gifts_list, 20)  
 
@@ -632,7 +635,7 @@ def cards_store(request):
     
     #  خاص بالكوبونات
     
-    copons_list = Copon.objects.filter(is_active=True, expiration__gte=timezone.now().date()).only('name','value','img','min_bill_price','price')
+    copons_list = Copon.objects.filter(is_active=True, expiration__gte=timezone.now().date()).only('name','value','img','min_bill_price','price').order_by('-sales_count')
         
     paginator_all = Paginator(copons_list, 20)  
 
@@ -695,7 +698,7 @@ def cards_store(request):
         'results_count':results_count,
     }
     return render(request, 'store/cards-store.html',context)
-
+# صفحة تفاصيل الهدية
 def gift_details(request, gid):
 
     gift = get_object_or_404(Gift, id=gid)
@@ -704,7 +707,7 @@ def gift_details(request, gid):
         'gift': gift,
     }
     return render(request, 'store/gift-details.html', context)
-
+# صفحة تفاصيل الكوبون
 def copon_details(request, cid):
      
     copon = get_object_or_404(Copon, id=cid)
@@ -713,7 +716,7 @@ def copon_details(request, cid):
         'copon': copon,
     }
     return render(request, 'store/copon-details.html', context)
- 
+# دالة شراء كوبون 
 @login_required
 def buy_copon(request, cid):
     """
@@ -731,8 +734,8 @@ def buy_copon(request, cid):
         return JsonResponse({'error': 'لاتوجد نقاط كافية لإتمام عملية الشراء'}, status=400)
     
     # التحقق من أن الكوبون نشط وصالح
-    if not copon.is_active or copon.expiration < now().date():
-        return JsonResponse({'error': 'الكوبون غير صالح أو منتهي الصلاحية'}, status=400)
+    if copon.expiration < now().date():
+        return JsonResponse({'error': 'الكوبون منتهي الصلاحية'}, status=400)
     
     # التحقق من إذا كان المستخدم يملك الكوبون بالفعل
     user_copon, created = CoponUsage.objects.get_or_create(user=user, copon_code=copon) 
@@ -749,12 +752,88 @@ def buy_copon(request, cid):
     # حفظ سجل استخدام الكوبون
     user_copon.has_used = False  # الكوبون غير مستخدم بعد الشراء
     user_copon.sell_price = copon.price
+    copon.sales_count += 1 
+    copon.save()
     user_copon.save()
 
     return JsonResponse({'success': 'تم شراء الكوبون بنجاح'}, status=200)
-
-       
+# دالة شراء هدية
+@login_required
+def buy_gift(request, gid):
+    gift = get_object_or_404(Gift, id=gid)
+    user = request.user
+    profile = get_object_or_404(UserProfile, user=user)
     
+    if gift.price > profile.points:
+        return JsonResponse({'error': 'لا توجد نقاط كافية لإتمام عملية الشراء'}, status=400)
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            buy_for = data.get('buy_for')
+            recipient = user  # افتراضياً المشتري هو المستلم
+            
+            if buy_for == 'for-me':
+                recipient_name = user.username
+                recipient_phone = user.phone_number
+                message_content = ''
+            elif buy_for == 'for-another':
+                recipient_name = data.get('recipient_name')
+                recipient_phone = data.get('recipient_phone')
+                message_content = data.get('message_content')
+
+                try:
+                    recipient = User.objects.get(phone_number=recipient_phone)
+                except User.DoesNotExist:
+                    # إذا لم يكن المستخدم موجودًا، قم بإنشاء سجل في GiftDealing
+                    GiftDealing.objects.create(
+                        sender=user, 
+                        receiver_name=recipient_name,
+                        receiver_phone=recipient_phone,
+                    )
+                    
+                    profile.points -= gift.price
+                    profile.save()
+                    gift.sales_count += 1
+                    gift.save()
+                    
+                    return JsonResponse({'success': 'تم إرسال إشعار خدمة العملاء.'}, status=200)
+
+            # إنشاء كائن GiftItem
+            gift_item = GiftItem.objects.create(
+                gift=gift,
+                buyer=user,
+                sell_price=gift.price,
+                recipient=recipient
+            )
+
+            # إنشاء كائن GiftRecipient
+            GiftRecipient.objects.create(
+                gift_item=gift_item,
+                gift_for=buy_for,
+                recipient_name=recipient_name,
+                recipient_phone=recipient_phone,
+                message=message_content,
+            )
+
+            # تحديث نقاط المستخدم وعدد مبيعات الهدية
+            profile.points -= gift.price
+            profile.save()
+            gift.sales_count += 1
+            gift.save()
+
+            return JsonResponse({'success': 'تمت عملية الشراء بنجاح!'}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'فشل في قراءة البيانات المرسلة.'}, status=400)
+        except IntegrityError:
+            return JsonResponse({'error': 'حدثت مشكلة في قاعدة البيانات.'}, status=500)
+        except ObjectDoesNotExist:
+            return JsonResponse({'error': 'المستلم غير موجود.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'طلب غير صحيح.'}, status=400)
 
 # ===================================================
 

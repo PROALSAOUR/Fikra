@@ -34,5 +34,6 @@ urlpatterns = [
     path('gift-details/<gid>', gift_details, name='gift-details'),
     path('copon-details/<cid>', copon_details, name='copon-details'),
     path('buy-copon/<cid>', buy_copon, name='buy-copon'),
+    path('buy-gift/<gid>', buy_gift, name='buy-gift'),
     
     ]

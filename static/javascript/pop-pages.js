@@ -182,61 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
-// ===================================================================================================
-// الكود الخاص بعرض النافذة الخاصة بمشاركة كود الدعوة
-document.addEventListener('DOMContentLoaded', function () {
-    const shareCodeMenu = document.querySelector('.share-code');
-    const shareCodeLink = document.querySelector('.share-code-link');
-    const copyIcon = document.querySelector('.share-code code i');
-    const shareCodeText = document.querySelector('.share-code code');
-
-    function showShareCodeMenu() {
-        shareCodeMenu.style.display = 'block'; // عرض القائمة
-        setTimeout(() => {
-            shareCodeMenu.style.visibility = 'visible';
-            shareCodeMenu.style.opacity = '1';
-            shareCodeMenu.style.transform = 'translate(-50%, -40%) scale(1)';
-        }, 10);
-    }
-
-    function hideShareCodeMenu() {
-        shareCodeMenu.style.opacity = '0';
-        shareCodeMenu.style.transform = 'translate(-50%, -40%) scale(0.5)';
-        setTimeout(() => {
-            shareCodeMenu.style.visibility = 'hidden';
-            shareCodeMenu.style.display = 'none';
-        }, 300);
-    }
-
-    // التحقق من وجود العناصر قبل إضافة الأحداث
-    if (shareCodeMenu && shareCodeLink) {
-        shareCodeLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (shareCodeMenu.style.visibility === 'hidden' || shareCodeMenu.style.visibility === '') {
-                showShareCodeMenu();
-            }
-        });
-    }
-
-    if (copyIcon && shareCodeText) {
-        copyIcon.addEventListener('click', function () {
-            const range = document.createRange();
-            range.selectNode(shareCodeText);
-            window.getSelection().removeAllRanges(); // إلغاء تحديد النصوص الحالية
-            window.getSelection().addRange(range);
-            document.execCommand('copy');
-            window.getSelection().removeAllRanges(); // إلغاء التحديد بعد النسخ
-            alert('تم نسخ الكود بنجاح!');
-        });
-    }
-
-    document.addEventListener('click', function (e) {
-        if (shareCodeMenu && shareCodeMenu.style.visibility === 'visible' && !shareCodeMenu.contains(e.target) && !shareCodeLink.contains(e.target)) {
-            hideShareCodeMenu();
-        }
-    });
-});
-// ========================================================================================================= 
+// =================================================================================================== 
 // الكود الخاص بصفحة التحقق من رقم الهاتف
 document.addEventListener('DOMContentLoaded', function () {
     const verifMenu = document.querySelector('.verif-code');
@@ -367,6 +313,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 // =============================================================================================
+
+
 // إظهار الفاتورة
 document.addEventListener('DOMContentLoaded', function () {
     const showCheckbox = document.querySelector('#show');
@@ -426,7 +374,6 @@ document.addEventListener('DOMContentLoaded', function () {
         window.addEventListener('resize', updateReceiptVisibility);
     }
 });
-
 // =============================================================================================
 // الكود الخاص بعرض النافذة الخاصة باستعمال كود الهدية
 document.addEventListener('DOMContentLoaded', function () {
@@ -485,70 +432,47 @@ document.addEventListener('DOMContentLoaded', function () {
    
 });
 // =============================================================================================
-// الكود الخاص بعرض النافذة الخاصة بإتمام عملية شراء كوبون بنجاح
-document.addEventListener('DOMContentLoaded', function() {
-    let hideTimeout;
-  
-    function showBuyDoneMenu() {
-        const menu = document.querySelector('.buy-done-pop-page');
-        if (!menu) return; // تأكد من وجود القائمة
-  
-        menu.style.display = 'block';
-        setTimeout(() => {
-            menu.style.visibility = 'visible';
-            menu.style.opacity = '1';
-            menu.style.transform = 'translate(-50%, -40%) scale(1)';
-        }, 10);
-  
-        clearTimeout(hideTimeout);
-        hideTimeout = setTimeout(hideMenu, 3000);
-    }
-  
-    function hideMenu() {
-        const menu = document.querySelector('.buy-done-pop-page');
-        if (!menu) return; // تأكد من وجود القائمة
-  
-        menu.style.opacity = '0';
-        menu.style.transform = 'translate(-50%, -40%) scale(0.5)';
-        setTimeout(() => {
-            menu.style.visibility = 'hidden';
-            menu.style.display = 'none';
-        }, 300);
+// الكود الخاص بإظهار نافذة ادخال البيانات عند شراء الهدية
+document.addEventListener('DOMContentLoaded', function () {
+    const menu = document.querySelector('.pop-gift-details');
+    const links = document.querySelectorAll('.pop-gift-details-link'); // استخدام querySelectorAll لجلب جميع العناصر
 
-        location.reload();
-    }
-  
-    // تأكد من تحميل jQuery أولاً
-    if (window.jQuery) {
-        $(document).ready(function() {
-            $('.buy-done-link').click(function(e) {
-                e.preventDefault(); // منع الانتقال إلى الرابط
-  
-                var url = $(this).attr('href'); // الحصول على الرابط من عنصر الارتباط
-  
-                $.ajax({
-                    type: 'POST',
-                    url: url,
-                    data: {
-                        csrfmiddlewaretoken: getCookie('csrftoken'), // استخدام الدالة لجلب رمز CSRF
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            showBuyDoneMenu(); // عرض النافذة المنبثقة عند النجاح
-                        } else {
-                            alert(response.error); // عرض رسالة الخطأ
-                        }
-                    },
-                    error: function(xhr) {
-                        var errorMessage = xhr.responseJSON ? xhr.responseJSON.error : 'حدث خطأ أثناء إرسال الطلب.';
-                        alert(errorMessage);
-                    }
-                });
+    if (menu && links.length > 0) { // تحقق من وجود القائمة والروابط
+        function showMenu() {
+            menu.style.display = 'block'; // عرض القائمة
+            setTimeout(() => {
+                menu.style.visibility = 'visible';
+                menu.style.opacity = '1';
+                menu.style.transform = 'translate(-50%, -40%) scale(1)';
+            }, 10);
+        }
+
+        function hideMenu() {
+            menu.style.opacity = '0';
+            menu.style.transform = 'translate(-50%, -40%) scale(0.5)';
+            setTimeout(() => {
+                menu.style.visibility = 'hidden';
+                menu.style.display = 'none';
+            }, 300);
+        }
+
+        // إضافة حدث النقر لكل رابط
+        links.forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (menu.style.visibility === 'hidden' || menu.style.visibility === '') {
+                    showMenu();
+                }
             });
+        });
+
+        document.addEventListener('click', function (e) {
+            if (menu.style.visibility === 'visible' && !menu.contains(e.target) && !Array.from(links).some(link => link.contains(e.target))) {
+                hideMenu();
+            }
         });
     }
 });
-
 // =============================================================================================
 // الكود الخاص بعرض النافذة الخاصة بإضافة كوبون الى الفاتورة
 document.addEventListener('DOMContentLoaded', function () {
@@ -596,8 +520,68 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 // =============================================================================================
 
+// الكود الخاص بعرض النافذة الخاصة بإتمام عملية شراء كوبون بنجاح
+document.addEventListener('DOMContentLoaded', function() {
+    let hideTimeout;
+  
+    function showBuyDoneMenu() {
+        const menu = document.querySelector('.buy-done-pop-page');
+        if (!menu) return; // تأكد من وجود القائمة
+  
+        menu.style.display = 'block';
+        setTimeout(() => {
+            menu.style.visibility = 'visible';
+            menu.style.opacity = '1';
+            menu.style.transform = 'translate(-50%, -40%) scale(1)';
+        }, 10);
+  
+        clearTimeout(hideTimeout);
+        hideTimeout = setTimeout(hideMenu, 3000);
+    }
+  
+    function hideMenu() {
+        const menu = document.querySelector('.buy-done-pop-page');
+        if (!menu) return; // تأكد من وجود القائمة
+  
+        menu.style.opacity = '0';
+        menu.style.transform = 'translate(-50%, -40%) scale(0.5)';
+        setTimeout(() => {
+            menu.style.visibility = 'hidden';
+            menu.style.display = 'none';
+        }, 300);
 
+        location.reload();
+    }
+  
+    // تأكد من تحميل jQuery أولاً
+    if (window.jQuery) {
+        $(document).ready(function() {
+            $('.copon-buy-done-link').click(function(e) {
+                e.preventDefault(); // منع الانتقال إلى الرابط
+  
+                var url = $(this).attr('href'); // الحصول على الرابط من عنصر الارتباط
+  
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: {
+                        csrfmiddlewaretoken: getCookie('csrftoken'), // استخدام الدالة لجلب رمز CSRF
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showBuyDoneMenu(); // عرض النافذة المنبثقة عند النجاح
+                        } else {
+                            alert(response.error); // عرض رسالة الخطأ
+                        }
+                    },
+                    error: function(xhr) {
+                        var errorMessage = xhr.responseJSON ? xhr.responseJSON.error : 'حدث خطأ أثناء إرسال الطلب.';
+                        alert(errorMessage);
+                    }
+                });
+            });
+        });
+    }
+});
 
-
-
-
+// =============================================================================================

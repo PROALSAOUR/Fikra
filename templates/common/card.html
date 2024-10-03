@@ -1,3 +1,4 @@
+{% load static %}
 
 <div class="specific">
     <div class="product-box ">
@@ -30,16 +31,60 @@
         {% if user_points >= card.price  %}
             <span class="add-to-cart">
                 {% if card.min_bill_price %}
-                    <a href="#" class="buy-copon-button"><span> شراء </span><i class="fa-solid fa-cart-shopping"></i></a>
+                    <a href="{% url "store:buy-copon" card.id %}" class="copon-buy-done-link">
+                        <span> شراء </span><i class="fa-solid fa-cart-shopping"></i>
+                    </a>
                 {% else %}
-                    <a href="#"><span> شراء </span><i class="fa-solid fa-cart-shopping"></i></a>
+                    <a href="" class="pop-gift-details-link">
+                        <span> شراء </span><i class="fa-solid fa-cart-shopping"></i>
+                    </a>
                 {% endif %}
             </span>
 
         {% else %}
             <span class="add-to-cart">
-                <a href="#"><span>  نقاطك لا تكفي؟ </span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                <a href="#"><span>نقاطك لا تكفي؟ </span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
             </span>
         {% endif %}
     </div>
 </div>
+
+{% comment %} 
+{% if not card.min_bill_price %}
+    <div class="Pop-up-page pop-gift-details">
+        <div class="logo">
+            <img src="{% static "/images/name logo.jpg" %}" alt="">
+        </div>
+        <form class="buy-for">  
+                <input type="hidden" id="for-another" name="buy-for" value='for-another'>
+        </form>
+        <form class="buy-as-gift">
+            <input type="hidden" id="gift-id" name="gift-id" value="{{ gift.id }}">
+            <div class="form-item">
+                <label for="recipient-name"> اسم المستلم:</label>
+                <input type="text" name="recipient-name" placeholder="الاسم" id="recipient-name" required>
+            </div>
+            <div class="form-item">
+                <label for="recipient-phone"> رقم هاتف المستلم:</label>
+                <input type="text" name="recipient-phone" placeholder="رقم الهاتف " id="recipient-phone" required>
+            </div>
+            <div class="form-item">
+                <input type="checkbox" name="" id="send-message">
+                <label for="send-message">ارسال رسالة الى المستلم</label> 
+            </div>
+            <div class="message-details">
+                <div class="form-item">
+                    <label for="content"> محتوى الرسالة:</label>
+                    <textarea name="message-content" id="content" placeholder="اكتب رسالتك هنا" rows="5" cols="50"></textarea>
+                </div>
+            </div>
+
+            <a href="" class="buy-done-link">
+               <span> إتمام عملية الشراء</span>
+            </a>
+
+        </form>
+    
+    </div>
+{% endif %} {% endcomment %}
+

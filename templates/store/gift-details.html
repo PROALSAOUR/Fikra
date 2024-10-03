@@ -33,7 +33,7 @@
             <h3>شراء</h3>
             <div class="recipet">
 
-                <div class="buy-for">
+                <form class="buy-for">
                     <div class="option">
                         <input type="radio" id="for-me" name="buy-for" checked>
                         <span class="custom-radio"></span>
@@ -44,9 +44,10 @@
                         <span class="custom-radio"></span>
                         <label for="for-another">اهداء لغيري</label>
                     </div>
-                </div>
+                </form>
 
                 <form class="buy-as-gift ">
+                    <input type="hidden" id="gift-id" name="gift-id" value="{{ gift.id }}">
                     <div class="form-item">
                         <label for="recipient-name"> اسم المستلم:</label>
                         <input type="text" name="recipient-name" placeholder="الاسم" id="recipient-name">
@@ -55,12 +56,9 @@
                         <label for="recipient-phone"> رقم هاتف المستلم:</label>
                         <input type="text" name="recipient-phone" placeholder="رقم الهاتف " id="recipient-phone">
                     </div>
+                   
                     <div class="form-item">
-                        <input type="checkbox" name="" id="show-sender-details">
-                        <label for="show-sender-details">اظهار معلوماتي للمستلم</label> 
-                    </div>
-                    <div class="form-item">
-                        <input type="checkbox" name="" id="send-message">
+                        <input type="checkbox" name="recipient-message" id="send-message">
                         <label for="send-message">ارسال رسالة الى المستلم</label> 
                     </div>
                     <div class="message-details ">
@@ -81,15 +79,15 @@
                     {% endif %}
                     {% if user.is_authenticated %}
                         {% if  user_points >= gift.price %}
-                            <input type="submit" value="إتمام عملية الشراء"  >
+                            <a href="" class="buy-done-link">
+                                إتمام عملية الشراء
+                            </a>
                         {% else %}
                             <span>نقاطك غير كافية!</span>
                         {% endif %}
                     {% else %}
                         <a href="{% url "accounts:sign" %}">سجل الدخول للشراء</a>
                     {% endif %} 
-                    {% comment %} اظهر النافذة والا اخفيها Successfully  اذا كان قيمة المربع المخفي  {% endcomment %}
-                    <input type="hidden" class="buy-done-link-hidden" value="">
                 </div>
 
                 <a class="note" href="#">
@@ -106,7 +104,7 @@
 <!-- Start buy-done-pop-page Section -->
 <div class="Pop-up-page buy-done-pop-page">
     <div class="logo">
-        <img src="/images/name logo.jpg" alt="">
+        <img src="{% static "/images/name logo.jpg" %}" alt="">
     </div>
     <p >لقد تمت اضافة البطاقة الى مخزون البطاقات الخاص بك بنجاح</p>
     <a href="#">استعراض <i class="fa-solid fa-arrow-up-right-from-square"></i></a>

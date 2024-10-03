@@ -319,7 +319,7 @@ class Copon(models.Model):
     is_active = models.BooleanField(default=True)
     expiration = models.DateField()
     sales_count = models.PositiveIntegerField(default=0)  # عدد مرات بيع الكوبون
-    tags = models.ManyToManyField(Tag, )
+    tags = models.ManyToManyField(Tag,  blank=True)
 
     def __str__(self):
         return self.name
@@ -372,66 +372,81 @@ class Gift(models.Model):
     code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_uppercase + string.digits)
     name = models.CharField(max_length=30)
     img = models.ImageField(upload_to='store/Cards/Gifts')
-    value = models.PositiveIntegerField()
-    price = models.PositiveIntegerField(default=0)
-    is_active = models.BooleanField(default=True)
+    value = models.PositiveIntegerField()  # قيمة الهدية
+    price = models.PositiveIntegerField()  # سعر الشراء بالنقاط أو المال
+    is_active = models.BooleanField(default=True)  # حالة الهدية (نشطة أو غير نشطة)
     sales_count = models.PositiveIntegerField(default=0)  # عدد مرات بيع الهدية
-    tags = models.ManyToManyField(Tag)
-
+    tags = models.ManyToManyField(Tag, blank=True)
+    
     def __str__(self):
         return self.name
-     
-    def gift_image(self):
-        # دالة مسؤولة عن عرض صورة المنتج المصغرة في لوحة الادارة
-        return mark_safe("<img src='%s' width='50' height='50'/>" % (self.img.url) )
-        
-    def clean(self):
-        # تحقق إذا كانت القيمة اصغر من 0
-        if self.value <= 0:
-            raise ValidationError("القيمة للهدية يجب أن تكون اكبر من  0.")
-        super(Gift, self).clean()
 
-    def save(self, *args, **kwargs):
-        # تنفيذ clean للتأكد من التحقق قبل الحفظ
-        self.clean()
-        super(Gift, self).save(*args, **kwargs)
-    
+    def gift_image(self):
+        return mark_safe(f"<img src='{self.img.url}' width='50' height='50' />")
+
     class Meta:
         verbose_name = 'كرت هدية'
-        verbose_name_plural = 'كروت هدايا'
-    
+        verbose_name_plural = 'كروت هدايا'   
+
+class GiftItem(models.Model):
+    gift = models.ForeignKey(Gift, on_delete=models.CASCADE, related_name='gift_items')
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gift_items_buyer')  # المستخدم الذي اشترى الهدية
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gift_items_recipient', null=True)  # المستخدم الذي له الهدية
+    gift_code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_letters + string.digits)  # كود فريد لهذه الهدية المشتراة
+    purchase_date = models.DateTimeField(auto_now_add=True)  # وقت الشراء
+    sell_price = models.PositiveIntegerField(default=0) # سعر  عندما اشتراه المستخدم
+    has_used = models.BooleanField(default=False)  # هل تم استخدام الهدية أم لا
+
+    def __str__(self):
+        return f"{self.buyer.username} - {self.gift.name} - {self.gift_code}"
+
+    class Meta:
+        verbose_name = 'هدية مشتراة'
+        verbose_name_plural = 'هدايا مشتراة'
+
 class GiftRecipient(models.Model):
+    gift_item = models.ForeignKey(GiftItem, on_delete=models.CASCADE, related_name='recipients')
     
-    BUY_FOR =  [
-        ('me', 'شراء لنفسي'),
-        ('another', 'اهداء لصديق'),
+    BUY_FOR_CHOICES = [
+        ('for-me', 'شراء لنفسي'),
+        ('for-another', 'إهداء لشخص آخر'),
     ]
     
-    gift = models.ForeignKey(Gift, on_delete=models.CASCADE, related_name='gift_recipients')
-    gift_for = models.CharField(choices=BUY_FOR, max_length=10)
-    recipient_name = models.CharField(max_length=100, null=True)
-    recipient_phone = models.CharField(max_length=15, null=True)
-    message = models.TextField(blank=True, null=True, max_length=300)
-    seen = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.recipient_name
-
-class GiftUsage(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # المستخدم الذي اشترى الرمز
-    gift_code = models.ForeignKey(Gift, on_delete=models.CASCADE)  # رمز الهدية
-    has_used = models.BooleanField(default=False)  # لتتبع إذا استخدم المستخدم الرمز
-    purchase_date = models.DateTimeField(auto_now_add=True)  # وقت شراء الرمز
+    gift_for = models.CharField(choices=BUY_FOR_CHOICES, max_length=20)  # شراء لنفسي أو لشخص آخر
+    recipient_name = models.CharField(max_length=100, null=True, blank=True)  # اسم المستلم
+    recipient_phone = models.CharField(max_length=15, null=True, blank=True)  # هاتف المستلم
+    message = models.TextField(blank=True, null=True, max_length=300)  # رسالة شخصية
     
     def __str__(self):
-        return f"{self.user.first_name} - {self.gift_code.code}"
+        return f"هدية إلى: {self.recipient_name or 'نفسه'}"
     
     class Meta:
-        verbose_name = 'سجلات شراء الهدايا'
-        verbose_name_plural = 'سجلات شراء الهدايا'
+        verbose_name = 'مستلم هدية'
+        verbose_name_plural = 'مستلمو الهدايا'
 
-# ============================= Cards ====================================
+class GiftDealing(models.Model):
+    '''
+    في حال ارسل احدهم هدية الى شخص ولم يكن مستعملا للبرنامج
+    يتم التواصل معه بواسطة خدمة العملاء من هنا
+    '''
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    receiver_name = models.CharField(max_length=50)
+    receiver_phone = models.CharField(max_length=20)
+    is_dealt = models.BooleanField(default=False)
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
+    
+    def __str__(self):
+        return f"هدية إلى: {self.receiver_name} من: {self.sender}"
+    
+    class Meta:
+        verbose_name = 'ايصال هدية'
+        verbose_name_plural = 'ايصال هدايا'
+    
+        
+    
 
+# =======================================================================
 
 
 

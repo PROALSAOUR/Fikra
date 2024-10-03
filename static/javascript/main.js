@@ -1,3 +1,4 @@
+1
 // ========================================================================================================= 
 // تفعيل Swiper.js للسلايدر الرئيسي
 const mainSwiper = new Swiper('.main-slider', {
@@ -1018,7 +1019,129 @@ document.addEventListener('DOMContentLoaded', function() {
   } 
 });
 //  =========================================================================================================
-  
+// دالة شراء هدية 
+document.addEventListener('DOMContentLoaded', function () {
+
+  const buyDoneLink = document.querySelector('.buy-done-link');
+  const giftIdElement = document.querySelector('#gift-id'); // تحقق من وجود العنصر
+
+  if (!giftIdElement || !giftIdElement.value) {
+    return;
+  }
+
+  const giftId = giftIdElement.value; // الحصول على قيمة gift-id
+
+  if (buyDoneLink) {
+    buyDoneLink.addEventListener('click', function(event) {
+      event.preventDefault(); // منع إعادة تحميل الصفحة
+
+      let selectedOption = document.querySelector('input[name="buy-for"]:checked'); // جلب الخيار المحدد عند النقر
+      let buy_for = selectedOption ? selectedOption.id : '';
+
+      if (buy_for === 'for-me') {
+        fetch(`/buy-gift/${giftId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')  // احصل على الـ CSRF token
+          },
+          body: JSON.stringify({
+            buy_for: 'for-me',
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showBuyDoneMenu();
+            // هنا يمكن تنفيذ ما تريد بعد نجاح الشراء
+          } else {
+            alert(data.error);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+
+      } else if (buy_for === 'for-another') {
+        const recipientName = document.querySelector('#recipient-name')?.value || '';
+        const recipientPhone = document.querySelector('#recipient-phone')?.value || '';
+        const sendMessage = document.querySelector('#send-message')?.checked || false;
+        const messageContent = document.querySelector('#content')?.value || '';
+
+        // التحقق من الحقول
+        if (recipientName === '') {
+          alert('اسم المستلم مطلوب');
+          return;
+        }
+
+        if (recipientPhone === '') {
+          alert('رقم هاتف المستلم مطلوب');
+          return;
+        }
+
+        if (sendMessage && messageContent === '') {
+          alert('محتوى الرسالة مطلوب عند تحديد خيار إرسال رسالة');
+          return;
+        }
+
+        fetch(`/buy-gift/${giftId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')  // احصل على الـ CSRF token
+          },
+          body: JSON.stringify({
+            buy_for: 'for-another',
+            recipient_name: recipientName,
+            recipient_phone: recipientPhone,
+            send_message: sendMessage,
+            message_content: messageContent,
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showBuyDoneMenu();
+          } else {
+            alert(data.error || 'حدث خطأ ما');
+          }
+        })
+        .catch(error => console.error('Error:', error));
+      }
+    });
+  }
+
+  let hideTimeout;
+
+  function showBuyDoneMenu() {
+    const menu = document.querySelector('.buy-done-pop-page');
+     
+
+    menu.style.display = 'block';
+    setTimeout(() => {
+        menu.style.visibility = 'visible';
+        menu.style.opacity = '1';
+        menu.style.transform = 'translate(-50%, -40%) scale(1)';
+    }, 10);
+
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(hideMenu, 3000);
+  }
+
+  function hideMenu() {
+      const menu = document.querySelector('.buy-done-pop-page');
+     
+
+      menu.style.opacity = '0';
+      menu.style.transform = 'translate(-50%, -40%) scale(0.5)';
+      setTimeout(() => {
+          menu.style.visibility = 'hidden';
+          menu.style.display = 'none';
+      }, 300);
+
+      location.reload();
+  }
+
+});
+//  =========================================================================================================
 
 
 
