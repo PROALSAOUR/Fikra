@@ -2,7 +2,6 @@ from django.contrib import admin
 from store.models import *
 from django.utils.html import mark_safe
 
-
 class AdsProductsInline(admin.TabularInline):
     model = AdsProducts
     extra = 1 
@@ -65,6 +64,44 @@ class ProductAdmin(admin.ModelAdmin):
     ordering = ('updated_at',)   
     inlines = (ProductImagesInline, ProductItemInline,)
 
+class CoponAdmin(admin.ModelAdmin):
+    list_display = ('copon_image', 'name', 'get_value_display', 'min_bill_price', 'price', 'sales_count', 'expiration', 'is_active',)
+    search_fields = ('name','value',)
+    list_filter = ('is_active',)
+    ordering = ('sales_count',)   
+    exclude = ('sales_count',)
+    
+    def get_value_display(self, obj):
+        return f"{obj.value}%"
+    get_value_display.short_description = 'value' # عنوان العمود في الواجهة
+    
+class GiftAdmin(admin.ModelAdmin):
+    list_display = ('gift_image', 'name', 'get_value_display', 'price', 'sales_count', 'is_active',)
+    search_fields = ('name','value',)
+    list_filter = ('is_active',)
+    ordering = ('sales_count',)   
+    exclude = ('sales_count',)
+    
+    def get_value_display(self, obj):
+        return f"{obj.value}"
+    get_value_display.short_description = 'value' # عنوان العمود في الواجهة
+
+class CoponUsageAdmin(admin.ModelAdmin):
+    list_display = ('get_gift_image', 'copon_code__name', 'user','sell_price', 'get_now_price', 'has_used', 'purchase_date',)
+    search_fields = ('name','value',)
+    list_filter = ('has_used','user',)
+    ordering = ('purchase_date',)   
+    exclude = ('has_used',)
+    
+    def get_gift_image(self, obj):
+        return f"{obj.copon_code.copon_image()}"
+    get_gift_image.short_description = 'image' # عنوان العمود في الواجهة
+    
+    def get_now_price(self, obj):
+        return f"{obj.copon_code.price}"
+    get_now_price.short_description = 'Current price' # عنوان العمود في الواجهة
+
+
 admin.site.register(AdsSlider, AdsSliderAdmin)
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(SizeCategory, SizeCategoryAdmin)
@@ -73,3 +110,6 @@ admin.site.register(Tag, TagAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductItem, ProductItemAdmin)
 admin.site.register(ProductVariation, ProductVariationAdmin)
+admin.site.register(Copon, CoponAdmin)
+admin.site.register(CoponUsage, CoponUsageAdmin)
+admin.site.register(Gift, GiftAdmin)

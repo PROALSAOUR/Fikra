@@ -2,8 +2,12 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.db.models import Q
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from itertools import chain
+from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from store.models import *
+from accounts.models import UserProfile
 
 
 # الصفحة الرئيسية
@@ -57,9 +61,10 @@ def brand_page(request, slug):
     brand = get_object_or_404(Brand, title=slug)
     last_products = Product.objects.filter(brand=brand).order_by('-updated_at')[:12]
     offerd_products = Product.objects.filter(brand=brand, offer=True)[:12]
-    
+
     # تطبيق Paginator على جميع منتجات العلامة التجارية
     all_brand_products_list = Product.objects.filter(brand=brand)
+    
     paginator_all = Paginator(all_brand_products_list, 12)  # 12 منتجًا لكل صفحة
 
     page_all = request.GET.get('page_all', 1)
@@ -134,32 +139,6 @@ def brand_page(request, slug):
     }
     
     return render(request, 'store/brand.html', context)
-# ===================================================
-# صفحة  بيع المنتجات بالنقاط
-# def point_products_page(request):
-    # products = Product.objects.filter(ready_to_sale=True,).order_by('-new_price')
-    # products_count = products.count()
-    
-    # paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
-    # page = request.GET.get('page', 1)
-
-    # try:
-    #     points_products = paginator.page(page)
-    # except PageNotAnInteger:
-    #     points_products = paginator.page(1)
-    # except EmptyPage:
-    #     points_products = paginator.page(paginator.num_pages)
-
-    # if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-    #     results_data = list(points_products.object_list.values())
-    #     return JsonResponse({'results': results_data})
-    
-    
-    # context  ={
-    #     'points_products': points_products,
-    #     'products_count': products_count,
-    # }
-    # return render(request, 'store/points-products.html', context)
 # ===================================================
 # صفحة التصنيف
 def category_page(request, slug):
@@ -633,7 +612,150 @@ def update_cart_item_qty(request):
 
 # ===================================================
 
+def cards_store(request):
+    #  خاص بالهدايا
+        
+    gifts_list = Gift.objects.filter(is_active=True).only('name','value','img','price')
+    
+    paginator_all = Paginator(gifts_list, 20)  
 
+    page_all = request.GET.get('page_all', 1)
+    
+    try:
+        gifts = paginator_all.page(page_all)
+    except PageNotAnInteger:
+        gifts = paginator_all.page(1)
+    except EmptyPage:
+        gifts = paginator_all.page(paginator_all.num_pages)
+    
+    # =====================================================
+    
+    #  خاص بالكوبونات
+    
+    copons_list = Copon.objects.filter(is_active=True, expiration__gte=timezone.now().date()).only('name','value','img','min_bill_price','price')
+        
+    paginator_all = Paginator(copons_list, 20)  
 
+    page_all = request.GET.get('page_all', 1)
+    
+    try:
+        copons = paginator_all.page(page_all)
+    except PageNotAnInteger:
+        copons = paginator_all.page(1)
+    except EmptyPage:
+        copons = paginator_all.page(paginator_all.num_pages)
+    
+    # =====================================================
+    
+    # إضافة فلترة أخرى بناءً على معايير المستخدم (البحث، السعر، العلامة التجارية)
+    query = request.GET.get('q', '')
+    price_min = request.GET.get('price_min')
+    price_max = request.GET.get('price_max')
+   
+    filters = Q(is_active=True)
+    
+    if query:
+        filters &= (Q(name__icontains=query) | Q(tags__name__icontains=query)) 
+
+    if price_min and price_min.isdigit():
+        price_min = int(price_min)
+        filters &= Q(price__gte=price_min) 
+        
+    if price_max and price_max.isdigit():
+        price_max = int(price_max)
+        filters &= Q(price__lte=price_max)
+    
+    copon_filters = filters & Q(expiration__gte=timezone.now().date()) # فلاتر خاصة بالكوبونات
+    
+    # جلب المنتجات بناءً على الفلاتر
+    results_list = list(chain(
+    Copon.objects.filter(copon_filters).distinct(),
+    Gift.objects.filter(filters).distinct()
+    ))
+    
+    # إعداد التصفح المرقم
+    paginator = Paginator(results_list, 20)  # عرض 20 منتجًا في كل صفحة
+    page = request.GET.get('page', 1)
+
+    try:
+        results = paginator.page(page)
+    except PageNotAnInteger:
+        results = paginator.page(1)
+    except EmptyPage:
+        results = paginator.page(paginator.num_pages)
+
+    results_count = len(results_list)
+    
+    # =====================================================
+    
+    context  = {
+        'gifts': gifts,
+        'copons': copons,
+        'results':results,
+        'results_count':results_count,
+    }
+    return render(request, 'store/cards-store.html',context)
+
+def gift_details(request, gid):
+
+    gift = get_object_or_404(Gift, id=gid)
+        
+    context  = {
+        'gift': gift,
+    }
+    return render(request, 'store/gift-details.html', context)
+
+def copon_details(request, cid):
+     
+    copon = get_object_or_404(Copon, id=cid)
+        
+    context  = {
+        'copon': copon,
+    }
+    return render(request, 'store/copon-details.html', context)
+ 
+@login_required
+def buy_copon(request, cid):
+    """
+    دالة للتحقق من الكوبون المراد شرائه
+    """
+    # الحصول على الكوبون والمستخدم
+    copon = get_object_or_404(Copon, id=cid)
+    user = request.user
+    profile = get_object_or_404(UserProfile, user=user)
+    
+    points = profile.points
+    
+    # التحقق من أن المستخدم لديه نقاط كافية
+    if copon.price > points:
+        return JsonResponse({'error': 'لاتوجد نقاط كافية لإتمام عملية الشراء'}, status=400)
+    
+    # التحقق من أن الكوبون نشط وصالح
+    if not copon.is_active or copon.expiration < now().date():
+        return JsonResponse({'error': 'الكوبون غير صالح أو منتهي الصلاحية'}, status=400)
+    
+    # التحقق من إذا كان المستخدم يملك الكوبون بالفعل
+    user_copon, created = CoponUsage.objects.get_or_create(user=user, copon_code=copon) 
+    
+    if not created:
+        if not user_copon.has_used:
+            return JsonResponse({'error': 'لديك هذا الكوبون في مخزونك بالفعل'}, status=400)
+    
+    # خصم النقاط وحفظ التحديثات
+    points -= copon.price
+    profile.points = points
+    profile.save()
+    
+    # حفظ سجل استخدام الكوبون
+    user_copon.has_used = False  # الكوبون غير مستخدم بعد الشراء
+    user_copon.sell_price = copon.price
+    user_copon.save()
+
+    return JsonResponse({'success': 'تم شراء الكوبون بنجاح'}, status=200)
+
+       
+    
+
+# ===================================================
 
 

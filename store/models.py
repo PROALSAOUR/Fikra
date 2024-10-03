@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from django.utils.html import mark_safe
 from shortuuid.django_fields import ShortUUIDField
 from accounts.models import User
+from django.utils.timezone import now  # لجلب التاريخ الحالي
+from datetime import timedelta  # لحساب الفروق الزمنية
 import string
 
 # ======================== Product ======================================
@@ -304,6 +306,132 @@ class OrderItem(models.Model):
     order_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='order_items')
     qty = models.PositiveIntegerField(default=1)
     price = models.PositiveIntegerField()
+
+# ============================= Cards ====================================
+
+class Copon(models.Model):
+    code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_uppercase + string.digits)
+    name = models.CharField(max_length=30)
+    img = models.ImageField(upload_to='store/Cards/Copons')
+    value = models.PositiveIntegerField()
+    min_bill_price = models.PositiveIntegerField()
+    price = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    expiration = models.DateField()
+    sales_count = models.PositiveIntegerField(default=0)  # عدد مرات بيع الكوبون
+    tags = models.ManyToManyField(Tag, )
+
+    def __str__(self):
+        return self.name
+     
+    def copon_image(self):
+        # دالة مسؤولة عن عرض صورة المنتج المصغرة في لوحة الادارة
+        return mark_safe("<img src='%s' width='50' height='50'/>" % (self.img.url) )
+    
+    def get_days_left(self):
+        """دالة لحساب عدد الأيام المتبقية حتى انتهاء صلاحية الكوبون"""
+        today = now().date()  # تاريخ اليوم
+        if self.expiration >= today:
+            days_left = (self.expiration - today).days  # حساب عدد الأيام المتبقية
+            return f"{days_left} أيام متبقية"
+        else:
+            return "الكوبون منتهي الصلاحية"
+        
+    def clean(self):
+        # تحقق إذا كانت القيمة أكبر من 100
+        if self.value > 100:
+            raise ValidationError("القيمة للكوبون يجب أن تكون اصغر من أو تساوي 100.")
+        if self.expiration and self.expiration < now().date():
+            raise ValidationError(" !لقد أدخلت تاريخ صلاحية منتهي بالفعل للكوبون")
+        super(Copon, self).clean()
+
+    def save(self, *args, **kwargs):
+        # تنفيذ clean للتأكد من التحقق قبل الحفظ
+        self.clean()
+        super(Copon, self).save(*args, **kwargs)
+    
+    class Meta:
+        verbose_name = 'كوبون خصم'
+        verbose_name_plural = 'كوبونات الخصم'
+    
+class CoponUsage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # المستخدم الذي اشترى الرمز
+    copon_code = models.ForeignKey(Copon, on_delete=models.CASCADE)  # رمز الخصم
+    sell_price = models.IntegerField(default=0) # سعر الكوبون عندما اشتراه المستخدم
+    has_used = models.BooleanField(default=False)  # لتتبع إذا استخدم المستخدم الرمز
+    purchase_date = models.DateTimeField(auto_now_add=True)  # وقت شراء الرمز
+    
+    def __str__(self):
+        return f"{self.user.first_name} - {self.copon_code.code}"
+    
+    class Meta:
+        verbose_name = 'سجلات شراء الكوبونات'
+        verbose_name_plural = 'سجلات شراء الكوبونات'
+
+class Gift(models.Model):
+    code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_uppercase + string.digits)
+    name = models.CharField(max_length=30)
+    img = models.ImageField(upload_to='store/Cards/Gifts')
+    value = models.PositiveIntegerField()
+    price = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    sales_count = models.PositiveIntegerField(default=0)  # عدد مرات بيع الهدية
+    tags = models.ManyToManyField(Tag)
+
+    def __str__(self):
+        return self.name
+     
+    def gift_image(self):
+        # دالة مسؤولة عن عرض صورة المنتج المصغرة في لوحة الادارة
+        return mark_safe("<img src='%s' width='50' height='50'/>" % (self.img.url) )
+        
+    def clean(self):
+        # تحقق إذا كانت القيمة اصغر من 0
+        if self.value <= 0:
+            raise ValidationError("القيمة للهدية يجب أن تكون اكبر من  0.")
+        super(Gift, self).clean()
+
+    def save(self, *args, **kwargs):
+        # تنفيذ clean للتأكد من التحقق قبل الحفظ
+        self.clean()
+        super(Gift, self).save(*args, **kwargs)
+    
+    class Meta:
+        verbose_name = 'كرت هدية'
+        verbose_name_plural = 'كروت هدايا'
+    
+class GiftRecipient(models.Model):
+    
+    BUY_FOR =  [
+        ('me', 'شراء لنفسي'),
+        ('another', 'اهداء لصديق'),
+    ]
+    
+    gift = models.ForeignKey(Gift, on_delete=models.CASCADE, related_name='gift_recipients')
+    gift_for = models.CharField(choices=BUY_FOR, max_length=10)
+    recipient_name = models.CharField(max_length=100, null=True)
+    recipient_phone = models.CharField(max_length=15, null=True)
+    message = models.TextField(blank=True, null=True, max_length=300)
+    seen = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.recipient_name
+
+class GiftUsage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # المستخدم الذي اشترى الرمز
+    gift_code = models.ForeignKey(Gift, on_delete=models.CASCADE)  # رمز الهدية
+    has_used = models.BooleanField(default=False)  # لتتبع إذا استخدم المستخدم الرمز
+    purchase_date = models.DateTimeField(auto_now_add=True)  # وقت شراء الرمز
+    
+    def __str__(self):
+        return f"{self.user.first_name} - {self.gift_code.code}"
+    
+    class Meta:
+        verbose_name = 'سجلات شراء الهدايا'
+        verbose_name_plural = 'سجلات شراء الهدايا'
+
+# ============================= Cards ====================================
+
 
 
 

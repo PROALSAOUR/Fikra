@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const isFlipped = localStorage.getItem('isFlipped') === 'true';
   
   // تطبيق حالة البطاقة عند تحميل الصفحة
-  if (isFlipped) {
+  if (isFlipped && signCard) {
     signCard.classList.add('rotate');
   }
   
@@ -457,6 +457,35 @@ document.addEventListener('DOMContentLoaded', function() {
       adjustStock();
   });
 
+  let hideTimeout;
+
+  function showAddToCartMenu() {
+      const menu = document.querySelector('.add-cart-pop-page');
+      if (!menu) return; // تأكد من وجود القائمة
+
+      menu.style.display = 'block';
+      setTimeout(() => {
+          menu.style.visibility = 'visible';
+          menu.style.opacity = '1';
+          menu.style.transform = 'translate(-50%, -40%) scale(1)';
+      }, 10);
+
+      clearTimeout(hideTimeout);
+      hideTimeout = setTimeout(hideMenu, 3000);
+  }
+
+  function hideMenu() {
+      const menu = document.querySelector('.add-cart-pop-page');
+      if (!menu) return; // تأكد من وجود القائمة
+
+      menu.style.opacity = '0';
+      menu.style.transform = 'translate(-50%, -40%) scale(0.5)';
+      setTimeout(() => {
+          menu.style.visibility = 'hidden';
+          menu.style.display = 'none';
+      }, 300);
+  }
+
   document.querySelector('.form').addEventListener('submit', function(e) {
       e.preventDefault(); // منع النموذج من الإرسال التلقائي
 
@@ -543,30 +572,64 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 // =========================================================================================================
 // دالة اضافة المنتج الى السلة من البطاقة الخاصة به
-$(document).ready(function() {
-  $('.add-to-cart-link').click(function(e) {
-      e.preventDefault(); // منع الانتقال إلى الرابط
+document.addEventListener('DOMContentLoaded', function() {
+  let hideTimeout;
 
-      var url = $(this).attr('href'); // الحصول على الرابط من عنصر الارتباط
+  function showAddToCartMenu() {
+      const menu = document.querySelector('.add-cart-pop-page');
+      if (!menu) return; // تأكد من وجود القائمة
 
-      $.ajax({
-          type: 'POST',
-          url: url,
-          data: {
-              csrfmiddlewaretoken: getCookie('csrftoken'), // استخدام الدالة لجلب رمز CSRF
-          },
-          success: function(response) {
-              if (response.success) {
-                  showAddToCartMenu(); // عرض النافذة المنبثقة عند النجاح
-              } else {
-                  alert(response.error); // عرض رسالة الخطأ
-              }
-          },
-          error: function() {
-              alert('حدث خطأ أثناء إرسال الطلب.');
-          }
+      menu.style.display = 'block';
+      setTimeout(() => {
+          menu.style.visibility = 'visible';
+          menu.style.opacity = '1';
+          menu.style.transform = 'translate(-50%, -40%) scale(1)';
+      }, 10);
+
+      clearTimeout(hideTimeout);
+      hideTimeout = setTimeout(hideMenu, 3000);
+  }
+
+  function hideMenu() {
+      const menu = document.querySelector('.add-cart-pop-page');
+      if (!menu) return; // تأكد من وجود القائمة
+
+      menu.style.opacity = '0';
+      menu.style.transform = 'translate(-50%, -40%) scale(0.5)';
+      setTimeout(() => {
+          menu.style.visibility = 'hidden';
+          menu.style.display = 'none';
+      }, 300);
+  }
+
+  // تأكد من تحميل jQuery أولاً
+  if (window.jQuery) {
+      $(document).ready(function() {
+          $('.add-to-cart-link').click(function(e) {
+              e.preventDefault(); // منع الانتقال إلى الرابط
+
+              var url = $(this).attr('href'); // الحصول على الرابط من عنصر الارتباط
+
+              $.ajax({
+                  type: 'POST',
+                  url: url,
+                  data: {
+                      csrfmiddlewaretoken: getCookie('csrftoken'), // استخدام الدالة لجلب رمز CSRF
+                  },
+                  success: function(response) {
+                      if (response.success) {
+                          showAddToCartMenu(); // عرض النافذة المنبثقة عند النجاح
+                      } else {
+                          alert(response.error); // عرض رسالة الخطأ
+                      }
+                  },
+                  error: function() {
+                      alert('حدث خطأ أثناء إرسال الطلب.');
+                  }
+              });
+          });
       });
-  });
+  }
 });
 // =========================================================================================================
 //  دالة ازالة المنتج من السلة
@@ -735,6 +798,228 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 // =========================================================================================================
+// الكود الخاص  بتبديل العرض  بين الكوبونات والهدايا في مستودع المستخدم
+document.addEventListener("DOMContentLoaded", function () {
+  // دوال مساعدة لحفظ واسترجاع حالة الاختيار من التخزين المحلي
+  function saveSelectedOption(value) {
+      localStorage.setItem("selectedRepo", value);
+  }
+
+  function getSelectedOption() {
+      return localStorage.getItem("selectedRepo");
+  }
+
+  // التحقق من وجود div الذي يحتوي على مربعات الراديو
+  const repoTitleDiv = document.querySelector('.repo-title');
+  const giftCardsDivs = document.querySelectorAll('.gift-cards');  // جميع عناصر gift-cards
+  const coponsCardsDivs = document.querySelectorAll('.copons-cards'); // جميع عناصر copons-cards
+  
+  if (repoTitleDiv && giftCardsDivs.length > 0 && coponsCardsDivs.length > 0) {
+      // مربعات الاختيار
+      const giftsPageRadio = document.getElementById("gifts-page");
+      const coponsPageRadio = document.getElementById("copons-page");
+
+      // labels المرتبطة بمربعات الاختيار
+      const giftsPageLabel = document.querySelector('label[for="gifts-page"]');
+      const coponsPageLabel = document.querySelector('label[for="copons-page"]');
+
+      // التحقق من وجود مربعات الاختيار والـ labels
+      if (giftsPageRadio && coponsPageRadio && giftsPageLabel && coponsPageLabel) {
+          // استرجاع الحالة المحفوظة أو تعيين الخيار الافتراضي
+          const savedOption = getSelectedOption();
+          
+          if (savedOption) {
+              document.getElementById(savedOption).checked = true;
+          } else {
+              giftsPageRadio.checked = true; // جعل الخيار الأول افتراضي
+              saveSelectedOption("gifts-page");
+          }
+
+          // تحديث العرض بناءً على الحالة المحفوظة أو الاختيار الافتراضي
+          updateVisibility();
+          updateActiveClass();
+
+          // إضافة مستمع للأحداث لتغيير العرض بناءً على الاختيار
+          giftsPageRadio.addEventListener("change", function () {
+              if (this.checked) {
+                  saveSelectedOption("gifts-page");
+                  updateVisibility();
+                  updateActiveClass();
+              }
+          });
+
+          coponsPageRadio.addEventListener("change", function () {
+              if (this.checked) {
+                  saveSelectedOption("copons-page");
+                  updateVisibility();
+                  updateActiveClass();
+              }
+          });
+
+          // دالة لتحديث عرض العناصر
+          function updateVisibility() {
+              if (giftsPageRadio.checked) {
+                  coponsCardsDivs.forEach(function (div) {
+                      div.classList.add("dont-show");
+                  });
+                  giftCardsDivs.forEach(function (div) {
+                      div.classList.remove("dont-show");
+                  });
+              } else if (coponsPageRadio.checked) {
+                  giftCardsDivs.forEach(function (div) {
+                      div.classList.add("dont-show");
+                  });
+                  coponsCardsDivs.forEach(function (div) {
+                      div.classList.remove("dont-show");
+                  });
+              }
+          }
+
+          // دالة لإضافة كلاس active إلى الـ label المرتبط بالخيار المحدد
+          function updateActiveClass() {
+              if (giftsPageRadio.checked) {
+                  giftsPageLabel.classList.add("active");
+                  coponsPageLabel.classList.remove("active");
+              } else if (coponsPageRadio.checked) {
+                  coponsPageLabel.classList.add("active");
+                  giftsPageLabel.classList.remove("active");
+              }
+          }
+      }
+  }
+});
+//  =========================================================================================================
+//  دالة اظهار الفورم واخفاءه داخل صفحة تفاصيل البطاقات
+document.addEventListener('DOMContentLoaded', function() {
+  const forMeRadio = document.getElementById('for-me');
+  const forAnotherRadio = document.getElementById('for-another');
+  const buyAsGiftForm = document.querySelector('.buy-as-gift');
+  const sendMessageCheckbox = document.getElementById('send-message');
+  const messageDetails = document.querySelector('.message-details');
+
+  // التحقق من وجود العناصر
+  if (forMeRadio && forAnotherRadio && buyAsGiftForm && sendMessageCheckbox && messageDetails) {
+
+      // وظيفة لتحديث عرض الفورم بناءً على اختيار الراديو
+      function updateFormVisibility() {
+          if (forMeRadio.checked) {
+              buyAsGiftForm.classList.add('dont-show'); // إضافة كلاس dont-show إذا كان for-me مختارًا
+          } else if (forAnotherRadio.checked) {
+              buyAsGiftForm.classList.remove('dont-show'); // إزالة كلاس dont-show إذا كان for-another مختارًا
+          }
+      }
+
+      // وظيفة لتحديث عرض تفاصيل الرسالة بناءً على اختيار "إرسال رسالة"
+      function updateMessageDetailsVisibility() {
+          if (sendMessageCheckbox.checked) {
+              messageDetails.classList.remove('dont-show'); // إزالة كلاس dont-show إذا كان send-message مختارًا
+          } else {
+              messageDetails.classList.add('dont-show'); // إضافة كلاس dont-show إذا لم يكن send-message مختارًا
+          }
+      }
+
+      // إضافة مستمع للأحداث على مربعات الراديو
+      forMeRadio.addEventListener('change', updateFormVisibility);
+      forAnotherRadio.addEventListener('change', updateFormVisibility);
+
+      // إضافة مستمع للأحداث على checkbox الخاص بإرسال الرسالة
+      sendMessageCheckbox.addEventListener('change', updateMessageDetailsVisibility);
+
+      // استدعاء الوظائف عند تحميل الصفحة للتأكد من حالة العناصر
+      updateFormVisibility();
+      updateMessageDetailsVisibility();
+  }
+});
+//  =========================================================================================================
+// الكود الخاص  بتبديل العرض  بين الكوبونات والهدايا في صفحة اختيار كوبون لاستعماله
+document.addEventListener('DOMContentLoaded', function () {
+  const giftCardsRadio = document.getElementById('gift-cards');
+  const coponCardsRadio = document.getElementById('copon-cards');
+  const giftForm = document.getElementById('gift-form');
+  const coponsForm = document.getElementById('copons-form');
+
+  // التحقق من وجود جميع العناصر قبل المتابعة
+  if (giftCardsRadio && coponCardsRadio && giftForm && coponsForm) {
+      // التحقق من حالة الراديو وتعيين الكلاس المناسب
+      function checkRadioSelection() {
+          if (giftCardsRadio.checked) {
+              giftForm.classList.remove('dont-show');
+              coponsForm.classList.add('dont-show');
+          } else if (coponCardsRadio.checked) {
+              coponsForm.classList.remove('dont-show');
+              giftForm.classList.add('dont-show');
+          }
+      }
+
+      // استدعاء الدالة عند تغيير الاختيار
+      giftCardsRadio.addEventListener('change', checkRadioSelection);
+      coponCardsRadio.addEventListener('change', checkRadioSelection);
+
+      // استدعاء الدالة في البداية للتحقق من الحالة الأولية
+      checkRadioSelection();
+  } 
+});
+//  =========================================================================================================
+//  انشاء تأثير قلب البطاقة لبطاقة الهدية 
+document.addEventListener('DOMContentLoaded', function() {
+  const flipButton = document.querySelector('.face .content .flip');
+  const face = document.querySelector('.gift-card .card-body');
+  const content = document.querySelector('.back .content');
+  const giftCard = document.querySelector('.gift-card');
+  const showGiftCardInput = document.getElementById('show-gift-card');
+  const exitButton = document.getElementById('exit'); // إضافة هذا السطر للعنصر .exit
+
+  // تحقق من وجود العناصر في الصفحة
+  if (flipButton && face && content && giftCard && showGiftCardInput) {
+    
+    // عند تغيير حالة الـ checkbox لإظهار أو إخفاء بطاقة الهدية
+    showGiftCardInput.addEventListener('change', function() {
+      if (this.checked) {
+        // إزالة كلاس hidden من .gift-card إذا كان checkbox محدد
+        giftCard.classList.remove('hidden');
+      } else {
+        // إضافة كلاس hidden إلى .gift-card إذا كان checkbox غير محدد
+        giftCard.classList.add('hidden');
+      }
+    });
+
+    // عند النقر على "انقر هنا" لإضافة كلاس rotate
+    flipButton.addEventListener('click', function() {
+      if (!face.classList.contains('rotate')) {
+        face.classList.remove('hidden'); // تأكد أن العنصر مرئي
+        face.classList.add('rotate');
+      }
+    });
+
+    // عند النقر على محتوى الظهر لإزالة كلاس rotate
+    content.addEventListener('click', function() {
+      if (face.classList.contains('rotate')) {
+        face.classList.remove('rotate');
+      }
+    });
+
+    // حدث لإغلاق بطاقة الهدية عند النقر خارجها
+    document.addEventListener('click', function(event) {
+      // تحقق مما إذا كان النقر خارج عنصر .gift-card
+      if (!giftCard.contains(event.target) && !showGiftCardInput.contains(event.target)) {
+        showGiftCardInput.checked = false; // تغيير حالة checkbox إلى غير مختار
+        giftCard.classList.add('hidden'); // إضافة كلاس hidden
+      }
+    });
+
+    // إذا كنت تريد إغلاق البطاقة عند النقر على .exit
+    if (exitButton) {
+      exitButton.addEventListener('click', function() {
+        showGiftCardInput.checked = false; // تغيير حالة checkbox إلى غير مختار
+        giftCard.classList.add('hidden'); // إضافة كلاس hidden
+      });
+    }
+    
+  } 
+});
+//  =========================================================================================================
+  
+
 
 
 

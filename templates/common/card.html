@@ -1,0 +1,45 @@
+
+<div class="specific">
+    <div class="product-box ">
+        {% comment %} استعملت اقل قيمة للفاتورة لمعرفة ان كان الكود لكوبون ام هدية وتحديد دالة صفحة عرض التفاصيل وفقا لذلك {% endcomment %}
+        <a href=" {% if card.min_bill_price %}{% url "store:copon-details" card.id %}{% else %}{% url "store:gift-details" card.id %}{% endif %}">
+            <div class="product-image">
+                <img src="{{ card.img.url }}" alt="{{ card.name }} تخقيض">
+            </div>
+            <div class="product-info">
+                <h4 class="product-name">{{ card.name }}</h4>
+
+                <p class="product-description">القيمة: {{ card.value }}{% if card.min_bill_price %}% {% else %} دينار{% endif %} </p>
+                {% if card.min_bill_price %}
+                    <p class="product-description"> صالح مع الطلبات بقيمة  {{ card.min_bill_price }} دينار او اكثر</p>
+                {% endif %}
+
+                <h4 class="product-price point">
+
+                    <div class="buy-by-points {% if  card.price > user_points %}forbidden{% endif %}{% if card.price == 0 %}free{% endif %} ">
+                        {% if card.price == 0 %} 
+                            مجانا 
+                        {% else %}
+                            {{ card.price }}<i class="fa-solid fa-gem"></i>
+                        {% endif %} 
+                    </div>   
+
+                </h4>
+            </div>
+        </a> 
+        {% if user_points >= card.price  %}
+            <span class="add-to-cart">
+                {% if card.min_bill_price %}
+                    <a href="#" class="buy-copon-button"><span> شراء </span><i class="fa-solid fa-cart-shopping"></i></a>
+                {% else %}
+                    <a href="#"><span> شراء </span><i class="fa-solid fa-cart-shopping"></i></a>
+                {% endif %}
+            </span>
+
+        {% else %}
+            <span class="add-to-cart">
+                <a href="#"><span>  نقاطك لا تكفي؟ </span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            </span>
+        {% endif %}
+    </div>
+</div>

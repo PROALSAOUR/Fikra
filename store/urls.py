@@ -13,9 +13,7 @@ urlpatterns = [
     path("ad-details/<slug:slug>/", ads_page, name="ad_details"),
     
     path("offer/", offer_page, name="offer_page"),
-    
-    # path("points-products/", point_products_page, name="points_page"),
-    
+        
     path("search/", search_page, name="search_page"),
     
     path("favourite/", favourite_page, name="favourite_page"),
@@ -32,4 +30,9 @@ urlpatterns = [
     path('update-cart-item-qty/', update_cart_item_qty, name='update_cart_item_qty'),
     
 
+    path('cards-store/',cards_store, name='cards-store'),
+    path('gift-details/<gid>', gift_details, name='gift-details'),
+    path('copon-details/<cid>', copon_details, name='copon-details'),
+    path('buy-copon/<cid>', buy_copon, name='buy-copon'),
+    
     ]

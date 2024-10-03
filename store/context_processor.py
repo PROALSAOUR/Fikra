@@ -7,9 +7,7 @@ from django.shortcuts import get_object_or_404
 def globals(request):
     
     user = request.user
-    
-    about_us = get_object_or_404(BlogPage.objects.only('slug'), slug='about-us')
-   
+       
     men_category =  Category.objects.get(slug='men')
     women_category =  Category.objects.get(slug='women')
      
@@ -46,7 +44,6 @@ def globals(request):
         'women_category': women_category,
         'men_categories': men_categories,
         'women_categories': women_categories,
-        'about-us':about_us,
         'favourite_products': favourite_products,
         'user_points': user_points,
         'unread_messages_count': unread_messages_count,

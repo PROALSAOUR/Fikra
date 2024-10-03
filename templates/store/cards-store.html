@@ -1,0 +1,187 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="cards-store">
+    <div class="fav-page page">
+    
+        <!-- Start Search Bar -->
+            <div class="search-bar">
+                <div class="container">
+                    <form id="filter-form" method="get" action="" class="search">
+                        <input type="search" class="search-input" id="search-query" name="q" placeholder="جرب البحث هنا" value="">        
+                        <div class="filter-container">
+                            <button type="button" class="filter-toggle">
+                                <i class="fa-solid fa-sliders"></i>
+                            </button>
+                            <div class="filter-options">
+                                <div class="filter-header">
+                                    <h2>خيارات الفلترة</h2>
+                                    <button type="button" class="close-filter">&times;</button>
+                                </div>
+                                <div class="filter-tabs">
+                                    <button type="button" class="filter-tab" data-target="price">السعر</button>
+                                </div>
+                                <div class="filter-content">
+                                    <!-- الفلاتر المخفية هنا -->
+                                    <div id="price" class="filter-group">
+                                        <label>نطاق السعر:</label>
+                                        <div class="price-range">
+                                            <input type="number" id="price_min" name="price_min" placeholder="من" aria-label="سعر من" value="{{ request.GET.price_min }}">
+                                            <input type="number" id="price_max" name="price_max" placeholder="إلى" aria-label="سعر إلى" value="{{ request.GET.price_max }}">
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                <button type="submit" class="apply-filters">تطبيق الفلاتر</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        <!-- End Search Bar -->
+        <!-- Start repo-title -->
+            {% if not request.GET.q and not request.GET.price_min and not request.GET.price_max  %}
+            
+                <div class="container" style='margin-top:20px;'>
+                    <div class="repo-title">
+                        <input type="radio" name="repo" id="gifts-page" >
+                        <label for="gifts-page" class="active">كروت هدايا</label>
+                        <input type="radio" name="repo" id="copons-page" >
+                        <label for="copons-page">كوبونات خصم</label>
+                    </div>
+                </div>
+
+            {% endif %}  
+        <!-- End repo-title -->
+        <!-- Start cards quantities --> 
+            {% if request.GET.q or request.GET.price_min or request.GET.price_max  %}
+                {% if results %}
+                    <h2 class='searched-product-counts'>عدد النتائج ({{ results_count }})</h2>
+                {% endif %}
+            {% endif %}  
+        <!-- End cards quantities --> 
+
+        <div class="favorite">
+            <div class="searched-products">
+                <div class="container">
+
+                    {% if request.GET.q or request.GET.price_min or request.GET.price_max  %}
+                        <div class="products-cards gift-cards">
+                        
+                            <!-- إذا كان هناك استعلام بحث، اعرض المنتجات -->
+                
+                            {% if results %}
+
+                                {% for card in results %}
+                                    {% include "common/card.html" %}
+                                {% endfor %}
+
+                            {% else %}
+                                {% include "common/no-result.html" %}
+                            {% endif %}
+                
+                        </div>
+
+                    {% else %}
+
+                        <!-- Start gift-products  -->
+                        <div class="products-cards gift-cards">
+                        
+                            {% if gifts %}
+
+                                {% for card in gifts %}
+                                    {% include "common/card.html" %}
+                                {% endfor %}
+
+                            {% else %}
+
+                                {% include "common/no-result.html" %}
+                    
+                            {% endif %}
+                                
+                        </div>
+                        <!-- End gift-products  -->
+                        
+                        <!-- Start copons-products  -->       
+                        <div class="products-cards copons-cards">
+                        
+                            {% if copons %}
+
+                                {% for card in copons %}
+                                    {% include "common/card.html" %}
+                                {% endfor %}
+
+                            {% else %}
+
+                                {% include "common/no-result.html" %}
+                    
+                            {% endif %}
+                                
+                        </div>
+                        <!-- End copons-products  -->
+
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+        
+        <!-- Start Pagination -->
+        {% if request.GET.q or request.GET.price_min or request.GET.price_max %}
+                {% if results %}
+                    <div class="pagination-container">
+                        <div class="container">
+                            <div class="pagination">
+                                <!-- Previous Page Link -->
+                                {% if results.has_previous %}
+                                    <a href="?page={{ results.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.price_min %}&price_min={{ request.GET.price_min }}{% endif %}{% if request.GET.price_max %}&price_max={{ request.GET.price_max }}{% endif %}" 
+                                    class="previous">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </a>
+                                {% else %}
+                                    <div class="previous disapled">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Page Number Display -->
+                                <div class="page-number">
+                                    <span class="in-page">{{ results.number }}</span>
+                                    <span class="from">من</span>
+                                    <span class="total-pages">{{ results.paginator.num_pages }}</span>
+                                </div>
+
+                                <!-- Next Page Link -->
+                                {% if results.has_next %}
+                                    <a href="?page={{ results.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.price_min %}&price_min={{ request.GET.price_min }}{% endif %}{% if request.GET.price_max %}&price_max={{ request.GET.price_max }}{% endif %}" 
+                                    class="next">
+                                        <i class="fa-solid fa-arrow-left"></i>
+                                    </a>
+                                {% else %}
+                                    <div class="next disapled">
+                                        <i class="fa-solid fa-arrow-left"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+        {% endif %}
+        <!-- End Pagination -->
+
+
+    </div>
+</div>
+
+{% endblock content %}
+
+   
+
+
+
+
+
+
+

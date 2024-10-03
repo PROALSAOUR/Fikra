@@ -38,7 +38,8 @@
     
     {% endblock content %}
     
-    {% include "common/added-to-cart.html" %}
+    {% include "pop-pages/added-to-cart.html" %}
+    {% include "pop-pages/buy-card.html" %}
 
     {% if request.path != '/accounts/sign/' %}
         {% include "partials/footer.html" %}
@@ -51,5 +52,6 @@
     <script src=" {% static "/javascript/pop-pages.js" %}"></script>
     <script src=" {% static "/javascript/main.js" %}"></script>
     <script src=" {% static "/javascript/live-search.js" %}"></script>
+    <script src=" {% static "/javascript/fireworks.js" %}"></script>
 </body>
 </html>
