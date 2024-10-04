@@ -18,7 +18,6 @@ from django.contrib import admin
 from django.urls import path, include
 from .settings import MEDIA_ROOT, MEDIA_URL, STATIC_ROOT, STATIC_URL
 from django.conf.urls.static import static
-import store, blog
 from debug_toolbar.toolbar import debug_toolbar_urls
 
 admin.site.site_header  = "Fikra  managment"
@@ -30,6 +29,7 @@ urlpatterns = [
     path('', include('store.urls')),
     path('blog/', include('blog.urls')),
     path('accounts/', include('accounts.urls')),
+    path('cards/', include('cards.urls')),
 ] + debug_toolbar_urls()
 
 urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)

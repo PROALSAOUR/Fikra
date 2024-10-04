@@ -30,10 +30,4 @@ urlpatterns = [
     path('update-cart-item-qty/', update_cart_item_qty, name='update_cart_item_qty'),
     
 
-    path('cards-store/',cards_store, name='cards-store'),
-    path('gift-details/<gid>', gift_details, name='gift-details'),
-    path('copon-details/<cid>', copon_details, name='copon-details'),
-    path('buy-copon/<cid>', buy_copon, name='buy-copon'),
-    path('buy-gift/<gid>', buy_gift, name='buy-gift'),
-    
-    ]
+]

@@ -170,10 +170,39 @@
                 {% endif %}
         {% endif %}
         <!-- End Pagination -->
-
-
     </div>
 </div>
+
+{% include "pop-pages/buy-done.html" %}
+
+<div class="Pop-up-page pop-gift-details" >
+    <div class="logo">
+        <img src="{% static "/images/name logo.jpg" %}" alt="">
+    </div>
+    <form id='get-data-from-me' class="buy-as-gift">
+        <div class="form-item">
+            <label for="recipient-name"> اسم المستلم:</label>
+            <input type="text" name="recipient-name" placeholder="الاسم" id="recipient-name" required>
+        </div>
+        <div class="form-item">
+            <label for="recipient-phone"> رقم هاتف المستلم:</label>
+            <input type="text" name="recipient-phone" placeholder="رقم الهاتف " id="recipient-phone" required>
+        </div>
+        <div class="message-details">
+            <div class="form-item">
+                <label for="content"> محتوى الرسالة:</label>
+                <textarea name="message-content" id="content" placeholder="اكتب رسالتك هنا" rows="5" cols="50"></textarea>
+            </div>
+        </div>
+
+        {% comment %} <button type="submit" class="buy-this-gift">إتمام عملية الشراء</button> {% endcomment %}
+
+        <a href="" class="submit-gift-form">
+            <span>اتمام عملية الشراء</span>
+        </a> 
+    </form>
+</div>
+
 
 {% endblock content %}
 

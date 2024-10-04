@@ -6891,6 +6891,7 @@ input[type="radio"]:checked + .custom-radio::after {
 .hidden {
   display: none;
   visibility: hidden;
+  position: absolute;
 }
 /* Start Fireworks */
 .frwdStage {
@@ -6950,6 +6951,7 @@ input[type="radio"]:checked + .custom-radio::after {
   text-align: center;
   margin-top: 5px;
 }
+
 .pop-gift-details form a span{
   background-color: var(--main-color);
   color: #ffffff;
@@ -6975,3 +6977,80 @@ input[type="radio"]:checked + .custom-radio::after {
   }
 }
 /* End pop-gift-details  */
+/* Start Show-related Gifts  */
+.repo-inputs-cont {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  padding: 0px 80px ;
+}
+.repo-inputs-cont input {
+  display: none;
+  visibility: hidden;
+}
+.repo-inputs-cont div{
+  width: 100%;
+  padding: 20px 40px 20px 0;
+  display: flex;
+  align-items: center;
+  font-size: var(--lab-xs-size);
+}
+.repo-inputs-cont div i{
+  color: var(--main-color);
+  margin-right: 10px;
+  font-size: var(--lab-m-size);
+}
+.repo-inputs-cont hr{
+  margin: 0;
+  height: 1px;
+  background-color: var(--disaple-text-color);
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+}
+@media (max-width:902px) {
+  .repo-inputs-cont {
+    padding: 0px 50px ;
+  }
+  .repo-inputs-cont div{
+    font-size: var(--tab-xs-size);
+  }
+  .repo-inputs-cont div i{
+    font-size: var(--tab-m-size);
+  }
+}
+@media (max-width:768px) {
+  .repo-inputs-cont {
+    padding: 0px 30px ;
+  }
+  .repo-inputs-cont div{
+    font-size: var(--tab-s-size);
+  }
+  .repo-inputs-cont div i{
+    font-size: var(--tab-xs-size);
+  }
+}
+@media (max-width:482px) {
+  .repo-inputs-cont {
+    padding: 0px 10px ;
+  }
+  .repo-inputs-cont div{
+    padding: 15px 20px 15px 0;
+    font-size: var(--mob-xs-size);
+  }
+  .repo-inputs-cont div i{
+    font-size: var(--mob-xs-size);
+  }
+}
+@media (max-width:392px) {
+  .repo-inputs-cont div{
+    padding: 15px 20px 15px 0;
+    font-size: var(--mob-s-size);
+  }
+  .repo-inputs-cont div i{
+    font-size: var(--mob-s-size);
+  }
+}
+/* End Show-related Gifts  */

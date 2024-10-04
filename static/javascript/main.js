@@ -1,4 +1,3 @@
-1
 // ========================================================================================================= 
 // تفعيل Swiper.js للسلايدر الرئيسي
 const mainSwiper = new Swiper('.main-slider', {
@@ -799,97 +798,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 // =========================================================================================================
-// الكود الخاص  بتبديل العرض  بين الكوبونات والهدايا في مستودع المستخدم
-document.addEventListener("DOMContentLoaded", function () {
-  // دوال مساعدة لحفظ واسترجاع حالة الاختيار من التخزين المحلي
-  function saveSelectedOption(value) {
-      localStorage.setItem("selectedRepo", value);
-  }
-
-  function getSelectedOption() {
-      return localStorage.getItem("selectedRepo");
-  }
-
-  // التحقق من وجود div الذي يحتوي على مربعات الراديو
-  const repoTitleDiv = document.querySelector('.repo-title');
-  const giftCardsDivs = document.querySelectorAll('.gift-cards');  // جميع عناصر gift-cards
-  const coponsCardsDivs = document.querySelectorAll('.copons-cards'); // جميع عناصر copons-cards
-  
-  if (repoTitleDiv && giftCardsDivs.length > 0 && coponsCardsDivs.length > 0) {
-      // مربعات الاختيار
-      const giftsPageRadio = document.getElementById("gifts-page");
-      const coponsPageRadio = document.getElementById("copons-page");
-
-      // labels المرتبطة بمربعات الاختيار
-      const giftsPageLabel = document.querySelector('label[for="gifts-page"]');
-      const coponsPageLabel = document.querySelector('label[for="copons-page"]');
-
-      // التحقق من وجود مربعات الاختيار والـ labels
-      if (giftsPageRadio && coponsPageRadio && giftsPageLabel && coponsPageLabel) {
-          // استرجاع الحالة المحفوظة أو تعيين الخيار الافتراضي
-          const savedOption = getSelectedOption();
-          
-          if (savedOption) {
-              document.getElementById(savedOption).checked = true;
-          } else {
-              giftsPageRadio.checked = true; // جعل الخيار الأول افتراضي
-              saveSelectedOption("gifts-page");
-          }
-
-          // تحديث العرض بناءً على الحالة المحفوظة أو الاختيار الافتراضي
-          updateVisibility();
-          updateActiveClass();
-
-          // إضافة مستمع للأحداث لتغيير العرض بناءً على الاختيار
-          giftsPageRadio.addEventListener("change", function () {
-              if (this.checked) {
-                  saveSelectedOption("gifts-page");
-                  updateVisibility();
-                  updateActiveClass();
-              }
-          });
-
-          coponsPageRadio.addEventListener("change", function () {
-              if (this.checked) {
-                  saveSelectedOption("copons-page");
-                  updateVisibility();
-                  updateActiveClass();
-              }
-          });
-
-          // دالة لتحديث عرض العناصر
-          function updateVisibility() {
-              if (giftsPageRadio.checked) {
-                  coponsCardsDivs.forEach(function (div) {
-                      div.classList.add("dont-show");
-                  });
-                  giftCardsDivs.forEach(function (div) {
-                      div.classList.remove("dont-show");
-                  });
-              } else if (coponsPageRadio.checked) {
-                  giftCardsDivs.forEach(function (div) {
-                      div.classList.add("dont-show");
-                  });
-                  coponsCardsDivs.forEach(function (div) {
-                      div.classList.remove("dont-show");
-                  });
-              }
-          }
-
-          // دالة لإضافة كلاس active إلى الـ label المرتبط بالخيار المحدد
-          function updateActiveClass() {
-              if (giftsPageRadio.checked) {
-                  giftsPageLabel.classList.add("active");
-                  coponsPageLabel.classList.remove("active");
-              } else if (coponsPageRadio.checked) {
-                  coponsPageLabel.classList.add("active");
-                  giftsPageLabel.classList.remove("active");
-              }
-          }
-      }
-  }
-});
-//  =========================================================================================================
 //  دالة اظهار الفورم واخفاءه داخل صفحة تفاصيل البطاقات
 document.addEventListener('DOMContentLoaded', function() {
   const forMeRadio = document.getElementById('for-me');
@@ -1019,7 +927,7 @@ document.addEventListener('DOMContentLoaded', function() {
   } 
 });
 //  =========================================================================================================
-// دالة شراء هدية 
+// دالة شراء هدية من صفحة التفاصيل
 document.addEventListener('DOMContentLoaded', function () {
 
   const buyDoneLink = document.querySelector('.buy-done-link');
@@ -1039,7 +947,7 @@ document.addEventListener('DOMContentLoaded', function () {
       let buy_for = selectedOption ? selectedOption.id : '';
 
       if (buy_for === 'for-me') {
-        fetch(`/buy-gift/${giftId}`, {
+        fetch(`/cards/buy-gift/${giftId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1082,7 +990,7 @@ document.addEventListener('DOMContentLoaded', function () {
           return;
         }
 
-        fetch(`/buy-gift/${giftId}`, {
+        fetch(`/cards/buy-gift/${giftId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1142,7 +1050,261 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 //  =========================================================================================================
+// دالة شراء هدية من البطاقة الخارجية
+document.addEventListener('DOMContentLoaded', function() {
+  // الكود الخاص بإظهار نافذة ادخال البيانات عند شراء الهدية
+  const menu = document.querySelector('.pop-gift-details');
+  const links = document.querySelectorAll('.pop-gift-details-link'); // استخدام querySelectorAll لجلب جميع العناصر
 
+  if (menu && links.length > 0) { // تحقق من وجود القائمة والروابط
+      function showMenu() {
+          menu.style.display = 'block'; // عرض القائمة
+          setTimeout(() => {
+              menu.style.visibility = 'visible';
+              menu.style.opacity = '1';
+              menu.style.transform = 'translate(-50%, -40%) scale(1)';
+          }, 10);
+      }
 
+      function hideMenu() {
+          menu.style.opacity = '0';
+          menu.style.transform = 'translate(-50%, -40%) scale(0.5)';
+          setTimeout(() => {
+              menu.style.visibility = 'hidden';
+              menu.style.display = 'none';
+          }, 300);
+      }
+
+      // إضافة حدث النقر لكل رابط
+      links.forEach(link => {
+          link.addEventListener('click', function (e) {
+              e.preventDefault();
+              if (menu.style.visibility === 'hidden' || menu.style.visibility === '') {
+                  showMenu();
+              }
+          });
+      });
+
+      document.addEventListener('click', function (e) {
+          if (menu.style.visibility === 'visible' && !menu.contains(e.target) && !Array.from(links).some(link => link.contains(e.target))) {
+              hideMenu();
+          }
+      });
+  }
+ 
+  let giftId = '';  // متغير لتخزين giftId
+  // إضافة حدث النقر لكل عنصر هدية
+  const giftLinks = document.querySelectorAll('.pop-gift-details-link');
+
+  if (giftLinks) {
+    giftLinks.forEach(link => {
+      link.addEventListener('click', function(event) {
+          // سحب البيانات من العنصر الذي تم النقر عليه
+          giftId = this.getAttribute('data-gift-id'); // الحصول على giftId من العنصر
+      });
+    });
+  } else  {
+    return;
+  }
+
+  const buyLink =document.querySelector('.submit-gift-form')
+  if (buyLink) {
+    buyLink.addEventListener('click', function(event) {
+        event.preventDefault();
+        const giftForm = document.getElementById('get-data-from-me');
+
+        if (giftForm) {
+            // عند الضغط على رابط شراء الهدية، يجب استدعاء وظيفة تقديم النموذج
+            handleFormSubmit();
+        }
+    });
+  }
+
+  function handleFormSubmit() {
+      // الحصول على بيانات النموذج
+      const recipientName = document.getElementById('recipient-name').value;
+      const recipientPhone = document.getElementById('recipient-phone').value;
+      const messageContent = document.querySelector('#content')?.value || '';
+
+      // التحقق من وجود جميع البيانات
+      if (recipientName && recipientPhone && giftId) {
+          // إجراء طلب AJAX
+          fetch(`/cards/buy-gift2/${giftId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCookie('csrftoken')  // احصل على الـ CSRF token
+            },
+              body: JSON.stringify({
+                recipient_name: recipientName,
+                recipient_phone: recipientPhone,
+                message_content: messageContent,
+              })
+          })
+          .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            hideMenu();
+            showBuyDoneMenu();
+            // هنا يمكن تنفيذ ما تريد بعد نجاح الشراء
+          } else {
+            alert(data.error);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+      } else {
+          alert('يرجى ملء جميع الحقول.');
+      }
+  }
+
+  let hideTimeout;
+
+  function showBuyDoneMenu() {
+    const menu = document.querySelector('.buy-done-pop-page');
+     
+
+    menu.style.display = 'block';
+    setTimeout(() => {
+        menu.style.visibility = 'visible';
+        menu.style.opacity = '1';
+        menu.style.transform = 'translate(-50%, -40%) scale(1)';
+    }, 10);
+
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(hideBuyDoneMenu, 3000);
+  }
+
+  function hideBuyDoneMenu() {
+      const menu = document.querySelector('.buy-done-pop-page');
+     
+
+      menu.style.opacity = '0';
+      menu.style.transform = 'translate(-50%, -40%) scale(0.5)';
+      setTimeout(() => {
+          menu.style.visibility = 'hidden';
+          menu.style.display = 'none';
+      }, 300);
+
+      location.reload();
+  }
+
+});
+//  =========================================================================================================
+// الكود الخاص  بتبديل العرض  بين الكوبونات والهدايا في مستودع المستخدم
+document.addEventListener("DOMContentLoaded", function () {
+  // دوال مساعدة لحفظ واسترجاع حالة الاختيار من التخزين المحلي
+  function saveSelectedOption(value) {
+      localStorage.setItem("selectedRepo", value);
+  }
+
+  function getSelectedOption() {
+      return localStorage.getItem("selectedRepo");
+  }
+
+  // التحقق من وجود div الذي يحتوي على مربعات الراديو
+  const repoTitleDiv = document.querySelector('.repo-title');
+  const giftCardsDivs = document.querySelectorAll('.gift-cards');  // جميع عناصر gift-cards
+  const coponsCardsDivs = document.querySelectorAll('.copons-cards'); // جميع عناصر copons-cards
+  
+  if (repoTitleDiv && giftCardsDivs.length > 0 && coponsCardsDivs.length > 0) {
+      // مربعات الاختيار
+      const giftsPageRadio = document.getElementById("gifts-page");
+      const coponsPageRadio = document.getElementById("copons-page");
+
+      // labels المرتبطة بمربعات الاختيار
+      const giftsPageLabel = document.querySelector('label[for="gifts-page"]');
+      const coponsPageLabel = document.querySelector('label[for="copons-page"]');
+
+      // التحقق من وجود مربعات الاختيار والـ labels
+      if (giftsPageRadio && coponsPageRadio && giftsPageLabel && coponsPageLabel) {
+          // استرجاع الحالة المحفوظة أو تعيين الخيار الافتراضي
+          const savedOption = getSelectedOption();
+          
+          if (savedOption) {
+              document.getElementById(savedOption).checked = true;
+          } else {
+              giftsPageRadio.checked = true; // جعل الخيار الأول افتراضي
+              saveSelectedOption("gifts-page");
+          }
+
+          // تحديث العرض بناءً على الحالة المحفوظة أو الاختيار الافتراضي
+          updateVisibility();
+          updateActiveClass();
+
+          // إضافة مستمع للأحداث لتغيير العرض بناءً على الاختيار
+          giftsPageRadio.addEventListener("change", function () {
+              if (this.checked) {
+                  saveSelectedOption("gifts-page");
+                  updateVisibility();
+                  updateActiveClass();
+              }
+          });
+
+          coponsPageRadio.addEventListener("change", function () {
+              if (this.checked) {
+                  saveSelectedOption("copons-page");
+                  updateVisibility();
+                  updateActiveClass();
+              }
+          });
+
+          // دالة لتحديث عرض العناصر
+          function updateVisibility() {
+              if (giftsPageRadio.checked) {
+                  coponsCardsDivs.forEach(function (div) {
+                      div.classList.add("dont-show");
+                  });
+                  giftCardsDivs.forEach(function (div) {
+                      div.classList.remove("dont-show");
+                  });
+              } else if (coponsPageRadio.checked) {
+                  giftCardsDivs.forEach(function (div) {
+                      div.classList.add("dont-show");
+                  });
+                  coponsCardsDivs.forEach(function (div) {
+                      div.classList.remove("dont-show");
+                  });
+              }
+          }
+
+          // دالة لإضافة كلاس active إلى الـ label المرتبط بالخيار المحدد
+          function updateActiveClass() {
+              if (giftsPageRadio.checked) {
+                  giftsPageLabel.classList.add("active");
+                  coponsPageLabel.classList.remove("active");
+              } else if (coponsPageRadio.checked) {
+                  coponsPageLabel.classList.add("active");
+                  giftsPageLabel.classList.remove("active");
+              }
+          }
+      }
+  }
+});
+//  =========================================================================================================
+// دالة عرض الهدايا بأنواعها داخل المستودع
+document.addEventListener('DOMContentLoaded', function () {
+  // الحصول على جميع مربعات الاختيار
+  const checkboxes = document.querySelectorAll('.repo-inputs-cont input[type="checkbox"]');
+
+  // دالة التحقق من حالة مربعات الاختيار
+  checkboxes.forEach(function (checkbox) {
+      checkbox.addEventListener('change', function () {
+          const divClass = this.id; // الحصول على معرف مربع الاختيار
+          const targetDiv = document.querySelector(`.products-cards.${divClass}`); // البحث عن القسم المرتبط
+          const icon = this.closest('label').querySelector('i'); // العثور على الأيقونة داخل الـ label
+
+          if (this.checked) {
+              targetDiv.classList.remove('hidden'); // إزالة الكلاس hidden إذا كان مربع الاختيار مختارًا
+              icon.classList.remove('fa-caret-down'); // إزالة الكلاس fa-caret-down
+              icon.classList.add('fa-caret-up'); // إضافة الكلاس fa-caret-up
+          } else {
+              targetDiv.classList.add('hidden'); // إضافة الكلاس hidden إذا كان مربع الاختيار غير مختار
+              icon.classList.remove('fa-caret-up'); // إزالة الكلاس fa-caret-up
+              icon.classList.add('fa-caret-down'); // إضافة الكلاس fa-caret-down
+          }
+      });
+  });
+});
+//  =========================================================================================================
 
 

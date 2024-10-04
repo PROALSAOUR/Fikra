@@ -3,7 +3,7 @@
 <div class="specific">
     <div class="product-box ">
         {% comment %} استعملت اقل قيمة للفاتورة لمعرفة ان كان الكود لكوبون ام هدية وتحديد دالة صفحة عرض التفاصيل وفقا لذلك {% endcomment %}
-        <a href=" {% if card.min_bill_price %}{% url "store:copon-details" card.id %}{% else %}{% url "store:gift-details" card.id %}{% endif %}">
+        <a href=" {% if card.min_bill_price %}{% url "cards:copon-details" card.id %}{% else %}{% url "cards:gift-details" card.id %}{% endif %}">
             <div class="product-image">
                 <img src="{{ card.img.url }}" alt="{{ card.name }} تخقيض">
             </div>
@@ -31,11 +31,11 @@
         {% if user_points >= card.price  %}
             <span class="add-to-cart">
                 {% if card.min_bill_price %}
-                    <a href="{% url "store:buy-copon" card.id %}" class="copon-buy-done-link">
+                    <a href="{% url "cards:buy-copon" card.id %}" class="copon-buy-done-link">
                         <span> شراء </span><i class="fa-solid fa-cart-shopping"></i>
                     </a>
                 {% else %}
-                    <a href="" class="pop-gift-details-link">
+                    <a href="" class="pop-gift-details-link" data-gift-id="{{ card.id }}" >
                         <span> شراء </span><i class="fa-solid fa-cart-shopping"></i>
                     </a>
                 {% endif %}
@@ -49,42 +49,4 @@
     </div>
 </div>
 
-{% comment %} 
-{% if not card.min_bill_price %}
-    <div class="Pop-up-page pop-gift-details">
-        <div class="logo">
-            <img src="{% static "/images/name logo.jpg" %}" alt="">
-        </div>
-        <form class="buy-for">  
-                <input type="hidden" id="for-another" name="buy-for" value='for-another'>
-        </form>
-        <form class="buy-as-gift">
-            <input type="hidden" id="gift-id" name="gift-id" value="{{ gift.id }}">
-            <div class="form-item">
-                <label for="recipient-name"> اسم المستلم:</label>
-                <input type="text" name="recipient-name" placeholder="الاسم" id="recipient-name" required>
-            </div>
-            <div class="form-item">
-                <label for="recipient-phone"> رقم هاتف المستلم:</label>
-                <input type="text" name="recipient-phone" placeholder="رقم الهاتف " id="recipient-phone" required>
-            </div>
-            <div class="form-item">
-                <input type="checkbox" name="" id="send-message">
-                <label for="send-message">ارسال رسالة الى المستلم</label> 
-            </div>
-            <div class="message-details">
-                <div class="form-item">
-                    <label for="content"> محتوى الرسالة:</label>
-                    <textarea name="message-content" id="content" placeholder="اكتب رسالتك هنا" rows="5" cols="50"></textarea>
-                </div>
-            </div>
-
-            <a href="" class="buy-done-link">
-               <span> إتمام عملية الشراء</span>
-            </a>
-
-        </form>
-    
-    </div>
-{% endif %} {% endcomment %}
 

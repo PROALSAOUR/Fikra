@@ -432,48 +432,6 @@ document.addEventListener('DOMContentLoaded', function () {
    
 });
 // =============================================================================================
-// الكود الخاص بإظهار نافذة ادخال البيانات عند شراء الهدية
-document.addEventListener('DOMContentLoaded', function () {
-    const menu = document.querySelector('.pop-gift-details');
-    const links = document.querySelectorAll('.pop-gift-details-link'); // استخدام querySelectorAll لجلب جميع العناصر
-
-    if (menu && links.length > 0) { // تحقق من وجود القائمة والروابط
-        function showMenu() {
-            menu.style.display = 'block'; // عرض القائمة
-            setTimeout(() => {
-                menu.style.visibility = 'visible';
-                menu.style.opacity = '1';
-                menu.style.transform = 'translate(-50%, -40%) scale(1)';
-            }, 10);
-        }
-
-        function hideMenu() {
-            menu.style.opacity = '0';
-            menu.style.transform = 'translate(-50%, -40%) scale(0.5)';
-            setTimeout(() => {
-                menu.style.visibility = 'hidden';
-                menu.style.display = 'none';
-            }, 300);
-        }
-
-        // إضافة حدث النقر لكل رابط
-        links.forEach(link => {
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (menu.style.visibility === 'hidden' || menu.style.visibility === '') {
-                    showMenu();
-                }
-            });
-        });
-
-        document.addEventListener('click', function (e) {
-            if (menu.style.visibility === 'visible' && !menu.contains(e.target) && !Array.from(links).some(link => link.contains(e.target))) {
-                hideMenu();
-            }
-        });
-    }
-});
-// =============================================================================================
 // الكود الخاص بعرض النافذة الخاصة بإضافة كوبون الى الفاتورة
 document.addEventListener('DOMContentLoaded', function () {
     const menu = document.querySelector('.add-copon-pop-page');
@@ -519,7 +477,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 // =============================================================================================
-
 // الكود الخاص بعرض النافذة الخاصة بإتمام عملية شراء كوبون بنجاح
 document.addEventListener('DOMContentLoaded', function() {
     let hideTimeout;
@@ -583,5 +540,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
 // =============================================================================================
