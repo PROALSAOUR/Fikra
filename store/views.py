@@ -31,13 +31,13 @@ def index(request):
         status='visible',
         gender_cat=False,
     ).prefetch_related(
-        'products'
+        'products', 'products__items__variations'
     ).filter(
         products__featured=True,
         products__ready_to_sale=True,
-    ).distinct()[:8] # عدد اقسام المنتجات المطلوب عرضها بالصفحة الرئيسية
+    ).distinct()[:8]
     
-    offered_products = Product.objects.filter(offer=True)[:8]
+    offered_products = Product.objects.filter(offer=True)[:8].prefetch_related('items__variations') # تحميل العناصر ومتغيراتها دفعة واحدة
     
     context = {
         'ads': ads,
@@ -52,7 +52,7 @@ def index(request):
 # صفحة الاعلان
 def ads_page(request, slug):
     ad = get_object_or_404(AdsSlider, slug=slug)
-    ad_content = AdsProducts.objects.filter(Ads_name=ad).prefetch_related('product')
+    ad_content = AdsProducts.objects.filter(Ads_name=ad).prefetch_related('product', 'product__items__variations')
     
     context = {
         'ad_content': ad_content,
@@ -63,11 +63,11 @@ def ads_page(request, slug):
 # صفحة العلامة التجارية
 def brand_page(request, slug):
     brand = get_object_or_404(Brand, title=slug)
-    last_products = Product.objects.filter(brand=brand).order_by('-updated_at')[:12]
-    offerd_products = Product.objects.filter(brand=brand, offer=True)[:12]
+    last_products = Product.objects.filter(brand=brand).order_by('-updated_at').prefetch_related( 'items__variations')[:12]
+    offerd_products = Product.objects.filter(brand=brand, offer=True).prefetch_related('items__variations')[:12]
 
     # تطبيق Paginator على جميع منتجات العلامة التجارية
-    all_brand_products_list = Product.objects.filter(brand=brand)
+    all_brand_products_list = Product.objects.filter(brand=brand).prefetch_related('items__variations')
     
     paginator_all = Paginator(all_brand_products_list, 12)  # 12 منتجًا لكل صفحة
 
@@ -115,7 +115,7 @@ def brand_page(request, slug):
         filters &= Q(category_id__in=category_ids)
 
     # جلب المنتجات بناءً على الفلاتر
-    results = Product.objects.filter(filters).distinct()
+    results = Product.objects.filter(filters).prefetch_related('items__variations').distinct()
     
     # إعداد التصفح المرقم
     paginator = Paginator(results, 20)  # عرض 20 منتجًا في كل صفحة
@@ -153,10 +153,10 @@ def category_page(request, slug):
     subcategories = Category.objects.filter(parent_category=category)
     
     # استرجاع المنتجات التي تنتمي للتصنيفات الفرعية
-    subcategory_products = Product.objects.filter(category__in=subcategories)
+    subcategory_products = Product.objects.filter(category__in=subcategories).prefetch_related('items__variations')
     
     # استرجاع المنتجات التي تنتمي للتصنيف الأب مباشرة
-    parent_category_products = Product.objects.filter(category=category)
+    parent_category_products = Product.objects.filter(category=category).prefetch_related('items__variations')
     
     # دمج المنتجات من التصنيف الأب والتصنيفات الفرعية
     combined_products = parent_category_products | subcategory_products
@@ -197,7 +197,7 @@ def category_page(request, slug):
         filters &= Q(brand_id=brand_id)
 
     # جلب المنتجات بناءً على الفلاتر
-    results = Product.objects.filter(filters).distinct()
+    results = Product.objects.filter(filters).prefetch_related('items__variations').distinct()
     
     # إعداد التصفح المرقم
     paginator = Paginator(results, 20)  # عرض 20 منتجًا في كل صفحة
@@ -227,7 +227,7 @@ def category_page(request, slug):
 # ===================================================
 # صفحة العروض
 def offer_page(request):
-    products = Product.objects.filter(offer=True, ready_to_sale=True).order_by('-new_price')
+    products = Product.objects.filter(offer=True, ready_to_sale=True).prefetch_related( 'items__variations').order_by('-new_price')
     products_count = products.count()
     
     paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
@@ -289,7 +289,7 @@ def search_page(request):
     if brand_id:
         filters &= Q(brand_id=brand_id)
 
-    results = Product.objects.filter(filters).distinct()
+    results = Product.objects.filter(filters).prefetch_related('items__variations').distinct()
     
  # إعداد التصفح المرقم
     paginator = Paginator(results, 20)  # عرض 20 منتجًا في كل صفحة
@@ -323,13 +323,13 @@ def product_details(request, pid):
     category = product.category
     brand = product.brand
 
-    related_category_products = Product.objects.filter(category=category).exclude(pk=pid)[:8]
-    related_brand_products = Product.objects.filter(brand=brand).exclude(pk=pid)[:8]
+    related_category_products = Product.objects.filter(category=category).prefetch_related('items__variations').exclude(pk=pid)[:8]
+    related_brand_products = Product.objects.filter(brand=brand).prefetch_related('items__variations').exclude(pk=pid)[:8]
 
     product_images = product.images.all()
-
     variants = ProductVariation.objects.filter(product_item__product_id=pid, stock__gt=0).select_related('size', 'product_item')
     
+
     # الحصول على جميع الأحجام الفريدة المرتبطة بالمنتج
     sizes = SizeOption.objects.filter(variations__product_item__product_id=pid, variations__stock__gt=0).distinct()
 
@@ -376,9 +376,8 @@ def favourite_page(request):
         لذا نستعمل created
     """
     favourite, created = Favourite.objects.get_or_create(user=request.user) # احصل أو أنشئ المفضلة للمستخدم
-    products = favourite.products.all() # احصل على جميع المنتجات المفضلة للمستخدم
+    products = favourite.products.all().prefetch_related('items__variations') # احصل على جميع المنتجات المفضلة للمستخدم
     products_count = products.count() # احسب عدد المنتجات في المفضلة
-    
     # search query
     query = request.GET.get('q', '')
     filters = Q(ready_to_sale=True) # & Q(كيف اضيف شرط ان المنتج داخل السلة)

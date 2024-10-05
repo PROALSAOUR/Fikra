@@ -39,10 +39,15 @@ class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'points')
     search_fields = ('user__phone_number','user__first_name','user__last_name',)
 
-
-
-
-
+class PointsUsageAdmin(admin.ModelAdmin):
+    list_display = ('user_profile__user', 'old_points', 'new_points', 'created_at',)
+    search_fields = ('user_profile__user', 'user_profile__user__phone_number')
+    exclude = ['created_at', 'old_points',]
+    readonly_fields = ['user_profile', 'old_points', 'new_points', 'created_at',]    # تحديد الحقول التي لا يمكن تعديلها
+    
+    def has_delete_permission(self, request, obj=None):
+        """منع حذف سجلات النقاط من لوحة الإدارة"""
+        return False
 
 
  
@@ -50,3 +55,4 @@ admin.site.register(User, UserAdmin)
 admin.site.register(UserProfile, ProfileAdmin)
 admin.site.register(Message, SendMessageAdmin)
 admin.site.register(Inbox, InboxAdmin)
+admin.site.register(PointsUsage, PointsUsageAdmin)

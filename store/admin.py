@@ -58,11 +58,16 @@ class ProductItemAdmin(admin.ModelAdmin):
     list_filter = ('sku', 'color')
    
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('product_thumbnail', 'name', 'category', 'brand', 'ready_to_sale', 'offer')
+    list_display = ('product_thumbnail', 'name', 'category', 'brand', 'sales_count', 'is_available', 'ready_to_sale', 'offer')
     search_fields = ('name', )
     list_filter = ('category', 'brand', 'ready_to_sale', 'price', 'featured' , 'offer')
     ordering = ('updated_at',)   
     inlines = (ProductImagesInline, ProductItemInline,)
+    
+    def is_available(self, obj):
+        return  obj.get_total_stock() 
+    is_available.short_description = 'available stock'
+    
 
 admin.site.register(AdsSlider, AdsSliderAdmin)
 admin.site.register(Brand, BrandAdmin)

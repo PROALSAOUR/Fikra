@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import BlogPage, PageSection, QuestionPage, QuestionContent
 
-# الشيفرة الخاصة بصفحات المحتوى
 
 class PageSectionInline(admin.TabularInline): 
     model = PageSection
@@ -9,7 +8,6 @@ class PageSectionInline(admin.TabularInline):
     fields = ('title', 'content', 'order')  # الحقول التي تريد عرضها في واجهة الإدارة
     ordering = ('order',)  # ترتيب الحقول حسب القيمة الافتراضية لـ 'order'
 
-@admin.register(BlogPage)
 class BlogPageAdmin(admin.ModelAdmin):
     list_display = ('title', 'order')
     search_fields = ('title',)
@@ -17,15 +15,12 @@ class BlogPageAdmin(admin.ModelAdmin):
     ordering = ('order',)
     inlines = [PageSectionInline]  # إضافة الـ InlineModelAdmin هنا
 
-# الشيفرة الخاصة بصفحة الاسئلة
-
-class QuestionContentInline(admin.TabularInline):  # أو admin.StackedInline
+class QuestionContentInline(admin.TabularInline):  
     model = QuestionContent
     extra = 1 
-    fields = ('title', 'content', 'order')  # الحقول التي تريد عرضها في واجهة الإدارة
+    fields = ('slug', 'title','content', 'order')  # الحقول التي تريد عرضها في واجهة الإدارة
     ordering = ('order',)  # ترتيب الحقول حسب القيمة الافتراضية لـ 'order'
 
-@admin.register(QuestionPage)
 class QuestionPageAdmin(admin.ModelAdmin):
     list_display = ('title',)
     search_fields = ('title',)
@@ -36,3 +31,5 @@ class QuestionPageAdmin(admin.ModelAdmin):
         return not QuestionPage.objects.exists()
     
 
+admin.site.register(QuestionPage, QuestionPageAdmin)
+admin.site.register(BlogPage, BlogPageAdmin)

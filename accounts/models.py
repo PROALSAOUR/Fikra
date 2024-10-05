@@ -75,6 +75,8 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     points = models.IntegerField(default=0)
     inbox = models.OneToOneField(Inbox, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.user.first_name
@@ -82,4 +84,21 @@ class UserProfile(models.Model):
     class Meta:
         verbose_name = 'بروفايل'
         verbose_name_plural = 'بروفايل'
+  
+class PointsUsage(models.Model): # تتبع النقاط
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    old_points = models.IntegerField()
+    new_points = models.IntegerField()
+    description = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
+    def __str__(self):
+        return f'سجل النقاط الخاص ب: {self.user_profile.user}'
+         
+    class Meta:
+        verbose_name = 'سجل نقاط'
+        verbose_name_plural = 'سجلات النقاط'
+        
+        
+           

@@ -2,7 +2,6 @@ from django.db.models import Count
 from store.models import *
 from blog.models import BlogPage
 from accounts.models import  UserProfile, Inbox
-from django.shortcuts import get_object_or_404
 
 def globals(request):
     

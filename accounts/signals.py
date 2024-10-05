@@ -1,6 +1,6 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from accounts.models import UserProfile, User, Inbox, Message
+from accounts.models import *
 
 
 @receiver(post_save, sender=User)
@@ -12,3 +12,24 @@ def craete_user_profile_and_inbo(sender, instance, created, **kwargs):
         # إنشاء بروفايل جديد مرتبط بالمستخدم وصندوق البريد
         UserProfile.objects.create(user=instance, inbox=inbox)
         
+
+@receiver(pre_save, sender=UserProfile)
+def track_user_profile_points_change(sender, instance,  **kwargs):
+    '''دالة تعمل عند اجراء اي تعديل على البروفايل
+    حيث تتحقق من النقاط ان وجدت اي تعديل عليها تنشئ سجل نقاط جديد به القيمة الجديدة والقديمة'''
+    
+    if instance.pk:
+        # نحصل على النسخة القديمة من UserProfile قبل الحفظ
+        old_profile = UserProfile.objects.get(pk=instance.pk)
+        
+        # نتحقق مما إذا كانت النقاط قد تغيرت
+        if old_profile.points != instance.points:
+            # إذا تغيرت النقاط، ننشئ سجل نقاط جديدًا
+            PointsUsage.objects.create(
+                user_profile=instance,
+                old_points=old_profile.points,
+                new_points=instance.points,
+                description="تغيير في نقاط المستخدم"
+            )
+
+

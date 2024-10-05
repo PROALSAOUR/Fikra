@@ -1,10 +1,10 @@
 from django.db import models
 
-# For Blog pages in the Blog
+# For Blog pages in the Blog =========================
 
 class BlogPage(models.Model):
     title = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100, unique=True, null=True, blank=True)
+    slug = models.SlugField(max_length=100, unique=True,)
     order = models.IntegerField(default=0)
     image = models.ImageField(upload_to='blog/pages', null=True, blank=True)
     
@@ -24,7 +24,7 @@ class PageSection(models.Model):
     def __str__(self):
         return self.title
 
-# For Question Page in the Blog
+# For Question Page in the Blog ======================
 
 class QuestionPage(models.Model):
     title = models.CharField(max_length=100)
@@ -39,6 +39,7 @@ class QuestionPage(models.Model):
      
 class QuestionContent(models.Model):
     questions_page = models.ForeignKey(QuestionPage, on_delete=models.CASCADE, related_name='questions')
+    slug = models.SlugField(max_length=100, unique=True)
     title = models.CharField(max_length=255)
     content = models.TextField()
     order = models.IntegerField(default=100)
