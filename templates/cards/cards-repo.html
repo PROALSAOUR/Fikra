@@ -1,0 +1,210 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <div class="cards-store cards-repo">
+        <div class="fav-page page">
+         
+            <div class="padding-con">
+                <div class="page-title">
+                    <h2>المخزون الخاص بي</h2>
+                </div>
+            </div>
+            <!-- Start repo-title -->
+                <div class="search-bar" >
+                    <div class="container">
+                        <div class="repo-title">
+                            <input type="radio" name="repo" id="gifts-page" >
+                            <label for="gifts-page" class="active">كروت هدايا</label>
+                            <input type="radio" name="repo" id="copons-page" >
+                            <label for="copons-page">كوبونات خصم</label>
+                            <span class="use-code-link">هل لديك كود هدية؟</span>
+                        </div>
+                    </div>
+                </div>
+            <!-- End repo-title -->
+
+            <!-- Start gift-products  -->
+            <div class="favorite gift-cards">
+                <div class="searched-products">
+                    <div class="container">
+
+                        <!-- Start Show-related Gifts -->
+
+                        <!-- الهدايا التي قمت بشرائها لنفسي -->
+                        <label for="my-own-gifts" class="repo-inputs-cont">
+                            <input type="checkbox" name="" id="my-own-gifts">
+                            <div>
+                                <h2>الهدايا التي قمت بشرائها</h2>
+                                <i class="fa-solid fa-caret-down"></i>
+                            </div>
+                            <hr>
+                        </label>
+                        <div class="products-cards my-own-gifts hidden">
+
+                            <!-- product-start -->
+                            <div class="specific">
+                                    <div class="product-box ">
+                                        <a href="/templates/product-details.html">
+                                            <div class="product-image">
+                                                <div class="off-holder">
+                                                    <span>تخفيض</span>
+                                                </div>
+                                                <img src="/images/gift-1.jpg" alt="">
+                                            </div>
+                                            <div class="product-info">
+                                                <h4 class="product-name"> كرت هدية</h4>
+                                                <p class="product-description">كرت هدية  من محمود محمد [0924629277] بقيمة مشتريات 100 دينار.</p>
+                                                <h4 class="product-price point">
+                                                    <div class="buy-by-points ">الكمية:2</div>            
+                                                </h4>
+                                            </div>
+                                        </a> 
+                                        <span class="add-to-cart">
+                                            <a href="/templates/cart.html"><span> طريقة الاستعمال </span></a>
+                                        </span>
+                                    </div>
+                            </div>
+                            <!-- product-end -->
+                            
+                        </div>
+
+                        <!-- الهدايا التي اهديت  الي -->
+                        <label for="from-another-gifts"  class="repo-inputs-cont">
+                            <input type="checkbox" name="" id="from-another-gifts">
+                            <div>
+                                <h2>الهدايا التي اهديت اليك</h2>
+                                <i class="fa-solid fa-caret-down"></i>
+                            </div>
+                            <hr>
+                        </label>
+                        <div class="products-cards from-another-gifts  hidden">
+
+                            <!-- product-start -->
+                            <div class="specific">
+                                    <div class="product-box ">
+                                        <a href="/templates/product-details.html">
+                                            <div class="product-image">
+                                                <div class="off-holder">
+                                                    <span>تخفيض</span>
+                                                </div>
+                                                <img src="/images/gift-1.jpg" alt="">
+                                            </div>
+                                            <div class="product-info">
+                                                <h4 class="product-name"> كرت هدية</h4>
+                                                <p class="product-description">كرت هدية  من محمود محمد [0924629277] بقيمة مشتريات 100 دينار.</p>
+                                                <h4 class="product-price point">
+                                                    <div class="buy-by-points ">الكمية:2</div>            
+                                                </h4>
+                                            </div>
+                                        </a> 
+                                        <span class="add-to-cart">
+                                            <a href="/templates/cart.html"><span> طريقة الاستعمال </span></a>
+                                        </span>
+                                    </div>
+                            </div>
+                            <!-- product-end -->
+                            
+                        </div>
+
+                        <label for="to-another-gifts"  class="repo-inputs-cont">
+                            <input type="checkbox" name="" id="to-another-gifts">
+                            <div>
+                                <h2>الهدايا التي  ارسلتها الى احدهم</h2>
+                                <i class="fa-solid fa-caret-down"></i>
+                            </div>
+                            <hr>
+                        </label>
+                        <!--  الهدايا التي اهديتها انا الي شخص اخر -->
+                        <div class="products-cards to-another-gifts hidden">
+
+                            <!-- product-start -->
+                            <div class="specific">
+                                    <div class="product-box ">
+                                        <a href="/templates/product-details.html">
+                                            <div class="product-image">
+                                                <div class="off-holder">
+                                                    <span>تخفيض</span>
+                                                </div>
+                                                <img src="/images/gift-1.jpg" alt="">
+                                            </div>
+                                            <div class="product-info">
+                                                <h4 class="product-name"> كرت هدية</h4>
+                                                <p class="product-description">كرت هدية  من محمود محمد [0924629277] بقيمة مشتريات 100 دينار.</p>
+                                                <h4 class="product-price point">
+                                                    <div class="buy-by-points ">الكمية:2</div>            
+                                                </h4>
+                                            </div>
+                                        </a> 
+                                        <span class="add-to-cart">
+                                            <a href="/templates/cart.html"><span> طريقة الاستعمال </span></a>
+                                        </span>
+                                    </div>
+                            </div>
+                            <!-- product-end -->
+                            
+                        </div>
+
+                        <!-- End Show-related Gifts -->
+
+                    </div>
+                </div>
+            </div>
+            <!-- End gift-products  -->
+             
+            <!-- Start copons-products  -->
+            <div class="favorite copons-cards ">
+                <div class="searched-products">
+                    <div class="container">
+                        <div class="products-cards">
+                            
+                            {% for card in copons %}
+                                {% include "common/card.html" %}
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End copons-products  -->
+
+        </div>
+    </div>
+
+    <!-- Start use-code-pop-page Section -->
+    <div class="Pop-up-page use-code-pop-page">
+        <div class="logo">
+            <img src="/images/name logo.jpg" alt="">
+        </div>
+        <div class="errors">
+            <div class="error-message">
+                <p>الكود الذي أدخلته غير صحيح</p>
+            </div>
+            <div class="error-message">
+                <p>الكود الذي أدخلته  مستخدم بالفعل</p>
+            </div>
+        </div>
+        <form action="">
+            <h3>رجاءً ادخل كود الكرت الذي لديك لأضافته الى مخزونك</h3>
+            <input type="text" name="" id="">
+            <input type="submit" value="استعمال الكود">
+        </form>
+    </div>
+    <!-- End use-code-pop-page Section -->
+
+
+
+{% endblock content %}
+
+
+
+
+
+
+
+
+
+
+
+

@@ -6,6 +6,8 @@ import string
 from accounts.models import User
 from django.utils.html import mark_safe
 from django.core.exceptions import ValidationError
+from datetime import timedelta
+
 
 # ============================= Cards ====================================
 
@@ -17,7 +19,7 @@ class Copon(models.Model):
     min_bill_price = models.PositiveIntegerField()
     price = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    expiration = models.DateField()
+    expiration_days = models.IntegerField(default=365) # عدد الايام التي يفسد بعدها الكوبون
     sales_count = models.PositiveIntegerField(default=0)  # عدد مرات بيع الكوبون
     tags = models.ManyToManyField(Tag,  blank=True)
 
@@ -27,22 +29,11 @@ class Copon(models.Model):
     def copon_image(self):
         # دالة مسؤولة عن عرض صورة المنتج المصغرة في لوحة الادارة
         return mark_safe("<img src='%s' width='50' height='50'/>" % (self.img.url) )
-    
-    def get_days_left(self):
-        """دالة لحساب عدد الأيام المتبقية حتى انتهاء صلاحية الكوبون"""
-        today = now().date()  # تاريخ اليوم
-        if self.expiration >= today:
-            days_left = (self.expiration - today).days  # حساب عدد الأيام المتبقية
-            return f"{days_left} أيام متبقية"
-        else:
-            return "الكوبون منتهي الصلاحية"
-        
+      
     def clean(self):
         # تحقق إذا كانت القيمة أكبر من 100
         if self.value > 100:
             raise ValidationError("القيمة للكوبون يجب أن تكون اصغر من أو تساوي 100.")
-        if self.expiration and self.expiration < now().date():
-            raise ValidationError(" !لقد أدخلت تاريخ صلاحية منتهي بالفعل للكوبون")
         super(Copon, self).clean()
 
     def save(self, *args, **kwargs):
@@ -56,10 +47,23 @@ class Copon(models.Model):
     
 class CoponUsage(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # المستخدم الذي اشترى الرمز
-    copon_code = models.ForeignKey(Copon, on_delete=models.CASCADE)  # رمز الخصم
+    copon_code = models.ForeignKey(Copon, on_delete=models.CASCADE, related_name='copon_usage')  # رمز الخصم
     sell_price = models.IntegerField(default=0) # سعر الكوبون عندما اشتراه المستخدم
     has_used = models.BooleanField(default=False)  # لتتبع إذا استخدم المستخدم الرمز
     purchase_date = models.DateTimeField(auto_now_add=True)  # وقت شراء الرمز
+    expire = models.DateField(null=True, blank=True) 
+    
+    
+    def use_copon(self):
+        self.has_used = True
+        self.expire = None
+        self.save()
+    
+    def buy_copon(self):
+        self.has_used = False # الكوبون غير مستخدم بعد الشراء
+        self.expire = now().date() + timedelta(days=self.copon_code.expiration_days) # صلاحية جديدة عد اتمام الشراء
+        self.sell_price = self.copon_code.price # سعر شراء الكوبون
+        self.save()
     
     def __str__(self):
         return f"{self.user.first_name} - {self.copon_code.code}"
@@ -144,6 +148,4 @@ class GiftDealing(models.Model):
         verbose_name_plural = 'ايصال هدايا'
     
         
-    
-
 # =======================================================================

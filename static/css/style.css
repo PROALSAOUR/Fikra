@@ -1272,13 +1272,11 @@ select option::selection {
   .mega-menu .top-icon .toggle {
     position: absolute;
     left: 0px;
-    top: 5px;
-    width: 30px;
-    height: 60px;
+    top: 53px;
+    width: 37.5px;
+    height: 70px;
     background-color: var(--background-color);
-    box-shadow:  inset -10px -10px 15px #00000041;
     border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
   }
   .mega-menu .top-icon .toggle input#them {
     opacity: 0;
@@ -1381,11 +1379,10 @@ select option::selection {
   .mega-menu .secondary-nav {
     position:fixed;
     left: 0px;
-    top: 50%;
+    top: 74%;
     padding: 10px;
     background-color: var(--background-color);
     transform: translateY(-50%);
-    border-top-right-radius: var(--main-border-radius);
     border-bottom-right-radius: var(--main-border-radius);
     -webkit-transform: translateY(-50%);
     -moz-transform: translateY(-50%);
@@ -1449,13 +1446,11 @@ select option::selection {
   .mega-menu .top-icon .toggle {
     position: absolute;
     left: 0px;
-    top: 95px;
-    width: 48px;
+    top: 75px;
+    width: 52.5px;
     height: 90px;
     background-color: var(--background-color);
-    box-shadow:  inset -10px -10px 15px #00000041;
     border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
     z-index: 2;
   }
   .mega-menu .top-icon .toggle input#them {
@@ -1557,10 +1552,9 @@ select option::selection {
   .mega-menu .secondary-nav {
     position:fixed;
     left: 0px;
-    top: 60%;
+    top: 49%;
     padding: 15px;
     background-color: var(--background-color);
-    border-top-right-radius: var(--main-border-radius);
     border-bottom-right-radius: var(--main-border-radius);
   }
   .mega-menu .secondary-nav ul {
@@ -6263,6 +6257,11 @@ input[type="number"] {
   display: inline-block;
   width: 200px;
 }
+.cards-details .upper-part .description  p.expiration {
+  font-size: var(--lab-xs-size);
+  width: 70%;
+  line-height: 1.7;
+}
 .cards-details .upper-part .description  span {
   color: var(--disaple-text-color);
 }
@@ -6280,6 +6279,9 @@ input[type="number"] {
   }
   .cards-details .upper-part .description  p {
     width: 150px;
+  }
+  .cards-details .upper-part .description  p.expiration {
+    font-size: var(--tab-xs-size);
   }
 }
 @media (max-width: 688px) {
@@ -6300,6 +6302,9 @@ input[type="number"] {
   .cards-details .upper-part .description  p {
     width: 150px;
   }
+  .cards-details .upper-part .description  p.expiration {
+    font-size: var(--tab-s-size);
+  }
 }
 @media (max-width: 596px) {
   .cards-details .upper-part .card-image {
@@ -6318,6 +6323,9 @@ input[type="number"] {
   }
   .cards-details .upper-part .description  p {
     width: 120px;
+  }
+  .cards-details .upper-part .description  p.expiration {
+    font-size: var(--mob-xs-size);
   }
 }
 @media (max-width: 496px) {
@@ -6338,6 +6346,10 @@ input[type="number"] {
   .cards-details .upper-part .description  p {
     width: 80px;
   }
+  .cards-details .upper-part .description  p.expiration {
+    font-size: var(--mob-s-size);
+    width: 80%;
+  }
 }
 @media (max-width: 370px) {
   .cards-details .upper-part .card-image {
@@ -6355,6 +6367,11 @@ input[type="number"] {
   }
   .cards-details .upper-part .description  p {
     width: 65px;
+  }
+  .cards-details .upper-part .description  p.expiration {
+    font-size: calc(var(--mob-s-size) - 2px);
+    width: 90%;
+
   }
 }
 .cards-details .lower-part{

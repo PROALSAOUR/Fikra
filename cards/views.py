@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from itertools import chain
-from django.utils import timezone
+from datetime import timedelta
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from store.models import *
 from accounts.models import UserProfile
@@ -15,6 +15,17 @@ from cards.models import *
 
 
 # ===================================================
+
+# مستودع البطاقات
+def cards_repo(request):
+    
+    purchased_copons =  CoponUsage.objects.filter(user=request.user)
+    
+    context  = {
+        # 'copons': copons,
+    }
+    return render(request, 'cards/cards-repo.html',context)
+
 # صفحة متجر البطاقات
 def cards_store(request):
     #  خاص بالهدايا
@@ -36,7 +47,7 @@ def cards_store(request):
     
     #  خاص بالكوبونات
     
-    copons_list = Copon.objects.filter(is_active=True, expiration__gte=timezone.now().date()).only('name','value','img','min_bill_price','price').order_by('-sales_count')
+    copons_list = Copon.objects.filter(is_active=True).only('name','value','img','min_bill_price','price', 'expiration_days').order_by('-sales_count')
         
     paginator_all = Paginator(copons_list, 20)  
 
@@ -69,11 +80,9 @@ def cards_store(request):
         price_max = int(price_max)
         filters &= Q(price__lte=price_max)
     
-    copon_filters = filters & Q(expiration__gte=timezone.now().date()) # فلاتر خاصة بالكوبونات
-    
     # جلب المنتجات بناءً على الفلاتر
     results_list = list(chain(
-    Copon.objects.filter(copon_filters).distinct(),
+    Copon.objects.filter(filters).distinct(),
     Gift.objects.filter(filters).distinct()
     ))
     
@@ -133,17 +142,17 @@ def buy_copon(request, cid):
     # التحقق من أن المستخدم لديه نقاط كافية
     if copon.price > points:
         return JsonResponse({'error': 'لاتوجد نقاط كافية لإتمام عملية الشراء'}, status=400)
-    
-    # التحقق من أن الكوبون نشط وصالح
-    if copon.expiration < now().date():
-        return JsonResponse({'error': 'الكوبون منتهي الصلاحية'}, status=400)
-    
+       
     # التحقق من إذا كان المستخدم يملك الكوبون بالفعل
-    user_copon, created = CoponUsage.objects.get_or_create(user=user, copon_code=copon) 
+    user_copon, created = CoponUsage.objects.get_or_create(user=user, copon_code=copon)
     
     if not created:
-        if not user_copon.has_used:
+        
+        # لو مو مستعمل وله صلاحية وصلاحيته غير منتهية اكسر البيعة
+        if not user_copon.has_used and user_copon.expire and user_copon.expire > now().date():
             return JsonResponse({'error': 'لديك هذا الكوبون في مخزونك بالفعل'}, status=400)
+       
+        
     
     # خصم النقاط وحفظ التحديثات
     points -= copon.price
@@ -151,9 +160,8 @@ def buy_copon(request, cid):
     profile.save()
     
     # حفظ سجل استخدام الكوبون
-    user_copon.has_used = False  # الكوبون غير مستخدم بعد الشراء
-    user_copon.sell_price = copon.price
     copon.sales_count += 1 
+    user_copon.buy_copon()
     copon.save()
     user_copon.save()
 
@@ -244,7 +252,6 @@ def buy_gift(request, gid):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'طلب غير صحيح.'}, status=400)
-
 # دالة شراء هدية من البطاقة الخارجية
 @login_required
 def buy_gift2(request, gid):

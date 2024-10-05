@@ -3,7 +3,7 @@ from cards.models import *
 
 
 class CoponAdmin(admin.ModelAdmin):
-    list_display = ('copon_image', 'name', 'get_value_display', 'min_bill_price', 'price', 'sales_count', 'expiration', 'is_active',)
+    list_display = ('copon_image', 'name', 'get_value_display', 'min_bill_price', 'price', 'sales_count', 'is_active',)
     search_fields = ('name','value',)
     list_filter = ('is_active',)
     ordering = ('sales_count',)   
@@ -14,7 +14,7 @@ class CoponAdmin(admin.ModelAdmin):
     get_value_display.short_description = 'value' # عنوان العمود في الواجهة
     
 class CoponUsageAdmin(admin.ModelAdmin):
-    list_display = ('get_gift_image', 'copon_code__name', 'user','sell_price', 'get_now_price', 'has_used', 'purchase_date',)
+    list_display = ('get_gift_image', 'copon_code__name', 'user','sell_price', 'get_now_price', 'has_used', 'expire',)
     search_fields = ('name','value',)
     list_filter = ('has_used','user',)
     ordering = ('purchase_date',)   
