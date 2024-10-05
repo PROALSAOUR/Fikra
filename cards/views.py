@@ -18,12 +18,35 @@ from cards.models import *
 
 # مستودع البطاقات
 def cards_repo(request):
+    user = request.user
     
-    purchased_copons =  CoponUsage.objects.filter(user=request.user)
+    user_copons = CoponUsage.objects.filter(user=user, has_used=False).prefetch_related('copon_code')
     
+    active_copons =  user_copons.filter(expire__gte=now().date()).order_by('-purchase_date')
+    expired_copons  = user_copons.filter(expire__lt=now().date()).order_by('-purchase_date')[:5]
+    
+    copons_count = active_copons.count() + expired_copons.count()
+    
+    # =================================================================
+    
+    from_self =  GiftItem.objects.filter(has_used=False , buyer=user, recipient=user).prefetch_related('gift')
+    from_frind =  GiftItem.objects.filter(has_used=False, recipient=user).exclude(buyer=user).prefetch_related('gift', 'recipients')
+    for_frind = GiftItem.objects.filter(buyer=user).exclude(recipient=user).prefetch_related('gift', 'recipients')
+    
+    gifts_count = from_self.count() + from_frind.count() 
+    
+    # =================================================================    
     context  = {
-        # 'copons': copons,
+        'active_copons': active_copons,
+        'expired_copons': expired_copons,
+        'copons_count': copons_count,
+        # ==========================
+        'from_self': from_self,
+        'from_frind': from_frind,
+        'for_frind': for_frind,
+        'gifts_count': gifts_count,
     }
+    
     return render(request, 'cards/cards-repo.html',context)
 
 # صفحة متجر البطاقات
@@ -208,6 +231,8 @@ def buy_gift(request, gid):
                         sender=user, 
                         receiver_name=recipient_name,
                         receiver_phone=recipient_phone,
+                        sell_price=gift.price,
+                        sell_value=gift.value,
                     )
                     
                     profile.points -= gift.price
@@ -222,6 +247,7 @@ def buy_gift(request, gid):
                 gift=gift,
                 buyer=user,
                 sell_price=gift.price,
+                sell_value=gift.value,
                 recipient=recipient
             )
 
@@ -293,6 +319,8 @@ def buy_gift2(request, gid):
                         sender=user, 
                         receiver_name=recipient_name,
                         receiver_phone=recipient_phone,
+                        sell_price=gift.price,
+                        sell_value=gift.value,
                     )
                     
                     profile.points -= gift.price
@@ -308,6 +336,7 @@ def buy_gift2(request, gid):
                 gift=gift,
                 buyer=user,
                 sell_price=gift.price,
+                sell_value=gift.value,
                 recipient=recipient
             )
 

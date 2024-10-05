@@ -1,0 +1,36 @@
+{% load static %}
+
+{% comment %} انشئ صفحة لكل وصف خاص بكل نوع {% endcomment %}
+
+<!-- product-start -->
+<div class="specific">
+    <div class="product-box  ">
+        <a >
+            <div class="product-image">
+                <div class="off-holder" >
+                        <span>منتهية</span>
+                </div>
+                <img src="{{ gift_item.gift.img.url }}" alt="خصم {{ gift_item.gift.name }}">
+            </div>
+            <div class="product-info">
+                <h4 class="product-name"> كرت هدية</h4>
+                <p class="product-description">كرت هدية  من  {{ gift_item.buyer }} [0924629277] بقيمة مشتريات {{ gift_item.sell_value }} دينار.</p>
+                <h4 class="product-price point">
+                    <div class="buy-by-points ">{{ gift_item.sell_price }}<i class="fa-solid fa-gem"></i></div>            
+                </h4>
+            </div>
+        </a> 
+        <span class="add-to-cart" style='opacity:1.0;'>
+            {% if buyer %}
+                <a href="{% url "cards:buy-copon"  usage_copon.copon_code.id %}" class="copon-buy-done-link">
+                    <span> شراء </span><i class="fa-solid fa-cart-shopping"></i>
+                </a>
+            {% else %}
+                    {% comment %} رابط لصفحة الاسئلة {% endcomment %}
+                    <a href=""><span> طريقة الاستعمال </span></a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+<!-- product-end -->
+

@@ -7071,3 +7071,23 @@ input[type="radio"]:checked + .custom-radio::after {
   }
 }
 /* End Show-related Gifts  */
+/* Start some ediit in copon & gift card */
+.specific .product-info .card-info {
+  line-height: 1.6;
+}
+@media (min-width: 793px) {
+  .specific .product-info .card-info {
+      font-size: var(--mob-m-size) !important;
+  }
+}
+@media (max-width: 792px) {
+  .specific .product-info .card-info {
+      font-size: 12px !important;
+  }
+}
+@media (max-width: 424px) {
+  .specific .product-info .card-info {
+      font-size: 10px !important;
+  }
+}
+

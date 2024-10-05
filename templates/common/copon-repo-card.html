@@ -1,0 +1,40 @@
+{% load static %}
+
+
+<!-- product-start -->
+<div class="specific">
+    <div class="product-box offer ">
+        <a {% if usage_copon.is_expire %} style='opacity:0.5;' {% endif %}>
+            <div class="product-image">
+                <div class="off-holder" >
+                    {% if usage_copon.is_expire %}
+                        <span>منتهية</span>
+                    {% endif %}
+                </div>
+                <img src="{{ usage_copon.copon_code.img.url }}" alt="خصم {{ usage_copon.copon_code.name }}">
+            </div>
+            <div class="product-info">
+                <h4 class="product-name">{{ usage_copon.copon_code.name }}</h4>
+                <p class="product-description card-info">كوبون خصم  بقيمة {{ usage_copon.copon_code.value }}%  صالح مع الطلبات بقيمة {{ usage_copon.copon_code.min_bill_price }} دينار او اكثر <br>
+                    {% if usage_copon.is_expire %} 
+                        انتهت صلاحيتها بتاريخ {{ causage_copon.expire }}
+                    {% else %}
+                        صالح حتى تاريخ {{ usage_copon.expire }} 
+                    {% endif %}
+                </p>
+            </div>
+        </a> 
+        <span class="add-to-cart" style='opacity:1.0;'>
+            {% if usage_copon.is_expire %}
+                <a href="{% url "cards:buy-copon"  usage_copon.copon_code.id %}" class="copon-buy-done-link">
+                    <span> شراء </span><i class="fa-solid fa-cart-shopping"></i>
+                </a>
+            {% else %}
+                    {% comment %} رابط لصفحة الاسئلة {% endcomment %}
+                    <a href=""><span> طريقة الاستعمال </span></a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+<!-- product-end -->
+

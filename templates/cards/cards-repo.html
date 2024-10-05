@@ -16,9 +16,9 @@
                     <div class="container">
                         <div class="repo-title">
                             <input type="radio" name="repo" id="gifts-page" >
-                            <label for="gifts-page" class="active">كروت هدايا</label>
+                            <label for="gifts-page" class="active">كروت هدايا {% if gifts_count %}({{ gifts_count }}){% endif %}</label>
                             <input type="radio" name="repo" id="copons-page" >
-                            <label for="copons-page">كوبونات خصم</label>
+                            <label for="copons-page">كوبونات خصم {% if copons_count %}({{ copons_count }}){% endif %}</label>
                             <span class="use-code-link">هل لديك كود هدية؟</span>
                         </div>
                     </div>
@@ -44,30 +44,15 @@
                         <div class="products-cards my-own-gifts hidden">
 
                             <!-- product-start -->
-                            <div class="specific">
-                                    <div class="product-box ">
-                                        <a href="/templates/product-details.html">
-                                            <div class="product-image">
-                                                <div class="off-holder">
-                                                    <span>تخفيض</span>
-                                                </div>
-                                                <img src="/images/gift-1.jpg" alt="">
-                                            </div>
-                                            <div class="product-info">
-                                                <h4 class="product-name"> كرت هدية</h4>
-                                                <p class="product-description">كرت هدية  من محمود محمد [0924629277] بقيمة مشتريات 100 دينار.</p>
-                                                <h4 class="product-price point">
-                                                    <div class="buy-by-points ">الكمية:2</div>            
-                                                </h4>
-                                            </div>
-                                        </a> 
-                                        <span class="add-to-cart">
-                                            <a href="/templates/cart.html"><span> طريقة الاستعمال </span></a>
-                                        </span>
-                                    </div>
-                            </div>
+                            {% if from_self %}
+                                {% for gift_item in from_self %}
+                                    {% include "common/gift-repo-card.html" %}
+                                {% endfor %}
+                            {% else %}
+                                {% include "common/no-result.html" %}
+                            {% endif %}
                             <!-- product-end -->
-                            
+                                                       
                         </div>
 
                         <!-- الهدايا التي اهديت  الي -->
@@ -81,30 +66,15 @@
                         </label>
                         <div class="products-cards from-another-gifts  hidden">
 
-                            <!-- product-start -->
-                            <div class="specific">
-                                    <div class="product-box ">
-                                        <a href="/templates/product-details.html">
-                                            <div class="product-image">
-                                                <div class="off-holder">
-                                                    <span>تخفيض</span>
-                                                </div>
-                                                <img src="/images/gift-1.jpg" alt="">
-                                            </div>
-                                            <div class="product-info">
-                                                <h4 class="product-name"> كرت هدية</h4>
-                                                <p class="product-description">كرت هدية  من محمود محمد [0924629277] بقيمة مشتريات 100 دينار.</p>
-                                                <h4 class="product-price point">
-                                                    <div class="buy-by-points ">الكمية:2</div>            
-                                                </h4>
-                                            </div>
-                                        </a> 
-                                        <span class="add-to-cart">
-                                            <a href="/templates/cart.html"><span> طريقة الاستعمال </span></a>
-                                        </span>
-                                    </div>
-                            </div>
-                            <!-- product-end -->
+                           
+                            {% if from_frind %}
+                                {% for gift_item in from_frind %}
+                                    {% include "common/gift-repo-card.html" %}
+                                {% endfor %}
+                            {% else %}
+                                {% include "common/no-result.html" %}
+                            {% endif %}
+                           
                             
                         </div>
 
@@ -119,30 +89,13 @@
                         <!--  الهدايا التي اهديتها انا الي شخص اخر -->
                         <div class="products-cards to-another-gifts hidden">
 
-                            <!-- product-start -->
-                            <div class="specific">
-                                    <div class="product-box ">
-                                        <a href="/templates/product-details.html">
-                                            <div class="product-image">
-                                                <div class="off-holder">
-                                                    <span>تخفيض</span>
-                                                </div>
-                                                <img src="/images/gift-1.jpg" alt="">
-                                            </div>
-                                            <div class="product-info">
-                                                <h4 class="product-name"> كرت هدية</h4>
-                                                <p class="product-description">كرت هدية  من محمود محمد [0924629277] بقيمة مشتريات 100 دينار.</p>
-                                                <h4 class="product-price point">
-                                                    <div class="buy-by-points ">الكمية:2</div>            
-                                                </h4>
-                                            </div>
-                                        </a> 
-                                        <span class="add-to-cart">
-                                            <a href="/templates/cart.html"><span> طريقة الاستعمال </span></a>
-                                        </span>
-                                    </div>
-                            </div>
-                            <!-- product-end -->
+                            {% if for_frind %}
+                                {% for gift_item in for_frind %}
+                                    {% include "common/gift-repo-card.html" %}
+                                {% endfor %}
+                            {% else %}
+                                {% include "common/no-result.html" %}
+                            {% endif %}
                             
                         </div>
 
@@ -158,10 +111,21 @@
                 <div class="searched-products">
                     <div class="container">
                         <div class="products-cards">
-                            
-                            {% for card in copons %}
-                                {% include "common/card.html" %}
-                            {% endfor %}
+
+                            {% if active_copons or expired_copons %}
+
+                                {% for usage_copon in active_copons %}
+                                    {% include "common/copon-repo-card.html" %}
+                                {% endfor %} 
+            
+                                {% for usage_copon in expired_copons %}
+                                    {% include "common/copon-repo-card.html" %}
+                                {% endfor %}
+                            {% else %}
+
+                                {% include "common/no-result.html" %}
+
+                            {% endif %}
 
                         </div>
                     </div>
@@ -175,7 +139,7 @@
     <!-- Start use-code-pop-page Section -->
     <div class="Pop-up-page use-code-pop-page">
         <div class="logo">
-            <img src="/images/name logo.jpg" alt="">
+            <img src="{% static "/images/name logo.jpg" %}" alt="">
         </div>
         <div class="errors">
             <div class="error-message">

@@ -51,8 +51,15 @@ class CoponUsage(models.Model):
     sell_price = models.IntegerField(default=0) # سعر الكوبون عندما اشتراه المستخدم
     has_used = models.BooleanField(default=False)  # لتتبع إذا استخدم المستخدم الرمز
     purchase_date = models.DateTimeField(auto_now_add=True)  # وقت شراء الرمز
-    expire = models.DateField(null=True, blank=True) 
+    expire = models.DateField(null=True, blank=True)
     
+    
+    def is_expire(self):
+        if self.expire:
+            if self.expire >= now().date():
+                return False
+            else:
+                return True
     
     def use_copon(self):
         self.has_used = True
@@ -99,6 +106,7 @@ class GiftItem(models.Model):
     gift_code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_letters + string.digits)  # كود فريد لهذه الهدية المشتراة
     purchase_date = models.DateTimeField(auto_now_add=True)  # وقت الشراء
     sell_price = models.PositiveIntegerField(default=0) # سعر  عندما اشتراه المستخدم
+    sell_value = models.PositiveIntegerField(default=0) # القيمة عند الشراء
     has_used = models.BooleanField(default=False)  # هل تم استخدام الهدية أم لا
 
     def __str__(self):
@@ -133,6 +141,8 @@ class GiftDealing(models.Model):
     في حال ارسل احدهم هدية الى شخص ولم يكن مستعملا للبرنامج
     يتم التواصل معه بواسطة خدمة العملاء من هنا
     '''
+    sell_price = models.PositiveIntegerField(default=0) # سعر  عندما اشتراه المستخدم
+    sell_value = models.PositiveIntegerField(default=0) # القيمة عند الشراء
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     receiver_name = models.CharField(max_length=50)
     receiver_phone = models.CharField(max_length=20)
