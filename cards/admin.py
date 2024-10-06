@@ -40,7 +40,7 @@ class GiftAdmin(admin.ModelAdmin):
     get_value_display.short_description = 'value' # عنوان العمود في الواجهة
 
 class GiftItemAdmin(admin.ModelAdmin):
-    list_display = ('get_gift_image', 'gift__name', 'buyer', 'recipient', 'sell_price', 'get_now_price', 'has_used', 'purchase_date',)
+    list_display = ('get_gift_image', 'gift__name', 'buyer', 'recipient','sell_value', 'sell_price', 'get_now_price', 'has_used', 'purchase_date',)
     search_fields = ('gift__name','buyer',)
     list_filter = ('has_used',)
     ordering = ('purchase_date',)   

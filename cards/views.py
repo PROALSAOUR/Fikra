@@ -31,7 +31,7 @@ def cards_repo(request):
     
     from_self =  GiftItem.objects.filter(has_used=False , buyer=user, recipient=user).prefetch_related('gift')
     from_frind =  GiftItem.objects.filter(has_used=False, recipient=user).exclude(buyer=user).prefetch_related('gift', 'recipients')
-    for_frind = GiftItem.objects.filter(buyer=user).exclude(recipient=user).prefetch_related('gift', 'recipients')
+    for_frind = GiftItem.objects.filter(buyer=user).exclude(recipient=user).prefetch_related('gift', 'recipients')[:12]
     
     gifts_count = from_self.count() + from_frind.count() 
     
@@ -48,7 +48,6 @@ def cards_repo(request):
     }
     
     return render(request, 'cards/cards-repo.html',context)
-
 # صفحة متجر البطاقات
 def cards_store(request):
     #  خاص بالهدايا
@@ -149,7 +148,7 @@ def copon_details(request, cid):
         'copon': copon,
     }
     return render(request, 'cards/copon-details.html', context)
-# دالة شراء كوبون 
+# دالة شراء كوبون من اي مكان
 @login_required
 def buy_copon(request, cid):
     """
@@ -189,7 +188,7 @@ def buy_copon(request, cid):
     user_copon.save()
 
     return JsonResponse({'success': 'تم شراء الكوبون بنجاح'}, status=200)
-# دالة شراء هدية
+# دالة شراء هدية من صفحة التفاصيل
 @login_required
 def buy_gift(request, gid):
     gift = get_object_or_404(Gift, id=gid)

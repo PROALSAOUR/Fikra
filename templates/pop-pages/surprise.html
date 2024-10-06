@@ -1,0 +1,31 @@
+{% load static %}
+
+<div class="gift-container" style="padding-top:100px;">
+    <input type="checkbox" name="" id="show-gift-card" >
+    
+    <div class="gift-card hidden" >
+        
+        <div class="card-body "><!-- add class rotate -->
+
+            <div class="face" style="background-image:url(/images/g-f.png); ">
+               <div class="content">
+                    <i class="fa-solid fa-xmark" id="exit"></i>
+                    <p>لقد ارسل اليك فلان الفلاني هدية!  <span class="flip"> انقر هنا</span> لرؤية الرسالة المرفقة مع الهدية</p>
+                    <span class="go-to-repo">الذهاب الى مستودع الهدايا <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+               </div>
+            </div>
+
+            <div class="back" style="background-image:url(/images/g-b.png); ">
+               <div class="content">
+                    <!-- اقصى طول للرسالة 300 حرف -->
+                     <p></p>
+                    <span>فلان الفلاني الهمندعي</span>
+                    <i class="fa-solid fa-rotate"></i>
+               </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

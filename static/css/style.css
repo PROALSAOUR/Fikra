@@ -371,7 +371,7 @@ select option::selection {
     font-size: var(--mob-s-size);
     padding-bottom: 5px;
     margin-bottom: 5px;
-    line-height: 15px;
+    line-height: 1.6;
   }
   .product-box .product-info .product-price{
     font-size: var(--mob-m-size);
@@ -7090,4 +7090,26 @@ input[type="radio"]:checked + .custom-radio::after {
       font-size: 10px !important;
   }
 }
-
+.specific .clik-to-surprise {
+  cursor: pointer;
+  color: #5d7fce;
+  text-decoration: underline;
+  font-size: var(--mob-xs-size);
+  position: absolute;
+  left: 15px;
+  top: 15px;
+}
+@media (max-width: 524px) {
+  .specific .clik-to-surprise {
+    font-size: var(--mob-s-size);
+    left: 10px;
+    top: 10px;
+  }
+}
+@media (max-width: 402px) {
+  .specific .clik-to-surprise {
+    font-size: 8px;
+    left: 7px;
+    top: 7px;
+  }
+}
