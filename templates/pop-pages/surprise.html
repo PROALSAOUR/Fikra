@@ -1,31 +1,39 @@
 {% load static %}
 
-<div class="gift-container" style="padding-top:100px;">
-    <input type="checkbox" name="" id="show-gift-card" >
+{% for recipient in gift_item.recipients.all %}
     
-    <div class="gift-card hidden" >
-        
+    <div class="gift-card hidden" data-related-gift="forgiftitem-{{ gift_item.id }}">
         <div class="card-body "><!-- add class rotate -->
 
-            <div class="face" style="background-image:url(/images/g-f.png); ">
-               <div class="content">
-                    <i class="fa-solid fa-xmark" id="exit"></i>
-                    <p>لقد ارسل اليك فلان الفلاني هدية!  <span class="flip"> انقر هنا</span> لرؤية الرسالة المرفقة مع الهدية</p>
-                    <span class="go-to-repo">الذهاب الى مستودع الهدايا <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
-               </div>
+            <div class="face" style="background-image:url({% static "images/g-f.png" %}); ">
+                <div class="content">
+                        <i class="fa-solid fa-xmark" id="exit"></i>
+                        <p>لقد ارسل اليك  {{ gift_item.buyer }} هدية!  <span class="flip"> انقر هنا</span> لرؤية الرسالة المرفقة مع الهدية</p>
+                        {% if request.path != '/cards/' %}
+                            <a href="{% url "cards:cards-repo" %}"  class="go-to-repo">الذهاب الى مستودع الهدايا <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                        {% endif %}
+                </div>
             </div>
 
-            <div class="back" style="background-image:url(/images/g-b.png); ">
-               <div class="content">
-                    <!-- اقصى طول للرسالة 300 حرف -->
-                     <p></p>
-                    <span>فلان الفلاني الهمندعي</span>
-                    <i class="fa-solid fa-rotate"></i>
-               </div>
+            <div class="back" style="background-image:url({% static "images/g-b.png" %}); ">
+                <div class="content">
+                        <!-- اقصى طول للرسالة 300 حرف -->
+                        {% if recipient.message %}
+                            <p>{{ recipient.message|slice:":300" }}</p>
+                        {% else %}
+                            <p> المعذرة يا {{ recipient.recipient_name }} 
+                                يبدو ان {{ gift_item.buyer }} قد نسي كتابة الرسالة 😅
+                            </p>
+                        {% endif %}
+                        <span>{{ gift_item.buyer }}</span>
+                        <i class="fa-solid fa-rotate"></i>
+                </div>
             </div>
 
         </div>
 
     </div>
 
-</div>
+{% endfor %}
+
+

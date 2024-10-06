@@ -29,9 +29,9 @@ def cards_repo(request):
     
     # =================================================================
     
-    from_self =  GiftItem.objects.filter(has_used=False , buyer=user, recipient=user).prefetch_related('gift')
-    from_frind =  GiftItem.objects.filter(has_used=False, recipient=user).exclude(buyer=user).prefetch_related('gift', 'recipients')
-    for_frind = GiftItem.objects.filter(buyer=user).exclude(recipient=user).prefetch_related('gift', 'recipients')[:12]
+    from_self =  GiftItem.objects.filter(has_used=False , buyer=user, recipient=user).prefetch_related('gift').order_by('-purchase_date')
+    from_frind =  GiftItem.objects.filter(has_used=False, recipient=user).exclude(buyer=user).prefetch_related('gift', 'recipients').order_by('-purchase_date')
+    for_frind = GiftItem.objects.filter(buyer=user).exclude(recipient=user).prefetch_related('gift', 'recipients').order_by('-purchase_date')[:12]
     
     gifts_count = from_self.count() + from_frind.count() 
     
@@ -366,5 +366,6 @@ def buy_gift2(request, gid):
                 return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'طلب غير صحيح.'}, status=400)
+
 
 # ===================================================

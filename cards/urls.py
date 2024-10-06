@@ -13,4 +13,5 @@ urlpatterns = [
     path('buy-gift/<gid>', buy_gift, name='buy-gift'),
     path('buy-gift2/<gid>', buy_gift2, name='buy-gift2'),
     
+    
 ]

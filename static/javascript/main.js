@@ -869,64 +869,6 @@ document.addEventListener('DOMContentLoaded', function () {
   } 
 });
 //  =========================================================================================================
-//  انشاء تأثير قلب البطاقة لبطاقة الهدية 
-document.addEventListener('DOMContentLoaded', function() {
-  const flipButton = document.querySelector('.face .content .flip');
-  const face = document.querySelector('.gift-card .card-body');
-  const content = document.querySelector('.back .content');
-  const giftCard = document.querySelector('.gift-card');
-  const showGiftCardInput = document.getElementById('show-gift-card');
-  const exitButton = document.getElementById('exit'); // إضافة هذا السطر للعنصر .exit
-
-  // تحقق من وجود العناصر في الصفحة
-  if (flipButton && face && content && giftCard && showGiftCardInput) {
-    
-    // عند تغيير حالة الـ checkbox لإظهار أو إخفاء بطاقة الهدية
-    showGiftCardInput.addEventListener('change', function() {
-      if (this.checked) {
-        // إزالة كلاس hidden من .gift-card إذا كان checkbox محدد
-        giftCard.classList.remove('hidden');
-      } else {
-        // إضافة كلاس hidden إلى .gift-card إذا كان checkbox غير محدد
-        giftCard.classList.add('hidden');
-      }
-    });
-
-    // عند النقر على "انقر هنا" لإضافة كلاس rotate
-    flipButton.addEventListener('click', function() {
-      if (!face.classList.contains('rotate')) {
-        face.classList.remove('hidden'); // تأكد أن العنصر مرئي
-        face.classList.add('rotate');
-      }
-    });
-
-    // عند النقر على محتوى الظهر لإزالة كلاس rotate
-    content.addEventListener('click', function() {
-      if (face.classList.contains('rotate')) {
-        face.classList.remove('rotate');
-      }
-    });
-
-    // حدث لإغلاق بطاقة الهدية عند النقر خارجها
-    document.addEventListener('click', function(event) {
-      // تحقق مما إذا كان النقر خارج عنصر .gift-card
-      if (!giftCard.contains(event.target) && !showGiftCardInput.contains(event.target)) {
-        showGiftCardInput.checked = false; // تغيير حالة checkbox إلى غير مختار
-        giftCard.classList.add('hidden'); // إضافة كلاس hidden
-      }
-    });
-
-    // إذا كنت تريد إغلاق البطاقة عند النقر على .exit
-    if (exitButton) {
-      exitButton.addEventListener('click', function() {
-        showGiftCardInput.checked = false; // تغيير حالة checkbox إلى غير مختار
-        giftCard.classList.add('hidden'); // إضافة كلاس hidden
-      });
-    }
-    
-  } 
-});
-//  =========================================================================================================
 // دالة شراء هدية من صفحة التفاصيل
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -1286,21 +1228,75 @@ document.addEventListener('DOMContentLoaded', function () {
   // الحصول على جميع مربعات الاختيار
   const checkboxes = document.querySelectorAll('.repo-inputs-cont input[type="checkbox"]');
 
-  // دالة التحقق من حالة مربعات الاختيار
-  checkboxes.forEach(function (checkbox) {
-      checkbox.addEventListener('change', function () {
-          const divClass = this.id; // الحصول على معرف مربع الاختيار
-          const targetDiv = document.querySelector(`.products-cards.${divClass}`); // البحث عن القسم المرتبط
-          const icon = this.closest('label').querySelector('i'); // العثور على الأيقونة داخل الـ label
+  if (checkboxes.length > 0) {
+      // دالة التحقق من حالة مربعات الاختيار
+      checkboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            const divClass = this.id; // الحصول على معرف مربع الاختيار
+            const targetDiv = document.querySelector(`.products-cards.${divClass}`); // البحث عن القسم المرتبط
+            const icon = this.closest('label').querySelector('i'); // العثور على الأيقونة داخل الـ label
+            const hr = this.closest('label').querySelector('hr');
 
-          if (this.checked) {
-              targetDiv.classList.remove('hidden'); // إزالة الكلاس hidden إذا كان مربع الاختيار مختارًا
-              icon.classList.remove('fa-caret-down'); // إزالة الكلاس fa-caret-down
-              icon.classList.add('fa-caret-up'); // إضافة الكلاس fa-caret-up
-          } else {
-              targetDiv.classList.add('hidden'); // إضافة الكلاس hidden إذا كان مربع الاختيار غير مختار
-              icon.classList.remove('fa-caret-up'); // إزالة الكلاس fa-caret-up
-              icon.classList.add('fa-caret-down'); // إضافة الكلاس fa-caret-down
+            if (this.checked) {
+                targetDiv.classList.remove('hidden'); // إزالة الكلاس hidden إذا كان مربع الاختيار مختارًا
+                icon.classList.remove('fa-caret-down'); // إزالة الكلاس fa-caret-down
+                icon.classList.add('fa-caret-up'); // إضافة الكلاس fa-caret-up
+                hr.classList.add('hidden');
+              } else {
+                targetDiv.classList.add('hidden'); // إضافة الكلاس hidden إذا كان مربع الاختيار غير مختار
+                icon.classList.remove('fa-caret-up'); // إزالة الكلاس fa-caret-up
+                icon.classList.add('fa-caret-down'); // إضافة الكلاس fa-caret-down
+                hr.classList.remove('hidden');
+              }
+        });
+    });
+  }
+
+});
+//  =========================================================================================================
+// انشاء تأثير قلب وإظهار بطاقة الهدية المنبثقة 
+document.addEventListener('DOMContentLoaded', function() {
+  const surpriseButtons = document.querySelectorAll('.clik-to-surprise');
+
+  surpriseButtons.forEach(button => {
+      button.addEventListener('click', function() {
+          const relatedGiftId = this.dataset.relatedGift;
+          const giftCard = document.querySelector(`.gift-card[data-related-gift="${relatedGiftId}"]`);
+
+          // إذا كانت البطاقة موجودة، قم بإزالة كلاس hidden
+          if (giftCard) {
+              giftCard.classList.remove('hidden');
+              
+              // إضافة تأثير دوران البطاقة
+              const face = giftCard.querySelector('.card-body');
+              const flipButton = giftCard.querySelector('.flip');
+              const content = giftCard.querySelector('.back .content');
+              const exitButton = giftCard.querySelector('#exit');
+
+              // التعامل مع قلب البطاقة
+              if (flipButton && face && content) {
+                  flipButton.addEventListener('click', function() {
+                      face.classList.add('rotate');
+                  });
+
+                  content.addEventListener('click', function() {
+                      face.classList.remove('rotate');
+                  });
+              }
+
+              // إغلاق البطاقة عند النقر على زر الخروج
+              if (exitButton) {
+                  exitButton.addEventListener('click', function() {
+                      giftCard.classList.add('hidden'); // إعادة إضافة كلاس hidden
+                  });
+              }
+
+              // إغلاق البطاقة عند النقر خارجها
+              document.addEventListener('click', function(event) {
+                  if (!giftCard.contains(event.target) && !button.contains(event.target)) {
+                      giftCard.classList.add('hidden'); // إعادة إضافة كلاس hidden
+                  }
+              });
           }
       });
   });

@@ -1,13 +1,15 @@
 //   ===============================================================
 // كود الالعاب النارية عند وصول هدية
 document.addEventListener('DOMContentLoaded', function() {
-    const showGiftCardInput = document.getElementById('show-gift-card');
+    const surpriseButtons = document.querySelectorAll('.clik-to-surprise');
   
     // تحقق من وجود العناصر في الصفحة
-    if (showGiftCardInput) {
-        showGiftCardInput.addEventListener('change', function() {
-            if (showGiftCardInput.checked) {
-                
+    if (surpriseButtons.length > 0) {
+        surpriseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                if (button) {
+
+                       
                 var tceW3C   = 0; //#BCON
                 var tceIE    = 1; //#BCON
                 var tceOther = 2; //#BCON
@@ -700,9 +702,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 session.setupFireworkDoodle(gHeadElement);
 
                 session.FireworkDoodle.start();
-                            } 
+                           
+                } 
+            });
         });
     }
-      
-  });
+
+});
 //   ===============================================================

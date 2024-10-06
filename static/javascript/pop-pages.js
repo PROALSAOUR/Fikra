@@ -313,8 +313,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 // =============================================================================================
-
-
 // إظهار الفاتورة
 document.addEventListener('DOMContentLoaded', function () {
     const showCheckbox = document.querySelector('#show');
@@ -541,3 +539,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 // =============================================================================================
+
+

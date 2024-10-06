@@ -32,7 +32,12 @@
             </div>
         </a> 
         {% if gift_item in from_frind or gift_item in for_frind %}
-            <div class='clik-to-surprise'>استعراض <i class="fa-solid fa-eye"></i></div>
+
+            {% if gift_item.recipients.all %}
+                <div class='clik-to-surprise' data-related-gift="forgiftitem-{{ gift_item.id }}">استعراض <i class="fa-solid fa-eye"></i></div>
+                {% include "pop-pages/surprise.html" %}
+            {% endif %}
+
         {% endif %}
         <span class="add-to-cart" >
             {% comment %} رابط لصفحة الاسئلة {% endcomment %}
@@ -42,4 +47,3 @@
 </div>
 <!-- product-end -->
 
-{% include "pop-pages/surprise.html" %}
