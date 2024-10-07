@@ -14,7 +14,6 @@ import phonenumbers
 
 
 # ===================================================
-
 # مستودع البطاقات
 def cards_repo(request):
     user = request.user
@@ -422,5 +421,19 @@ def verfie_code(request):
 
     return JsonResponse({"success": False, "message": "حدث خطأ ما."})
 
+@login_required
+def change_seen_status(request, gid):
+    
+    try: 
+        user = request.user
+        gift_item = GiftItem.objects.get(id=gid)
+        if gift_item.buyer != user and gift_item.recipient == user :
+            gift_item.is_seen = True
+            gift_item.save()  # احفظ التغييرات
 
+        return JsonResponse({'status': 'success'})  # أرجع استجابة JSON
+    except:
+        return JsonResponse({'status': 'error'})  # أرجع استجابة JSON
+    
+    
 # ===================================================

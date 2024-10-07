@@ -1,16 +1,11 @@
+from store.models import *
 from django.shortcuts import redirect, render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from itertools import chain
-from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from store.models import *
-from accounts.models import UserProfile
-import json
-from django.db import IntegrityError
-from django.core.exceptions import ObjectDoesNotExist
-import phonenumbers
+from cards.models import GiftItem
+
 
 
 
@@ -611,7 +606,7 @@ def update_cart_item_qty(request):
             return JsonResponse({'error': str(e)}, status=500) # المشكلة تأتي من هنا
 
     return JsonResponse({'error': 'طريقة غير صحيحة، يجب أن تكون POST.'}, status=400)
-
+# ===================================================
 
 
 

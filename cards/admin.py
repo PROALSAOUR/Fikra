@@ -40,7 +40,7 @@ class GiftAdmin(admin.ModelAdmin):
     get_value_display.short_description = 'value' # عنوان العمود في الواجهة
 
 class GiftItemAdmin(admin.ModelAdmin):
-    list_display = ('get_gift_image', 'gift__name', 'buyer', 'recipient','sell_value', 'sell_price', 'get_now_price', 'has_used', 'purchase_date',)
+    list_display = ('get_gift_image', 'gift__name', 'buyer', 'recipient','sell_value', 'sell_price', 'get_now_price', 'is_seen', 'has_used', 'purchase_date',)
     search_fields = ('gift__name','buyer',)
     list_filter = ('has_used',)
     ordering = ('-purchase_date',)   
@@ -74,7 +74,9 @@ class ReceiveGiftAdmin(admin.ModelAdmin):
         return f"{obj.gift.gift_image()}"
     get_gift_image.short_description = 'gift image' # عنوان العمود في الواجهة
     
-
+class GiftmessageAdmin(admin.ModelAdmin):
+    list_display = ('gift_item','recipient_name', 'message')
+    search_fields = ('recipient_name',)
 
 admin.site.register(Copon, CoponAdmin)
 admin.site.register(CoponUsage, CoponUsageAdmin)
@@ -82,3 +84,4 @@ admin.site.register(Gift, GiftAdmin)
 admin.site.register(GiftItem, GiftItemAdmin)
 admin.site.register(GiftDealing, GiftDealingAdmin)
 admin.site.register(ReceiveGift, ReceiveGiftAdmin)
+admin.site.register(GiftRecipient, GiftmessageAdmin)

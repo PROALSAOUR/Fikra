@@ -1257,15 +1257,53 @@ document.addEventListener('DOMContentLoaded', function () {
 // انشاء تأثير قلب وإظهار بطاقة الهدية المنبثقة 
 document.addEventListener('DOMContentLoaded', function() {
   const surpriseButtons = document.querySelectorAll('.clik-to-surprise');
+  const showsurpriseanywhere = document.querySelector('.showsurpriseanywhere');
 
   surpriseButtons.forEach(button => {
       button.addEventListener('click', function() {
-          const relatedGiftId = this.dataset.relatedGift;
-          const giftCard = document.querySelector(`.gift-card[data-related-gift="${relatedGiftId}"]`);
+          const relatedGiftData = this.dataset.relatedGift;
+          const giftCard = document.querySelector(`.gift-card[data-related-gift="${relatedGiftData}"]`);
 
           // إذا كانت البطاقة موجودة، قم بإزالة كلاس hidden
           if (giftCard) {
-              giftCard.classList.remove('hidden');
+            giftCard.classList.remove('hidden');
+
+            // ================================================
+            // إرسال طلب لتحديث حالة الهدية
+            const relatedGiftid = giftCard.dataset.relatedGift;
+            const giftId = relatedGiftid.split('-').pop(); // استخلاص الجزء بعد '-'
+
+            if (giftId) {
+              // إرسال طلب لتحديث حالة الهدية
+              fetch(`/cards/change-seen-status/${giftId}`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRFToken': getCookie('csrftoken')  // تأكد من تضمين CSRF token إذا كان لديك تمكين حماية CSRF
+                  },
+                  body: JSON.stringify({ id: giftId, })
+              })
+              .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+              })
+              .then(data => {
+                  if (data.status === 'success') {
+                      console.log('تم تحديث حالة الهدية بنجاح.');
+                  } else {
+                      console.log('فشل تحديث الحالة.');
+                  }
+              })
+              .catch(error => {
+                  console.error('حدث خطأ:', error);
+              });
+            } else {
+              console.log('لم يتم العثور على ID الهدية.');
+            }
+
+            // ======================================================
               
               // إضافة تأثير دوران البطاقة
               const face = giftCard.querySelector('.card-body');
@@ -1300,6 +1338,85 @@ document.addEventListener('DOMContentLoaded', function() {
           }
       });
   });
+
+  if (showsurpriseanywhere && showsurpriseanywhere.checked) {
+    const giftCard = document.querySelector(`.gift-showsurpriseanywhere`);
+
+    // إذا كانت البطاقة موجودة، قم بإزالة كلاس hidden
+    if (giftCard) {
+      giftCard.classList.remove('hidden');
+
+      // ================================================
+      // إرسال طلب لتحديث حالة الهدية
+      const relatedGiftid = giftCard.dataset.relatedGift;
+      const giftId = relatedGiftid.split('-').pop(); // استخلاص الجزء بعد '-'
+
+      if (giftId) {
+        // إرسال طلب لتحديث حالة الهدية
+        fetch(`/cards/change-seen-status/${giftId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')  // تأكد من تضمين CSRF token إذا كان لديك تمكين حماية CSRF
+            },
+            body: JSON.stringify({ id: giftId, })
+        })
+        .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                console.log('تم تحديث حالة الهدية بنجاح.');
+            } else {
+                console.log('فشل تحديث الحالة.');
+            }
+        })
+        .catch(error => {
+            console.error('حدث خطأ:', error);
+        });
+      } else {
+        console.log('لم يتم العثور على ID الهدية.');
+      }
+
+      // ======================================================
+        
+        // إضافة تأثير دوران البطاقة
+        const face = giftCard.querySelector('.card-body');
+        const flipButton = giftCard.querySelector('.flip');
+        const content = giftCard.querySelector('.back .content');
+        const exitButton = giftCard.querySelector('#exit');
+
+        // التعامل مع قلب البطاقة
+        if (flipButton && face && content) {
+            flipButton.addEventListener('click', function() {
+                face.classList.add('rotate');
+            });
+
+            content.addEventListener('click', function() {
+                face.classList.remove('rotate');
+            });
+        }
+
+        // إغلاق البطاقة عند النقر على زر الخروج
+        if (exitButton) {
+            exitButton.addEventListener('click', function() {
+                giftCard.classList.add('hidden'); // إعادة إضافة كلاس hidden
+            });
+        }
+
+        // إغلاق البطاقة عند النقر خارجها
+        document.addEventListener('click', function(event) {
+            if (!giftCard.contains(event.target) ) {
+                giftCard.classList.add('hidden'); // إعادة إضافة كلاس hidden
+            }
+        });
+    }
+
+  }
+
 });
 //  =========================================================================================================
 // الكود الخاص بعرض النافذة الخاصة باستعمال كود الهدية

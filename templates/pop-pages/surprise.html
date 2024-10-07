@@ -1,8 +1,7 @@
 {% load static %}
 
-{% for recipient in gift_item.recipients.all %}
-    
-    <div class="gift-card hidden" data-related-gift="forgiftitem-{{ gift_item.id }}">
+
+    <div class="gift-card hidden {% if request.path != '/cards/' %}gift-showsurpriseanywhere{% endif %}" data-related-gift="{% if request.path == '/cards/' %}forgiftitem-{{ gift_item.id }}{% else %}surpriseany-{{  gift_item.id }}{% endif %}" >
         <div class="card-body "><!-- add class rotate -->
 
             <div class="face" style="background-image:url({% static "images/g-f.png" %}); ">
@@ -18,10 +17,10 @@
             <div class="back" style="background-image:url({% static "images/g-b.png" %}); ">
                 <div class="content">
                         <!-- اقصى طول للرسالة 300 حرف -->
-                        {% if recipient.message %}
-                            <p>{{ recipient.message|slice:":300" }}</p>
+                        {% if gift_item.recipients.message %}
+                            <p>{{ gift_item.recipients.message|slice:":300" }}</p>
                         {% else %}
-                            <p> المعذرة يا {{ recipient.recipient_name }} 
+                            <p> المعذرة يا {{ gift_item.recipients.recipient_name }} 
                                 يبدو ان {{ gift_item.buyer }} قد نسي كتابة الرسالة 😅
                             </p>
                         {% endif %}
@@ -34,6 +33,5 @@
 
     </div>
 
-{% endfor %}
 
 

@@ -109,21 +109,27 @@ class GiftItem(models.Model):
     has_used = models.BooleanField(default=False) # هل تم استخدام الهدية أم لا
     is_seen = models.BooleanField(default=False) # هل شاهد المستخدم الهدية؟
 
+    def save(self, *args, **kwargs):
+        if self.buyer == self.recipient:
+            self.is_seen = True
+        super(GiftItem, self).save(*args, **kwargs)
+
+
     def __str__(self):
-        return f"{self.buyer.username} - {self.gift.name}"
+        return f"{self.buyer} - {self.gift.name}"
 
     class Meta:
         verbose_name = 'سجل شراء هدية'
         verbose_name_plural = ' سجلات شراء الهدايا'
 
 class GiftRecipient(models.Model):
-    gift_item = models.ForeignKey(GiftItem, on_delete=models.CASCADE, related_name='recipients')
+    gift_item = models.OneToOneField(GiftItem, on_delete=models.CASCADE, related_name='recipients')
     recipient_name = models.CharField(max_length=100, null=True, blank=True)  # اسم المستلم
     recipient_phone = models.CharField(max_length=15, null=True, blank=True)  # هاتف المستلم
     message = models.TextField(blank=True, null=True, max_length=300)  # رسالة شخصية
     
     def __str__(self):
-        return f"هدية إلى: {self.recipient_name or 'نفسه'}"
+        return f"هدية{self.gift_item.pk} إلى: {self.recipient_name or 'نفسه'}"
     
     class Meta:
         verbose_name = 'مستلم هدية'
@@ -164,5 +170,4 @@ class GiftDealing(models.Model):
         verbose_name = 'ايصال هدية'
         verbose_name_plural = 'ايصال هدايا'
       
-        
 # =======================================================================
