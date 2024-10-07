@@ -13,6 +13,7 @@ urlpatterns = [
     path('buy-gift/<gid>', buy_gift, name='buy-gift'),
     path('buy-gift2/<gid>', buy_gift2, name='buy-gift2'),
     path('verfie-code/', verfie_code, name='verfie-code'),
-    
     path('change-seen-status/<gid>', change_seen_status, name='change-seen-status'),
+    
+    
 ]

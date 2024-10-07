@@ -1,0 +1,85 @@
+{% load static %}
+
+<!-- Start add-copon-pop-page Section -->
+<div class="Pop-up-page add-copon-pop-page">
+    <div class="logo">
+        <img src="{% static "images/name logo.jpg" %}" alt="">
+    </div>
+
+    <p>رجاء قم بالإختيار من البطاقات التالية:</p>
+    <form class="cards-type">
+        <div class="option">
+            <input type="radio" id="gift-cards" name="card-type" checked>
+            <span class="custom-radio"></span>
+            <label for="gift-cards">بطاقات هدايا</label>
+        </div>
+        <div class="option">
+            <input type="radio" id="copon-cards" name="card-type">
+            <span class="custom-radio"></span>
+            <label for="copon-cards"> بطاقات خصم</label>
+        </div>
+    </form>
+
+
+    <!-- gift cards -->
+    {% if user_gifts %}
+        <form id="gift-form" class="">
+            <div class="choose-card">
+                {% for gift_item in user_gifts %}
+                    <!-- start card -->
+                    <div class="card">
+                        <input type="radio" id="gift-{{ gift_item.id }}" name="choosen-card">
+                        <label for="gift-{{ gift_item.id }}">
+                            <div class="image">
+                                <img src="{{ gift_item.gift.img.url }}" alt="هدايا مجانا">
+                            </div>
+                            <div class="details">
+                                <h4>{{ gift_item.gift.name }}</h4>
+                                <p> القيمة: {{ gift_item.sell_value }} دل</p>
+                            </div>
+                            
+                        </label>
+                    </div>
+                    <!-- end card  -->
+                {% endfor %}
+            </div>
+            <button type="submit" >
+                استعمال
+            </button>
+        </form>
+    {% else %}
+        <p>لايوجد لديك هدايا </p>
+    {% endif %}
+
+    <!-- copons cards -->
+    {% if user_copons %}
+        <form id="copons-form">
+            <div class="choose-card">
+                {% for usage_copon in user_copons %}
+                    <!-- start card -->
+                    <div class="card">
+                        <input type="radio" id="copon-{{ usage_copon.id }}" name="choosen-card">
+                        <label for="copon-{{ usage_copon.id }}">
+                            <div class="image">
+                                <img src="{{usage_copon.copon_code.img.url}}" alt="عنوان الاناقة في طبرق">
+                            </div>
+                            <div class="details">
+                                <h4>{{usage_copon.copon_code.name}}</h4>
+                                <p> القيمة: {{ usage_copon.copon_code.value }}%</p>
+                                <p> الصلاحية : {{ usage_copon.expire }} </p>
+                            </div>
+                        </label>
+                    </div>
+                    <!-- end card  -->
+                {% endfor %}
+            </div>
+            <button type="submit" >
+                استعمال
+            </button>
+        </form>
+    {% else %}
+        <p>لايوجد لديك كوبونات خصم</p>
+    {% endif %}
+   
+</div>
+<!-- End add-copon-pop-page Section -->

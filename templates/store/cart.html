@@ -217,88 +217,10 @@
         </div>
         <!-- End add-cart-pop-page Section -->
 
-        <!-- Start add-copon-pop-page Section -->
-        <div class="Pop-up-page add-copon-pop-page">
-            <div class="logo">
-                <img src="/images/name logo.jpg" alt="">
-            </div>
-            <p>رجاء قم بالإختيار من البطاقات التالية:</p>
-            <form class="cards-type">
-                <div class="option">
-                    <input type="radio" id="gift-cards" name="card-type" checked>
-                    <span class="custom-radio"></span>
-                    <label for="gift-cards">بطاقات هدايا</label>
-                </div>
-                <div class="option">
-                    <input type="radio" id="copon-cards" name="card-type">
-                    <span class="custom-radio"></span>
-                    <label for="copon-cards"> بطاقات خصم</label>
-                </div>
-            </form>
-            <!-- gift cards -->
+        {% include "pop-pages/copons-in-cart.html" %}
 
-            <form id="gift-form" class="">
-                <div class="choose-card">
-
-                    <!-- start card -->
-                    <div class="card">
-                        <input type="radio" id="card3" name="choosen-card">
-                        <label for="card3">
-                            <div class="image">
-                                <img src="/images/gift-1.jpg" alt="">
-                            </div>
-                            <div class="details">
-                                <h4>بطاقة الجمعة البيضاء </h4>
-                                <p> القيمة: 100 دل</p>
-                                <p> الصلاحية المتبقية: 10 ايام</p>
-                            </div>
-                            <div class="card-qty">
-                                <p> الكمية: 2 </p>
-                            </div>
-                        </label>
-                    </div>
-                    <!-- end card  -->
-                    
-                </div>
-                <button type="submit" >
-                    استعمال
-                </button>
-
-            </form>
-
-            <!-- copons cards -->
-            <form id="copons-form">
-                <div class="choose-card">
-                    <!-- start card -->
-                    <div class="card">
-                        <input type="radio" id="card1" name="choosen-card">
-                        <label for="card1">
-                            <div class="image">
-                                <img src="/images/copon20.jpg" alt="">
-                            </div>
-                            <div class="details">
-                                <h4>بطاقة الجمعة البيضاء </h4>
-                                <p> القيمة: 100 دل</p>
-                                <p> الصلاحية المتبقية: 10 ايام</p>
-                            </div>
-                            <div class="card-qty">
-                                <p> الكمية: 2 </p>
-                            </div>
-                        </label>
-                    </div>
-                    <!-- end card  -->
-                </div>
-                <button type="submit" >
-                    استعمال
-                </button>
-
-            </form>
-           
-        </div>
-        <!-- End add-copon-pop-page Section -->
     </div>
    
- 
 {% endblock content %}
 
 

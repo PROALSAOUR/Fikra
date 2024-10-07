@@ -1,10 +1,11 @@
 from store.models import *
+from cards.models import GiftItem, CoponUsage
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from cards.models import GiftItem
+from django.utils.timezone import now 
 
 
 
@@ -464,6 +465,13 @@ def cart_page(request):
     av_count =  len(available_items)
     unav_count =  len(unavailable_items)
     
+    # ======== تضمين بطاقات المستخدم ==========
+    user = request.user
+    
+    user_copons = CoponUsage.objects.filter(user=user, has_used=False ,expire__gte=now().date()).prefetch_related('copon_code').order_by('copon_code__value')
+    user_gifts = GiftItem.objects.filter(has_used=False, recipient=user).prefetch_related('gift').order_by('sell_value')
+    
+    
     context = {
         'cart_items': cart_items,
         'available_items': available_items,
@@ -473,6 +481,8 @@ def cart_page(request):
         'total_qty': total_qty,
         'total_price': total_price,
         'total_bonus': total_bonus,
+        'user_copons': user_copons,
+        'user_gifts': user_gifts,
     }
 
     return render(request, 'store/cart.html', context)

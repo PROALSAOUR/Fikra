@@ -420,7 +420,7 @@ def verfie_code(request):
             return JsonResponse({"success": False, "message": 'نعتذر حصلت مشكلة اثناء معالجة البيانات!'})
 
     return JsonResponse({"success": False, "message": "حدث خطأ ما."})
-
+# دالة تغيير حالة الهدية عند فتحها
 @login_required
 def change_seen_status(request, gid):
     
@@ -434,6 +434,5 @@ def change_seen_status(request, gid):
         return JsonResponse({'status': 'success'})  # أرجع استجابة JSON
     except:
         return JsonResponse({'status': 'error'})  # أرجع استجابة JSON
-    
-    
+
 # ===================================================

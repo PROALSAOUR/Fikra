@@ -3745,6 +3745,7 @@ hr.sep {
   visibility: hidden;
 }
 .add-copon-pop-page .choose-card .card label{
+  cursor: pointer;
   overflow: hidden;
   position: relative;
   display: flex;
