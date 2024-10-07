@@ -62,6 +62,18 @@ class GiftDealingAdmin(admin.ModelAdmin):
     ordering = ('created_at',)   
     exclude = ('sender', 'receiver_name', 'receiver_phone',)
 
+class ReceiveGiftAdmin(admin.ModelAdmin):
+    list_display = ('get_gift_image' ,'value', 'is_used', 'created_at', 'updated_at')
+    search_fields = ('gift__name',)
+    list_filter = ('is_used',)
+    ordering = ('-updated_at',)   
+    exclude = ('is_used', 'code')
+    
+    
+    def get_gift_image(self, obj):
+        return f"{obj.gift.gift_image()}"
+    get_gift_image.short_description = 'gift image' # عنوان العمود في الواجهة
+    
 
 
 admin.site.register(Copon, CoponAdmin)
@@ -69,3 +81,4 @@ admin.site.register(CoponUsage, CoponUsageAdmin)
 admin.site.register(Gift, GiftAdmin)
 admin.site.register(GiftItem, GiftItemAdmin)
 admin.site.register(GiftDealing, GiftDealingAdmin)
+admin.site.register(ReceiveGift, ReceiveGiftAdmin)

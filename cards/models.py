@@ -103,11 +103,11 @@ class GiftItem(models.Model):
     gift = models.ForeignKey(Gift, on_delete=models.CASCADE, related_name='gift_items')
     buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gift_items_buyer')  # المستخدم الذي اشترى الهدية
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gift_items_recipient', null=True)  # المستخدم الذي له الهدية
-    gift_code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_letters + string.digits)  # كود فريد لهذه الهدية المشتراة
     purchase_date = models.DateTimeField(auto_now_add=True)  # وقت الشراء
     sell_price = models.PositiveIntegerField(default=0) # سعر  عندما اشتراه المستخدم
     sell_value = models.PositiveIntegerField(default=0) # القيمة عند الشراء
-    has_used = models.BooleanField(default=False)  # هل تم استخدام الهدية أم لا
+    has_used = models.BooleanField(default=False) # هل تم استخدام الهدية أم لا
+    is_seen = models.BooleanField(default=False) # هل شاهد المستخدم الهدية؟
 
     def __str__(self):
         return f"{self.buyer.username} - {self.gift.name} - {self.gift_code}"
@@ -118,13 +118,6 @@ class GiftItem(models.Model):
 
 class GiftRecipient(models.Model):
     gift_item = models.ForeignKey(GiftItem, on_delete=models.CASCADE, related_name='recipients')
-    
-    BUY_FOR_CHOICES = [
-        ('for-me', 'شراء لنفسي'),
-        ('for-another', 'إهداء لشخص آخر'),
-    ]
-    
-    gift_for = models.CharField(choices=BUY_FOR_CHOICES, max_length=20)  # شراء لنفسي أو لشخص آخر
     recipient_name = models.CharField(max_length=100, null=True, blank=True)  # اسم المستلم
     recipient_phone = models.CharField(max_length=15, null=True, blank=True)  # هاتف المستلم
     message = models.TextField(blank=True, null=True, max_length=300)  # رسالة شخصية
@@ -135,6 +128,18 @@ class GiftRecipient(models.Model):
     class Meta:
         verbose_name = 'مستلم هدية'
         verbose_name_plural = 'مستلمو الهدايا'
+
+class ReceiveGift(models.Model):
+    gift = models.ForeignKey(Gift, on_delete=models.CASCADE, related_name='receive_gift')
+    code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_letters + string.digits)  # كود فريد لهذه الهدية المشتراة
+    is_used = models.BooleanField(default=False)
+    value = models.PositiveIntegerField()
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
+        
+    class Meta:
+        verbose_name = 'كود استلام هدية'
+        verbose_name_plural = 'اكواد استلام هدايا'
 
 class GiftDealing(models.Model):
     '''
@@ -147,15 +152,17 @@ class GiftDealing(models.Model):
     receiver_name = models.CharField(max_length=50)
     receiver_phone = models.CharField(max_length=20)
     is_dealt = models.BooleanField(default=False)
+    receive = models.ForeignKey(ReceiveGift, on_delete=models.CASCADE)
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
     
+        
     def __str__(self):
         return f"هدية إلى: {self.receiver_name} من: {self.sender}"
     
     class Meta:
         verbose_name = 'ايصال هدية'
         verbose_name_plural = 'ايصال هدايا'
-    
+      
         
 # =======================================================================

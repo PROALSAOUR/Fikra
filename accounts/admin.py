@@ -42,6 +42,7 @@ class ProfileAdmin(admin.ModelAdmin):
 class PointsUsageAdmin(admin.ModelAdmin):
     list_display = ('user_profile__user', 'old_points', 'new_points', 'created_at',)
     search_fields = ('user_profile__user', 'user_profile__user__phone_number')
+    list_filter = ('user_profile__user',)
     exclude = ['created_at', 'old_points',]
     readonly_fields = ['user_profile', 'old_points', 'new_points', 'created_at',]    # تحديد الحقول التي لا يمكن تعديلها
     

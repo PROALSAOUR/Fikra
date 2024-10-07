@@ -208,6 +208,7 @@ def buy_gift(request, gid):
                 recipient_name = user.username
                 recipient_phone = user.phone_number
                 message_content = ''
+                
             elif buy_for == 'for-another':
                 recipient_name = data.get('recipient_name')
                 recipient_phone = data.get('recipient_phone')
@@ -225,13 +226,21 @@ def buy_gift(request, gid):
                 try:
                     recipient = User.objects.get(phone_number=recipient_phone)
                 except User.DoesNotExist:
-                    # إذا لم يكن المستخدم موجودًا، قم بإنشاء سجل في GiftDealing
+                    # إذا لم يكن المستخدم موجودًا على فكرة 
+                    
+                    # انشاء كود استلام للهدية كي يتمنك المستخدم من استلام هديته بعد انشاء حساب على فكرة
+                    receive = ReceiveGift.objects.create(
+                        value = gift.value,
+                        gift = gift,
+                    )
+                    
                     GiftDealing.objects.create(
                         sender=user, 
                         receiver_name=recipient_name,
                         receiver_phone=recipient_phone,
                         sell_price=gift.price,
                         sell_value=gift.value,
+                        receive = receive,
                     )
                     
                     profile.points -= gift.price
@@ -253,7 +262,6 @@ def buy_gift(request, gid):
             # إنشاء كائن GiftRecipient
             GiftRecipient.objects.create(
                 gift_item=gift_item,
-                gift_for=buy_for,
                 recipient_name=recipient_name,
                 recipient_phone=recipient_phone,
                 message=message_content,
@@ -293,7 +301,6 @@ def buy_gift2(request, gid):
             recipient_name = data.get('recipient_name')
             recipient_phone = data.get('recipient_phone')
             message_content = data.get('message_content')
-            buy_for = 'for-me' # افتراضياً الهدية لل مستخدم
             recipient = user  # افتراضياً المشتري هو المستلم
             
             # التحقق من صحة رقم الهاتف حسب البلد 
@@ -307,12 +314,18 @@ def buy_gift2(request, gid):
             
             # تحقق ان كان المستخدم اشترى الكود لنفسه ام لا
             if user.phone_number != recipient_phone :
-                buy_for = 'for-another' 
                 recipient = user  
                 
                 try: # هل المستلم لديه حساب على فكرة؟
                     recipient = User.objects.get(phone_number=recipient_phone)
                 except User.DoesNotExist:
+                    
+                    # انشاء كود استلام للهدية كي يتمنك المستخدم من استلام هديته بعد انشاء حساب على فكرة
+                    receive = ReceiveGift.objects.create(
+                        value = gift.value,
+                        gift = gift,
+                    )
+                    
                     # إذا لم يكن المستخدم موجودًا، قم بإنشاء سجل في GiftDealing
                     GiftDealing.objects.create(
                         sender=user, 
@@ -320,6 +333,7 @@ def buy_gift2(request, gid):
                         receiver_phone=recipient_phone,
                         sell_price=gift.price,
                         sell_value=gift.value,
+                        receive = receive,
                     )
                     
                     profile.points -= gift.price
@@ -342,7 +356,6 @@ def buy_gift2(request, gid):
             # إنشاء كائن GiftRecipient
             GiftRecipient.objects.create(
                 gift_item=gift_item,
-                gift_for=buy_for,
                 recipient_name=recipient_name,
                 recipient_phone=recipient_phone,
                 message=message_content,
