@@ -373,63 +373,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 // =============================================================================================
-// الكود الخاص بعرض النافذة الخاصة باستعمال كود الهدية
-document.addEventListener('DOMContentLoaded', function () {
-    const shareCodeMenu = document.querySelector('.use-code-pop-page');
-    const shareCodeLink = document.querySelector('.use-code-link');
-
-    if (shareCodeMenu && shareCodeLink) {
-        // دالة لإظهار القائمة
-        function showShareCodeMenu() {
-            shareCodeMenu.style.display = 'block'; // عرض القائمة
-            setTimeout(() => {
-                shareCodeMenu.style.visibility = 'visible';
-                shareCodeMenu.style.opacity = '1';
-                shareCodeMenu.style.transform = 'translate(-50%, -40%) scale(1)';
-            }, 10);
-            // حفظ حالة القائمة على أنها ظاهرة
-            localStorage.setItem('shareCodeMenuVisibility', 'visible');
-        }
-
-        // دالة لإخفاء القائمة
-        function hideShareCodeMenu() {
-            shareCodeMenu.style.opacity = '0';
-            shareCodeMenu.style.transform = 'translate(-50%, -40%) scale(0.5)';
-            setTimeout(() => {
-                shareCodeMenu.style.visibility = 'hidden';
-                shareCodeMenu.style.display = 'none';
-            }, 300);
-            // حفظ حالة القائمة على أنها مخفية
-            localStorage.setItem('shareCodeMenuVisibility', 'hidden');
-        }
-
-        // استرجاع الحالة المحفوظة من localStorage عند تحميل الصفحة
-        const savedVisibility = localStorage.getItem('shareCodeMenuVisibility');
-        if (savedVisibility === 'visible') {
-            showShareCodeMenu(); // إظهار القائمة إذا كانت ظاهرة قبل التحديث
-        } else {
-            hideShareCodeMenu(); // إخفاء القائمة إذا كانت مخفية
-        }
-
-        // التحقق من وجود العناصر قبل إضافة الأحداث
-        shareCodeLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (shareCodeMenu.style.visibility === 'hidden' || shareCodeMenu.style.visibility === '') {
-                showShareCodeMenu();
-            }
-        });
-
-
-        // إخفاء القائمة عند النقر خارجها
-        document.addEventListener('click', function (e) {
-            if (shareCodeMenu && shareCodeMenu.style.visibility === 'visible' && !shareCodeMenu.contains(e.target) && !shareCodeLink.contains(e.target)) {
-                hideShareCodeMenu();
-            }
-        });
-    }
-   
-});
-// =============================================================================================
 // الكود الخاص بعرض النافذة الخاصة بإضافة كوبون الى الفاتورة
 document.addEventListener('DOMContentLoaded', function () {
     const menu = document.querySelector('.add-copon-pop-page');

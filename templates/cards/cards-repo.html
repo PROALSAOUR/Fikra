@@ -142,16 +142,11 @@
             <img src="{% static "/images/name logo.jpg" %}" alt="">
         </div>
         <div class="errors">
-            <div class="error-message">
-                <p>الكود الذي أدخلته غير صحيح</p>
-            </div>
-            <div class="error-message">
-                <p>الكود الذي أدخلته  مستخدم بالفعل</p>
-            </div>
+           {% comment %} append errors here {% endcomment %}
         </div>
         <form action="">
             <h3>رجاءً ادخل كود الكرت الذي لديك لأضافته الى مخزونك</h3>
-            <input type="text" name="" id="">
+            <input type="text" name="verfie-code">
             <input type="submit" value="استعمال الكود">
         </form>
     </div>

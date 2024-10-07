@@ -43,7 +43,7 @@ class GiftItemAdmin(admin.ModelAdmin):
     list_display = ('get_gift_image', 'gift__name', 'buyer', 'recipient','sell_value', 'sell_price', 'get_now_price', 'has_used', 'purchase_date',)
     search_fields = ('gift__name','buyer',)
     list_filter = ('has_used',)
-    ordering = ('purchase_date',)   
+    ordering = ('-purchase_date',)   
     exclude = ('has_used', 'sell_price')
     
     
@@ -59,7 +59,7 @@ class GiftDealingAdmin(admin.ModelAdmin):
     list_display = ('sender', 'receiver_name', 'receiver_phone', 'is_dealt', 'created_at', 'updated_at',)
     search_fields = ('sender',)
     list_filter = ('is_dealt',)
-    ordering = ('created_at',)   
+    ordering = ('-created_at',)   
     exclude = ('sender', 'receiver_name', 'receiver_phone',)
 
 class ReceiveGiftAdmin(admin.ModelAdmin):
@@ -67,7 +67,7 @@ class ReceiveGiftAdmin(admin.ModelAdmin):
     search_fields = ('gift__name',)
     list_filter = ('is_used',)
     ordering = ('-updated_at',)   
-    exclude = ('is_used', 'code')
+    exclude = ('is_used', )
     
     
     def get_gift_image(self, obj):

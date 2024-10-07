@@ -6915,6 +6915,9 @@ input[type="radio"]:checked + .custom-radio::after {
   visibility: hidden;
   position: absolute;
 }
+.success {
+  background-color: #1d9f4d !important;
+}
 /* Start Fireworks */
 .frwdStage {
   height: 100vh;

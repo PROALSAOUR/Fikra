@@ -110,7 +110,7 @@ class GiftItem(models.Model):
     is_seen = models.BooleanField(default=False) # هل شاهد المستخدم الهدية؟
 
     def __str__(self):
-        return f"{self.buyer.username} - {self.gift.name} - {self.gift_code}"
+        return f"{self.buyer.username} - {self.gift.name}"
 
     class Meta:
         verbose_name = 'سجل شراء هدية'
@@ -131,7 +131,7 @@ class GiftRecipient(models.Model):
 
 class ReceiveGift(models.Model):
     gift = models.ForeignKey(Gift, on_delete=models.CASCADE, related_name='receive_gift')
-    code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_letters + string.digits)  # كود فريد لهذه الهدية المشتراة
+    code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_uppercase + string.digits)  # كود فريد لهذه الهدية المشتراة
     is_used = models.BooleanField(default=False)
     value = models.PositiveIntegerField()
     created_at = models.DateField(auto_now_add=True)

@@ -14,4 +14,6 @@ urlpatterns = [
     path('buy-gift2/<gid>', buy_gift2, name='buy-gift2'),
     
     
+    path('verfie-code/', verfie_code, name='verfie-code'),
+    
 ]

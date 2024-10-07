@@ -1,17 +1,16 @@
+from cards.models import *
+from store.models import *
+from accounts.models import UserProfile
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from itertools import chain
-from datetime import timedelta
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from store.models import *
-from accounts.models import UserProfile
 import json
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 import phonenumbers
-from cards.models import *
 
 
 # ===================================================
@@ -35,7 +34,9 @@ def cards_repo(request):
     
     gifts_count = from_self.count() + from_frind.count() 
     
-    # =================================================================    
+    # =================================================================
+
+     
     context  = {
         'active_copons': active_copons,
         'expired_copons': expired_copons,
@@ -45,6 +46,7 @@ def cards_repo(request):
         'from_frind': from_frind,
         'for_frind': for_frind,
         'gifts_count': gifts_count,
+        # ==========================
     }
     
     return render(request, 'cards/cards-repo.html',context)
@@ -379,6 +381,46 @@ def buy_gift2(request, gid):
                 return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'طلب غير صحيح.'}, status=400)
+# دالة استلام هدية من الكود 
+@login_required
+def verfie_code(request):
+    user = request.user
+
+    if request.method == 'POST':
+        print(request.body)
+        
+        try:
+            data = json.loads(request.body)
+            verfie_code = data.get('verfie-code')
+        
+            try:
+                gift = ReceiveGift.objects.get(code=verfie_code)
+
+                if gift.is_used:
+                    return JsonResponse({"success": False, "message": "الكود الذي ادخلته مستخدم بالفعل"})
+
+                # إنشاء GiftItem جديد
+                GiftItem.objects.create(
+                    buyer=user,
+                    gift=gift.gift,
+                    sell_price=0,
+                    sell_value=gift.value,
+                    recipient=user,
+                )
+
+                # تحديث حالة الكود إلى "مستخدم"
+                gift.is_used = True
+                gift.save()
+
+                return JsonResponse({"success": True, "message": 'تهانينا! تم استلام كود الهدية بنجاح.'})
+
+            except ReceiveGift.DoesNotExist:
+                return JsonResponse({"success": False, "message": "كود الهدية غير صحيح أو غير موجود."})
+            
+        except ReceiveGift.DoesNotExist:
+            return JsonResponse({"success": False, "message": 'نعتذر حصلت مشكلة اثناء معالجة البيانات!'})
+
+    return JsonResponse({"success": False, "message": "حدث خطأ ما."})
 
 
 # ===================================================
