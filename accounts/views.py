@@ -1,9 +1,11 @@
+import time
 from django.shortcuts import redirect, render, get_object_or_404
 from accounts.forms import UserSignUpForm, UserLogInForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.hashers import check_password
 from django.contrib import messages
 from store.models import Product
 from accounts.models import Inbox, Message
@@ -99,7 +101,7 @@ def mark_as_read(request, message_id):
     message.is_read = True
     message.save()
     return JsonResponse({'status': 'success'})
-
+# دالة حذف حساب
 @login_required
 def delete_account(request):
     if request.method == 'POST':
@@ -107,3 +109,88 @@ def delete_account(request):
         user.delete()  # حذف المستخدم
         logout(request)  # تسجيل خروج المستخدم بعد الحذف
     return redirect('store:home')  # إعادة توجيه إلى الصفحة الرئيسية
+#  دالة تعديل حساب
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
+from django.contrib.auth.hashers import check_password
+
+@login_required
+def edit_account(request):
+    context = {}
+
+    if request.method == 'POST':
+        # الحصول على البيانات من الفورم
+        first_name = request.POST.get('first-name')
+        last_name = request.POST.get('last-name')
+        old_password = request.POST.get('old-password')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+
+        # تحقق إن كان المستخدم يرغب بتغيير الاسم فقط
+        if first_name and last_name and old_password and not password1 and not password2:
+            if check_password(old_password, request.user.password):
+                request.user.first_name = first_name
+                request.user.last_name = last_name
+                request.user.save()
+                messages.success(request, 'تم تحديث الأسماء بنجاح.')
+                return redirect('accounts:account_info')
+            else:
+                messages.error(request, 'كلمة المرور القديمة غير صحيحة.')
+
+        # تحقق إن كان المستخدم يرغب بتغيير كلمة المرور فقط
+        elif old_password and password1 and password2 and not first_name and not last_name:
+            if check_password(old_password, request.user.password):
+                if password1 == password2:
+                    if len(password1) >= 8 and ' ' not in password1 and not password1.isdigit() and password1.isascii():
+                        request.user.set_password(password1)
+                        update_session_auth_hash(request, request.user)  # الحفاظ على الجلسة
+                        request.user.save()
+                        messages.success(request, 'تم تحديث كلمة المرور بنجاح.')
+                        return redirect('accounts:account_info')
+                    else:
+                        messages.error(request, 'كلمة المرور يجب أن تكون 8 أحرف على الأقل، ولا تحتوي على فراغات، ولا تكون عبارة عن أرقام فقط.')
+                else:
+                    messages.error(request, 'كلمتا المرور الجديدة غير متطابقتين.')
+            else:
+                messages.error(request, 'كلمة المرور القديمة غير صحيحة.')
+
+        # تحقق إن كان المستخدم يرغب بتغيير الأسماء وكلمة المرور معًا
+        elif first_name and last_name and old_password and password1 and password2:
+            if check_password(old_password, request.user.password):
+                if password1 == password2:
+                    if len(password1) >= 8 and ' ' not in password1 and not password1.isdigit() and password1.isascii():
+                        request.user.first_name = first_name
+                        request.user.last_name = last_name
+                        request.user.set_password(password1)
+                        update_session_auth_hash(request, request.user)  # الحفاظ على الجلسة
+                        request.user.save()
+                        messages.success(request, 'تم تحديث الأسماء وكلمة المرور بنجاح.')
+                        return redirect('accounts:account_info')
+                    else:
+                        messages.error(request, 'كلمة المرور يجب أن تكون 8 أحرف على الأقل، ولا تحتوي على فراغات، ولا تكون عبارة عن أرقام فقط.')
+                else:
+                    messages.error(request, 'كلمتا المرور الجديدة غير متطابقتين.')
+            else:
+                messages.error(request, 'كلمة المرور القديمة غير صحيحة.')
+
+        else:
+            messages.error(request, 'يرجى إدخال البيانات المطلوبة.')
+
+    else:
+        # عرض الأسماء الحالية في حالة الطلب GET
+        context = {
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+        }
+
+    return render(request, 'accounts/edit.html', context)
+
+# =============================================================
+
+
+
+
+
+
+

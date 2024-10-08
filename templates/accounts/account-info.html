@@ -10,7 +10,7 @@
                     <div class="my-points">
                         <h3>نقاطي:</h3>
                         <div class="points">
-                            <a href="{% url "store:points_page" %}">
+                            <a href="">
                                 <span>{{ user_points }}</span>
                                 <i class="fa-solid fa-gem"></i>                
                             </a>
@@ -29,11 +29,11 @@
                 </div>
                 <div class="my-info-details" id='go_to_notfications'>
                     <div class="details-item">
-                        <div class="title"><p>اسم المستخدم</p><a href=""><i class="fa-solid fa-pen"></i></a></div>
+                        <div class="title"><p>اسم المستخدم</p><a href="{% url "accounts:edit-account" %}"><i class="fa-solid fa-pen"></i></a></div>
                         <div class="content">{{ user_name }}</div>
                     </div>
                     <div class="details-item">
-                        <div class="title"><p>رقم الهاتف</p><a href=""><i class="fa-solid fa-pen"></i></a></div>
+                        <div class="title"><p>رقم الهاتف</p><a href="{% url "accounts:edit-account" %}"><i class="fa-solid fa-pen"></i></a></div>
                         <div class="content">{{ phone_number }}</div>
                     </div>
                     

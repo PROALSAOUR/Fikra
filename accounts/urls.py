@@ -9,4 +9,5 @@ urlpatterns = [
     path('mark-as-read/<int:message_id>/', mark_as_read, name='mark-as-read'),
     path("sign/", sign, name="sign"),
     path('delete-account/', delete_account, name='delete_account'),
+    path('edit-account/', edit_account, name='edit-account'),
 ]

@@ -1,0 +1,67 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="sign-page" style="position: relative;">
+    <div class="edit-card">
+        <h1>تعديل بينات حسابي <i class="fa-solid fa-pen"></i></h1>
+        <form method='POST'>
+            {% csrf_token %}
+            <div class="data">
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if 'success' in message.tags %}
+                            <div class="error-messages" style="background-color: #74a432 !important;">
+                                {{ message }} 
+                            </div>
+                        {% else %}
+                            <div class="error-messages">
+                                {{ message }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                <div class="edit-items">
+                    <div>
+                        <label for="first-name">الإسم الأول</label>
+                        <input type="text" name="first-name" id="first-name" value="{{first_name}}"  >
+                    </div>
+                    <div>
+                        <label for="last-name">الإسم الاخير</label>
+                        <input type="text" name="last-name" id="last-name" value="{{last_name}}"  >
+                    </div>                           
+                    <div>
+                        <label for="oldpassword">كلمة المرور القديمة</label>
+                        <input type="text" name="old-password" id="oldpassword" required>
+                    </div>
+                    <div>
+                        <label for="password1">كلمة المرور الجديدة</label>
+                        <input type="password" name="password1" id="password1" placeholder="(اتركه فارغا ان اردت تغيير الاسم فقط)">
+                    </div>
+                    <div>
+                        <label for="password2">تأكيد كلمة المرور</label>
+                        <input type="password" name="password2" id="password2" placeholder="(اتركه فارغا ان اردت تغيير الاسم فقط)">
+                    </div>
+                    <button type="submit">تعديل</button>
+                </div>
+            </div>
+            <div class="image">
+                <img src="{% static "images/graphic-designer.jpg" %}" alt="تعديل بياناتي">
+            </div>
+
+        </form>
+    </div>           
+</div>         
+<script>
+    // إخفاء رسائل الخطأ أو النجاح بعد تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            const errorMessages = document.querySelectorAll('.error-messages');
+            errorMessages.forEach(function(message) {
+                message.style.display = 'none';
+            });
+        }, 5000); // إخفاء الرسائل بعد 5 ثوانٍ
+    });
+</script>
+{% endblock content %}
