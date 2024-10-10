@@ -2,7 +2,16 @@ from django.db import models
 from django.utils.html import mark_safe
 from store.models import ProductVariation
 from accounts.models import User
-        
+       
+class DliveryPrice(models.Model):
+    price = models.IntegerField(default=0)     
+    
+    def __str__(self):
+        return f"طلب من {self.user} [{self.user.phone_number}]"
+    
+    class Meta:
+        verbose_name = 'سعر التوصيل '
+        verbose_name_plural = 'سعر التوصيل'
         
 class Order(models.Model):
     
@@ -22,6 +31,13 @@ class Order(models.Model):
     order_date = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     with_message = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f"طلب من {self.user} [{self.user.phone_number}]"
+
+    class Meta:
+        verbose_name = 'طلب '
+        verbose_name_plural = 'الطلبات'
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
@@ -29,5 +45,8 @@ class OrderItem(models.Model):
     qty = models.PositiveIntegerField(default=1)
     price = models.PositiveIntegerField()
     returned = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f"{self.order_item.product_item.product.name}"
     
 
