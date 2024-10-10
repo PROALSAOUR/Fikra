@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.html import mark_safe
 from store.models import ProductVariation
 from accounts.models import User
-# Create your models here.
+        
         
 class Order(models.Model):
     
@@ -15,14 +15,19 @@ class Order(models.Model):
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending')
-    delivery_value = models.PositiveIntegerField(default=0)
-    discount_value = models.PositiveIntegerField(default=0)
     total_price = models.PositiveIntegerField()
+    total_points = models.PositiveIntegerField(null=True)
+    discount_amount = models.IntegerField(default=0)
+    dlivery_price = models.IntegerField(default=0)
     order_date = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    with_message = models.BooleanField(default=False)
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
     order_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='order_items')
     qty = models.PositiveIntegerField(default=1)
     price = models.PositiveIntegerField()
+    returned = models.BooleanField(default=False)
+    
 

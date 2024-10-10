@@ -25,6 +25,8 @@ class AdsSlider(models.Model):
     ads_for = models.CharField(choices=ads_options, max_length=20, default='special_products')
     category = models.ForeignKey('Category', null=True, blank=True, related_name='ads', on_delete=models.CASCADE)
     one_product = models.ForeignKey('Product', null=True, blank=True, related_name='ads', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     def get_ad_url(self):
         if self.ads_for == 'category':
@@ -224,6 +226,8 @@ class ProductVariation(models.Model):
     size = models.ForeignKey(SizeOption, related_name='variations', on_delete=models.PROTECT)
     stock = models.IntegerField(default=0)  # الكمية المتاحة
     sold = models.IntegerField(default=0)  # الكمية المباعة
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.product_item} - {self.product_item.product.name} - {self.product_item.color} - {self.size}"
@@ -286,27 +290,6 @@ class CartItem(models.Model):
             raise ValueError("الكمية المطلوبة أكبر من المخزون المتاح.")
         self.qty = new_qty
         self.save()
-        
-class Order(models.Model):
-    
-    ORDER_STATUS = [
-        ('pending', 'جاري المعالجة'),
-        ('shipped', 'تم الشحن'),
-        ('delivered', 'تم التسليم'),
-        ('canceled', 'تم الإلغاء'),
-    ]
-    
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
-    status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending')
-    total_price = models.PositiveIntegerField()
-    order_date = models.DateTimeField(auto_now_add=True)
-
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
-    order_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='order_items')
-    qty = models.PositiveIntegerField(default=1)
-    price = models.PositiveIntegerField()
-
 
 
 

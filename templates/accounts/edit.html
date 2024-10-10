@@ -6,6 +6,11 @@
 <div class="sign-page" style="position: relative;">
     <div class="edit-card">
         <h1>تعديل بينات حسابي <i class="fa-solid fa-pen"></i></h1>
+
+        <a class='edit-exit' href="javascript:void(0);" onclick="goBack()">
+            <span class="exit-button"><i class="fa-solid fa-arrow-left"></i></span>
+        </a>
+
         <form method='POST'>
             {% csrf_token %}
             <div class="data">

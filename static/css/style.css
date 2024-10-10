@@ -7142,6 +7142,33 @@ input[type="radio"]:checked + .custom-radio::after {
 .edit-card h1 i{
   font-size: var(--lab-m-size);
 }
+.edit-card .edit-exit {
+  position: absolute;
+  left: 0%;
+  top: 12%;
+}
+@media (max-width: 890px) {
+  .edit-card .edit-exit {
+    top: 11%;
+  }
+}
+@media (max-width: 716px) {
+  .edit-card .edit-exit {
+    left: 1%;
+    top: 10%;
+  }
+}
+@media (max-width: 598px) {
+  .edit-card .edit-exit {
+    top: 16%;
+  }
+}
+@media (max-width: 228px) {
+  .edit-card .edit-exit {
+    left: 0%;
+    top: 16%;
+  }
+}
 .edit-card form {
   position: relative;
   display: flex;

@@ -30,6 +30,7 @@ urlpatterns = [
     path('blog/', include('blog.urls')),
     path('accounts/', include('accounts.urls')),
     path('cards/', include('cards.urls')),
+    path('orders/', include('orders.urls')),
 ] + debug_toolbar_urls()
 
 urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)
