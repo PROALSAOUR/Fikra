@@ -468,9 +468,8 @@ def cart_page(request):
     # ======== تضمين بطاقات المستخدم ==========
     user = request.user
     
-    user_copons = CoponUsage.objects.filter(user=user, has_used=False ,expire__gte=now().date()).prefetch_related('copon_code').order_by('copon_code__value')
+    user_copons = CoponUsage.objects.filter(user=user, has_used=False ,expire__gte=now().date(), copon_code__min_bill_price__lte=total_price).prefetch_related('copon_code').order_by('copon_code__value')
     user_gifts = GiftItem.objects.filter(has_used=False, recipient=user).prefetch_related('gift').order_by('sell_value')
-    
     
     context = {
         'cart_items': cart_items,

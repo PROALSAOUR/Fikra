@@ -798,6 +798,228 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 // =========================================================================================================
+// دوال اختيار كوبون او هدية داخل السلة
+// دالة للتحقق من حالة مربع الاختيار
+function checkCheckbox() {
+  // الحصول على مربع الاختيار
+  const checkbox = document.querySelector('input[name="use-this"]');
+  // الحصول على div الذي يحتوي على كلاس receipt
+  const receiptDiv = document.querySelector('.receipt');
+
+  if (checkbox && receiptDiv) {
+      // التحقق مما إذا كان مربع الاختيار مختارًا
+      if (checkbox.checked) {
+          // إضافة كلاس offer إذا كان مختارًا
+          receiptDiv.classList.add('offer');
+      } else {
+          // إزالة كلاس offer إذا لم يكن مختارًا
+          receiptDiv.classList.remove('offer');
+      }
+  }
+}
+// استدعاء الدالة عند تغيير حالة مربع الاختيار
+document.addEventListener('DOMContentLoaded', function() {
+  const checkbox = document.querySelector('input[name="use-this"]');
+  if (checkbox) {
+      checkbox.addEventListener('change', checkCheckbox); // إضافة حدث التغيير
+  }
+
+  // استدعاء الدالة عند تحميل الصفحة للتحقق من الحالة الافتراضية
+  checkCheckbox();
+});
+// دالة وظيفتها اختيار بطاقة هدية داخل السلة
+function applyGiftCard(event) {
+  // منع تحديث الصفحة عند النقر على الزر
+  event.preventDefault();
+
+  // الحصول على الراديو المختار
+  const selectedRadio = document.querySelector('input[type="radio"][name="choosen-card"]:checked');
+
+  if (selectedRadio) {
+      // الحصول على قيم sell_value و gift_id و gift_name من الراديو المختار
+      const sellValue = parseFloat(selectedRadio.getAttribute('data-sell-value'));
+      const giftId = selectedRadio.getAttribute('data-gift-id');
+      const giftName = selectedRadio.getAttribute('data-gift-name'); // الحصول على الاسم
+
+
+      // تعديل span الذي يحتوي على class old و class new لوضع القيم
+      const totalPriceElement = document.querySelector('.total-price .old');
+      const newPriceElement = document.querySelector('.total-price .new');
+
+      if (totalPriceElement && newPriceElement) {
+          const totalPrice = parseFloat(totalPriceElement.textContent) || 0;
+          let newPrice = totalPrice - sellValue;
+
+          if (newPrice < 0) {
+              newPrice = 0; // إذا كانت القيمة سالبة، ضع 0
+          }
+
+          newPriceElement.textContent = ' | ' + newPrice.toFixed(2); // وضع القيمة الجديدة         
+      }
+
+      // إخفاء عنصر p.add-copon-link
+      const addCoponLink = document.querySelector('.add-copon-link');
+      if (addCoponLink) {
+          addCoponLink.classList.add('hidden');
+      }
+
+      // إظهار div.check-code
+      const checkCodeDiv = document.querySelector('.check-code');
+      if (checkCodeDiv) {
+          checkCodeDiv.classList.remove('hidden');
+
+          // تحديث قيم input المخفي داخل check-code
+          const cardTypeInput = checkCodeDiv.querySelector('input[name="card-type"]');
+          const cardIdInput = checkCodeDiv.querySelector('input[name="card-id"]');
+          const cardInfoParagraph = checkCodeDiv.querySelector('p'); // الحصول على عنصر <p>
+
+          if (cardTypeInput && cardIdInput) {
+              cardTypeInput.value = 'gift'; // وضع "gift" في حقل card-type
+              cardIdInput.value = giftId; // وضع قيمة gift_item.id في حقل card-id
+
+              // تحديث نص <p> بالمعلومات الجديدة
+              cardInfoParagraph.textContent = `استعمال: ${giftName} بقيمة: ${sellValue} دل`;
+          }
+      }
+
+      // جعل مربع الاختيار مختارًا عند تطبيق بطاقة الهدية
+      const checkbox = document.querySelector('input[name="use-this"]');
+      if (checkbox) {
+          checkbox.checked = true; // اجعله مختارًا
+          checkCheckbox(); // استدعاء الدالة للتحقق من حالة checkbox
+      }
+  }
+
+
+  // إعادة جميع التغييرات عند تحديث الصفحة
+  window.onbeforeunload = function () {
+      const addCoponLink = document.querySelector('.add-copon-link');
+      const checkCodeDiv = document.querySelector('.check-code');
+
+      if (addCoponLink) {
+          addCoponLink.classList.remove('hidden');
+      }
+
+      if (checkCodeDiv) {
+          checkCodeDiv.classList.add('hidden');
+          const cardTypeInput = checkCodeDiv.querySelector('input[name="card-type"]');
+          const cardIdInput = checkCodeDiv.querySelector('input[name="card-id"]');
+
+          if (cardTypeInput && cardIdInput) {
+              cardTypeInput.value = '';
+              cardIdInput.value = '';
+          }
+
+          const cardInfoParagraph = checkCodeDiv.querySelector('p');
+          if (cardInfoParagraph) {
+              cardInfoParagraph.textContent = ''; // إعادة النص إلى الحالة الافتراضية
+          }
+      }
+
+      // إلغاء اختيار الـ checkbox عند تحديث الصفحة
+      const checkbox = document.querySelector('input[name="use-this"]'); // تحديد الـ checkbox
+      if (checkbox) {
+          checkbox.checked = false; // إلغاء الاختيار
+      }
+  };
+}
+// دالة وظيفتها اختيار كوبون خصم داخل السلة
+function applyCoponCard(event) {
+  // منع تحديث الصفحة عند النقر على الزر
+  event.preventDefault();
+
+  // الحصول على الراديو المختار
+  const selectedRadio = document.querySelector('input[type="radio"][name="choosen-copon-card"]:checked');
+
+  if (selectedRadio) {
+      // الحصول على قيم sell_value و gift_id و gift_name من الراديو المختار
+      const coponsellValue = parseFloat(selectedRadio.getAttribute('data-sell-value'));
+      const coponId = selectedRadio.getAttribute('data-copon-id');
+      const coponName = selectedRadio.getAttribute('data-copon-name'); // الحصول على الاسم
+
+      // تعديل span الذي يحتوي على class old و class new لوضع القيم
+      const totalPriceElement = document.querySelector('.total-price .old');
+      const newPriceElement = document.querySelector('.total-price .new');
+
+      if (totalPriceElement && newPriceElement) {
+          const totalPrice = parseFloat(totalPriceElement.textContent) || 0;
+          const discountAmount = (totalPrice * (coponsellValue / 100));
+
+          let newPrice = totalPrice - discountAmount;
+
+          if (newPrice < 0) {
+              newPrice = 0; // إذا كانت القيمة سالبة، ضع 0
+          }
+
+          newPriceElement.textContent = ' | ' + newPrice.toFixed(1); // وضع القيمة الجديدة
+      }
+
+      // إخفاء عنصر p.add-copon-link
+      const addCoponLink = document.querySelector('.add-copon-link');
+      if (addCoponLink) {
+          addCoponLink.classList.add('hidden');
+      }
+
+      // إظهار div.check-code
+      const checkCodeDiv = document.querySelector('.check-code');
+      if (checkCodeDiv) {
+          checkCodeDiv.classList.remove('hidden');
+
+          // تحديث قيم input المخفي داخل check-code
+          const cardTypeInput = checkCodeDiv.querySelector('input[name="card-type"]');
+          const cardIdInput = checkCodeDiv.querySelector('input[name="card-id"]');
+          const cardInfoParagraph = checkCodeDiv.querySelector('p'); 
+
+          if (cardTypeInput && cardIdInput) {
+              cardTypeInput.value = 'copon'; 
+              cardIdInput.value = coponId; 
+
+              // تحديث نص <p> بالمعلومات الجديدة
+              cardInfoParagraph.textContent = ` استعمال: ${coponName} بقيمة: ${coponsellValue} %`;
+          }
+      }
+
+      // جعل مربع الاختيار مختارًا عند تطبيق بطاقة الهدية
+      const checkbox = document.querySelector('input[name="use-this"]');
+      if (checkbox) {
+          checkbox.checked = true; // اجعله مختارًا
+          checkCheckbox(); // استدعاء الدالة للتحقق من حالة checkbox
+      }
+  }
+
+  // إعادة جميع التغييرات عند تحديث الصفحة
+  window.onbeforeunload = function () {
+      const addCoponLink = document.querySelector('.add-copon-link');
+      const checkCodeDiv = document.querySelector('.check-code');
+
+      if (addCoponLink) {
+          addCoponLink.classList.remove('hidden');
+      }
+
+      if (checkCodeDiv) {
+          checkCodeDiv.classList.add('hidden');
+          const cardTypeInput = checkCodeDiv.querySelector('input[name="card-type"]');
+          const cardIdInput = checkCodeDiv.querySelector('input[name="card-id"]');
+
+          if (cardTypeInput && cardIdInput) {
+              cardTypeInput.value = '';
+              cardIdInput.value = '';
+          }
+
+          const cardInfoParagraph = checkCodeDiv.querySelector('p');
+          if (cardInfoParagraph) {
+              cardInfoParagraph.textContent = ''; // إعادة النص إلى الحالة الافتراضية
+          }
+      }
+
+      // إلغاء اختيار الـ checkbox عند تحديث الصفحة
+      const checkbox = document.querySelector('input[name="use-this"]'); // تحديد الـ checkbox
+      if (checkbox) {
+          checkbox.checked = false; // إلغاء الاختيار
+      }
+  };
+}
+// =========================================================================================================
 //  دالة اظهار الفورم واخفاءه داخل صفحة تفاصيل البطاقات
 document.addEventListener('DOMContentLoaded', function() {
   const forMeRadio = document.getElementById('for-me');

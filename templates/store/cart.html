@@ -167,7 +167,7 @@
                                 <span class="total-quantity"> {{ total_qty }} <br> قطعة</span>
                                 <div class="total-price">
                                     <h3>السعر الإجمالي:</h3>
-                                    <h4 class="price "><span class="old"> {{ total_price|floatformat:0 }} </span><span class="new"> | 28 </span><span> دل</span></h4>
+                                    <h4 class="price "><span class="old"> {{ total_price|floatformat:0 }}</span><span class="new"></span><span> دل</span></h4>
                                 </div>
                                 <div class="points">
                                     <h3>النقاط  المكتسبة:</h3>
@@ -176,15 +176,17 @@
 
                                 <form action="" class="discount">
                                 
-                                    <p  class=" add-copon-link">هل لديك لديك كوبون خصم؟</p>
+                                    <p  class="add-copon-link">هل لديك لديك كوبون خصم؟</p>
     
                                     {% comment %} في حال كان هنالك كود مختار بالفعل  {% endcomment %}
 
-                                    {% comment %} <div class="check-code">
-                                        <input type="checkbox" name="" id="" checked>
-                                        <p>كود خصم قدوم الربيع 20%</p> 
-                                        <span  class=" add-copon-link">تغيير <i class="fa-solid fa-repeat"></i></span>
-                                    </div>  {% endcomment %}
+                                    <div class="check-code hidden">
+                                        <input type="hidden" name="card-type" value="" >
+                                        <input type="hidden" name="card-id" value="" >
+                                        <input type="checkbox" name="use-this" id=""  >
+                                        <p></p> 
+                                        <span  class="add-copon-link">تغيير <i class="fa-solid fa-repeat"></i></span>
+                                    </div>  
     
                                     <input type="submit" value="إتمام الطلب" class="confirm ordered-done-link">
                                 </form>

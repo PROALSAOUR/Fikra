@@ -22,13 +22,13 @@
 
 
     <!-- gift cards -->
-    {% if user_gifts %}
-        <form id="gift-form" class="">
+    <form id="gift-form" class="">
+        {% if user_gifts %}
             <div class="choose-card">
                 {% for gift_item in user_gifts %}
                     <!-- start card -->
                     <div class="card">
-                        <input type="radio" id="gift-{{ gift_item.id }}" name="choosen-card">
+                        <input type="radio" id="gift-{{ gift_item.id }}" name="choosen-card" data-sell-value="{{ gift_item.sell_value }}" data-gift-id="{{ gift_item.id }}" data-gift-name="{{ gift_item.gift.name }}">
                         <label for="gift-{{ gift_item.id }}">
                             <div class="image">
                                 <img src="{{ gift_item.gift.img.url }}" alt="هدايا مجانا">
@@ -43,22 +43,22 @@
                     <!-- end card  -->
                 {% endfor %}
             </div>
-            <button type="submit" >
+            <button type="submit" class="hide-copon-link" onClick="applyGiftCard(event)" >
                 استعمال
             </button>
-        </form>
-    {% else %}
-        <p>لايوجد لديك هدايا </p>
-    {% endif %}
+        {% else %}
+            <p>لايوجد لديك هدايا </p>
+        {% endif %}
+    </form>
 
     <!-- copons cards -->
-    {% if user_copons %}
-        <form id="copons-form">
+    <form id="copons-form">
+        {% if user_copons %}
             <div class="choose-card">
                 {% for usage_copon in user_copons %}
                     <!-- start card -->
                     <div class="card">
-                        <input type="radio" id="copon-{{ usage_copon.id }}" name="choosen-card">
+                        <input type="radio" name="choosen-copon-card" id="copon-{{ usage_copon.id }}" data-sell-value="{{ usage_copon.copon_code.value  }}" data-copon-id="{{ usage_copon.id  }}" data-copon-name="{{ usage_copon.copon_code.name }}">
                         <label for="copon-{{ usage_copon.id }}">
                             <div class="image">
                                 <img src="{{usage_copon.copon_code.img.url}}" alt="عنوان الاناقة في طبرق">
@@ -73,13 +73,13 @@
                     <!-- end card  -->
                 {% endfor %}
             </div>
-            <button type="submit" >
+            <button type="submit" class="hide-copon-link" onClick="applyCoponCard(event)" >
                 استعمال
             </button>
-        </form>
-    {% else %}
-        <p>لايوجد لديك كوبونات خصم</p>
-    {% endif %}
+        {% else %}
+            <p>لايوجد لديك كوبونات خصم</p>
+        {% endif %}
+    </form>
    
 </div>
 <!-- End add-copon-pop-page Section -->

@@ -313,12 +313,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 // =============================================================================================
-// إظهار الفاتورة
+// إظهار الفاتورة و النافذة الخاصة بإضافة كوبون الى الفاتورة
 document.addEventListener('DOMContentLoaded', function () {
+
+    // إظهار الفاتورة
     const showCheckbox = document.querySelector('#show');
     const receipt = document.querySelector('.receipt');
     const confirmButton = document.querySelector('.confirm');
-    
+
+    // الكود الخاص بعرض النافذة الخاصة بإضافة كوبون الى الفاتورة
+    const menu = document.querySelector('.add-copon-pop-page');
+    const links = document.querySelectorAll('.add-copon-link'); // استخدم querySelectorAll لتحديد جميع الروابط
+    const hideButtons = document.querySelectorAll('.hide-copon-link'); // تحديد جميع الأزرار
+
     if (showCheckbox && receipt && confirmButton) { // تحقق من وجود العناصر قبل إضافة الأحداث
         // وظيفة لتحديث حالة الفاتورة بناءً على عرض الشاشة
         function updateReceiptVisibility() {
@@ -326,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // استعادة حالة التشيك بوكس من localStorage عند تحميل الصفحة
                 if (localStorage.getItem('showCheckboxState') === 'checked') {
                     showCheckbox.checked = true;
-                    receipt.style.display = 'block';
+                    receipt.style.display = 'block'; // التأكد من أن الفاتورة تظهر
                 } else {
                     showCheckbox.checked = false;
                     receipt.style.display = 'none';
@@ -343,20 +350,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
                 
-                // إضافة حدث للنقر على أي مكان خارج الفاتورة
-                document.addEventListener('click', function (event) {
-                    if (!receipt.contains(event.target) && event.target !== showCheckbox) {
+                // إضافة حدث للنقر على زر يحتوي على الكلاس confirm
+                confirmButton.addEventListener('click', function () {
+                    if (window.innerWidth < 992) { // التحقق من عرض الشاشة
                         showCheckbox.checked = false;
                         receipt.style.display = 'none';
                         localStorage.setItem('showCheckboxState', 'unchecked');
                     }
-                });
-                
-                // إضافة حدث للنقر على زر يحتوي على الكلاس confirm
-                confirmButton.addEventListener('click', function () {
-                    showCheckbox.checked = false;
-                    receipt.style.display = 'none';
-                    localStorage.setItem('showCheckboxState', 'unchecked');
                 });
             } else {
                 // إذا كانت الشاشة أكبر من 992px، اجعل الفاتورة تظهر دائمًا
@@ -371,15 +371,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // استدعاء الوظيفة عند تغيير حجم الشاشة
         window.addEventListener('resize', updateReceiptVisibility);
     }
-});
-// =============================================================================================
-// الكود الخاص بعرض النافذة الخاصة بإضافة كوبون الى الفاتورة
-document.addEventListener('DOMContentLoaded', function () {
-    const menu = document.querySelector('.add-copon-pop-page');
-    const link = document.querySelector('.add-copon-link');
 
-    if (menu && link) { // تحقق من وجود العنصرين قبل إضافة الأحداث
-        let hideTimeout; // متغير لتخزين مؤقت الإخفاء
+    if (menu && links.length > 0) { // تحقق من وجود القائمة وأن هناك روابط
 
         function showMenu() {
             menu.style.display = 'block'; // عرض القائمة
@@ -388,10 +381,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 menu.style.opacity = '1';
                 menu.style.transform = 'translate(-50%, -40%) scale(1)';
             }, 10);
-
-            // إعداد مؤقت للإخفاء بعد 3 ثوانٍ من ظهور القائمة
-            // clearTimeout(hideTimeout);
-            // hideTimeout = setTimeout(hideMenu, 3000);
         }
 
         function hideMenu() {
@@ -403,16 +392,40 @@ document.addEventListener('DOMContentLoaded', function () {
             }, 300);
         }
 
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (menu.style.visibility === 'hidden' || menu.style.visibility === '') {
-                showMenu();
-            }
+        // إضافة حدث click لجميع الروابط
+        links.forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                e.preventDefault(); // منع تحديث الصفحة
+                if (menu.style.visibility === 'hidden' || menu.style.visibility === '') {
+                    showMenu();
+                }
+            });
         });
 
+        // إضافة حدث لإخفاء القائمة عند النقر على الأزرار التي تحمل الكلاس hide-copon-link
+        hideButtons.forEach(function (button) {
+            button.addEventListener('click', function (e) {
+                e.preventDefault(); // منع تحديث الصفحة
+                
+                hideMenu(); // إخفاء القائمة
+                receipt.style.display = 'block'; // إظهار الفاتورة
+                showCheckbox.checked = true; // تعيين حالة التشيك بوكس
+                localStorage.setItem('showCheckboxState', 'checked'); // تخزين الحالة في localStorage
+            });
+        });
+
+        // إضافة حدث للنقر خارج القائمة
         document.addEventListener('click', function (e) {
-            if (menu.style.visibility === 'visible' && !menu.contains(e.target) && !link.contains(e.target)) {
-                hideMenu();
+            // تحقق إذا كانت القائمة مخفية
+            if (menu.style.visibility === 'hidden' || menu.style.visibility === '') {
+                if (window.innerWidth < 992) { // التحقق من عرض الشاشة
+                    if (!receipt.contains(e.target) && !showCheckbox.contains(e.target)) {
+                        // أغلق الفاتورة إذا كانت مخفية
+                        showCheckbox.checked = false;
+                        receipt.style.display = 'none';
+                        localStorage.setItem('showCheckboxState', 'unchecked');
+                    }
+                }
             }
         });
     }
