@@ -428,6 +428,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
+
+        // إضافة حدث للنقر خارج القائمة لإخفائها
+        document.addEventListener('click', function (e) {
+            if (menu.style.visibility === 'visible') {
+                if (!menu.contains(e.target) && !e.target.closest('.add-copon-link')) {
+                    hideMenu();
+                }
+            }
+        });
+
     }
 });
 // =============================================================================================

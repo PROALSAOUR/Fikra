@@ -7,7 +7,7 @@ class DliveryPrice(models.Model):
     price = models.IntegerField(default=0)     
     
     def __str__(self):
-        return f"طلب من {self.user} [{self.user.phone_number}]"
+        return f"سعر التوصيل {self.price}"
     
     class Meta:
         verbose_name = 'سعر التوصيل '
@@ -17,6 +17,7 @@ class Order(models.Model):
     
     ORDER_STATUS = [
         ('pending', 'جاري المعالجة'),
+        ('checking', 'جاري التجهيز'),
         ('shipped', 'تم الشحن'),
         ('delivered', 'تم التسليم'),
         ('canceled', 'تم الإلغاء'),
@@ -24,6 +25,7 @@ class Order(models.Model):
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending')
+    old_total = models.IntegerField()
     total_price = models.PositiveIntegerField()
     total_points = models.PositiveIntegerField(null=True)
     discount_amount = models.IntegerField(default=0)
@@ -31,6 +33,7 @@ class Order(models.Model):
     order_date = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     with_message = models.BooleanField(default=False)
+    message = models.TextField(blank=True, null=True)
     
     def __str__(self):
         return f"طلب من {self.user} [{self.user.phone_number}]"

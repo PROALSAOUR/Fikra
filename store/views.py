@@ -422,14 +422,14 @@ def clear_favourites(request):
 @login_required
 def cart_page(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
-    cart_items = cart.items.prefetch_related('cart_item__product_item__variations__size').select_related('cart_item__product_item__product').all()  # احصل على جميع المنتجات في سلة المستخدم
+    cart_items = cart.items.prefetch_related('cart_item__product_item__variations__size').select_related('cart_item__product_item__product').all()  
 
     available_items = []
     unavailable_items = []
     
     total_qty = 0  # عدد المنتجات الاجمالي
     total_price = 0  # حساب السعر الاجمالي 
-    total_bonus = 0  # حساب مجموع الـ bonus
+    total_bonus = 0  # حساب  الـبونس الاجمالي
 
     for item in cart_items:
         # تحقق من وجود المخزون للمتغير المرتبط بالمنتج
@@ -617,5 +617,6 @@ def update_cart_item_qty(request):
     return JsonResponse({'error': 'طريقة غير صحيحة، يجب أن تكون POST.'}, status=400)
 # ===================================================
 
-
-
+ 
+    
+    

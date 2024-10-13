@@ -243,7 +243,9 @@ class ProductVariation(models.Model):
             raise ValueError("مخزون غير كاف!")
 
     def sell(self, quantity):
-       pass
+       self.stock -= quantity
+       self.sold += quantity
+       self.save()
     
     @property
     def item_thumbnail(self):

@@ -1733,6 +1733,56 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 // =============================================================================================
+// الكود الخاص بعملية انشاء طلب في السلة 
+document.addEventListener('DOMContentLoaded', function() {
+  const confirmButton = document.querySelector('form.discount .confirm');
+
+  // تحقق من وجود الزر قبل إضافة حدث 'click'
+  if (confirmButton) {
+      confirmButton.addEventListener('click', function (e) {
+          e.preventDefault(); // منع إعادة تحميل الصفحة
+
+          // جلب الفورم الذي يحتوي على الزر الذي تم النقر عليه
+          const form = confirmButton.closest('form'); 
+          const formData = new FormData(form); // جمع بيانات النموذج
+
+          // التحقق من القيم وإعداد القيم الافتراضية إذا كانت فارغة
+          const cardType = formData.get('card-type') || ''; // تعيين قيمة فارغة إذا كانت غير موجودة
+          const cardId = formData.get('card-id') || ''; // تعيين قيمة فارغة إذا كانت غير موجودة
+          const usethis = formData.get('use-this') || ''; // تعيين قيمة فارغة إذا كانت غير موجودة
+
+          // تحديث FormData بالقيم
+          formData.set('card-type', cardType);
+          formData.set('card-id', cardId);
+          formData.set('use-this', usethis);
+
+          // إرسال البيانات باستخدام fetch
+          fetch('/orders/create-order/', {  
+              method: 'POST',
+              body: formData,
+              headers: {
+                  'X-CSRFToken': getCookie('csrftoken') // تمرير CSRF token
+              }
+          })
+          .then(response => response.json()) // تحويل الرد إلى JSON
+          .then(data => {
+              if (data.success) {
+                  // نجاح: عرض رسالة نجاح أو تنفيذ أي إجراء آخر
+                  alert('تمت العملية بنجاح');
+                  location.reload();
+              } else {
+                  // فشل: عرض رسالة خطأ
+                  alert(data.error || 'حدث خطأ ما');
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error); // عرض أي أخطاء أخرى
+              alert('حدث خطأ أثناء إرسال البيانات');
+          });
+      });
+  }
+});
+// =============================================================================================
 
 
 

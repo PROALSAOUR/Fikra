@@ -121,6 +121,10 @@ class GiftItem(models.Model):
     class Meta:
         verbose_name = 'سجل شراء هدية'
         verbose_name_plural = ' سجلات شراء الهدايا'
+        
+    # دالة للتحقق مما إذا كان هناك GiftRecipient مرتبط
+    def has_recipient(self):
+        return self.recipient is not None
 
 class GiftRecipient(models.Model):
     gift_item = models.OneToOneField(GiftItem, on_delete=models.CASCADE, related_name='recipients')
