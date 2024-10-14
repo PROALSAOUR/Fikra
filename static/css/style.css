@@ -5488,8 +5488,10 @@ input[type="number"] {
 /*medium mobile media */
 .product-details-page .product-details .product-images span button {
   position: absolute;
+  cursor: pointer;
   right: 10px;
   top: 10px;
+  opacity: 0.8;
   background-color: var(--seprator-color);
   color: var(--main-color);
   border: none;
@@ -5514,6 +5516,37 @@ input[type="number"] {
 /* mobile media */
 @media (max-width: 597px) {
   .product-details-page .product-details .product-images span button{
+    font-size: var(--mob-l-size);
+  }
+}
+.product-details-page .main-slider .share-this-product {
+  position: absolute;
+  right: 9px;
+  top: 60px;
+  padding: 10px;
+  opacity: 0.8;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 7px;
+  border: none;
+  background-color: var(--seprator-color);
+  color: var(--main-color);
+  font-size: var(--lab-l-size);
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  -ms-border-radius: 7px;
+  -o-border-radius: 7px;
+}
+@media (max-width: 768px) {
+  .product-details-page .main-slider .share-this-product {
+    font-size: var(--tab-l-size);
+  }
+}
+@media (max-width: 597px) {
+  .product-details-page .main-slider .share-this-product  {
     font-size: var(--mob-l-size);
   }
 }
@@ -7423,5 +7456,4 @@ input[type="radio"]:checked + .custom-radio::after {
   }
 }
 /* End Edit account */
-
 

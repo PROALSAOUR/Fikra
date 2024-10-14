@@ -16,7 +16,7 @@
                         <div class="product-slider">
                             <!-- السلايدر الرئيسي -->
                             <div class="swiper-container main-slider">
-
+                                
                                 {% if user.is_authenticated %}
                                     <span class="add-to-fav">
                                         <a href="{% url 'store:add_to_favourites' product.id %}" data-product-id="{{ product.id }}" class="add-to-fav-link">
@@ -36,6 +36,10 @@
                                         </a>
                                     </span>
                                 {% endif %}
+                              
+                                <button onclick="copyLink()" class="share-this-product">
+                                    <i class="fa-solid fa-share"></i>
+                                </button>
  
                                 
                                 <div class="swiper-wrapper">

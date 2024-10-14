@@ -1815,5 +1815,19 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 // =============================================================================================
+// دالة نسخ الرابط بصفحة تفاصيل المنتج
+function copyLink() {
+  const dummy = document.createElement('input'),
+      text = window.location.href;  // الحصول على رابط الصفحة الحالية
+
+  document.body.appendChild(dummy);
+  dummy.value = text;
+  dummy.select();
+  document.execCommand('copy');
+  document.body.removeChild(dummy);
+
+  alert("تم نسخ رابط المنتج بنجاح!");
+}
+// =============================================================================================
 
 
