@@ -1734,9 +1734,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 // =============================================================================================
 // الكود الخاص بعملية انشاء طلب في السلة 
+// الكود الخاص بعرض النافذة الخاصة بإتمام عملية الطلب بنجاح
 document.addEventListener('DOMContentLoaded', function() {
   const confirmButton = document.querySelector('form.discount .confirm');
-
+  const menu = document.querySelector('.ordered-done-pop-page');
+  const link = document.querySelector('.ordered-done-link');
+  
   // تحقق من وجود الزر قبل إضافة حدث 'click'
   if (confirmButton) {
       confirmButton.addEventListener('click', function (e) {
@@ -1767,11 +1770,11 @@ document.addEventListener('DOMContentLoaded', function() {
           .then(response => response.json()) // تحويل الرد إلى JSON
           .then(data => {
               if (data.success) {
-                  // نجاح: عرض رسالة نجاح أو تنفيذ أي إجراء آخر
-                  alert('تمت العملية بنجاح');
-                  location.reload();
+                  showMenu();
+                  setTimeout(function() {
+                    location.reload(); // تحديث الصفحة بعد 3 ثوانٍ
+                  }, 3000); 
               } else {
-                  // فشل: عرض رسالة خطأ
                   alert(data.error || 'حدث خطأ ما');
               }
           })
@@ -1781,8 +1784,36 @@ document.addEventListener('DOMContentLoaded', function() {
           });
       });
   }
+  if (menu && link) { // تحقق من وجود العنصرين قبل إضافة الأحداث
+    
+    let hideTimeout; // متغير لتخزين مؤقت الإخفاء
+    function showMenu() {
+          menu.style.display = 'block'; // عرض القائمة
+          setTimeout(() => {
+              menu.style.visibility = 'visible';
+              menu.style.opacity = '1';
+              menu.style.transform = 'translate(-50%, -40%) scale(1)';
+          }, 10);
+  
+          // إعداد مؤقت للإخفاء بعد 3 ثوانٍ من ظهور القائمة
+          clearTimeout(hideTimeout);
+          hideTimeout = setTimeout(hideMenu, 3000);
+    }
+    function hideMenu() {
+          menu.style.opacity = '0';
+          menu.style.transform = 'translate(-50%, -40%) scale(0.5)';
+          setTimeout(() => {
+              menu.style.visibility = 'hidden';
+              menu.style.display = 'none';
+          }, 300);
+    }
+    document.addEventListener('click', function (e) {
+        if (menu.style.visibility === 'visible' && !menu.contains(e.target) && !link.contains(e.target)) {
+            hideMenu();
+        }
+    });
+  }
 });
 // =============================================================================================
-
 
 

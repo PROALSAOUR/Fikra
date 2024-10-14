@@ -268,51 +268,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 // ===================================================================================================
-// الكود الخاص بعرض النافذة الخاصة بإتمام عملية الطلب بنجاح
-document.addEventListener('DOMContentLoaded', function () {
-    const menu = document.querySelector('.ordered-done-pop-page');
-    const link = document.querySelector('.ordered-done-link');
-
-    if (menu && link) { // تحقق من وجود العنصرين قبل إضافة الأحداث
-        let hideTimeout; // متغير لتخزين مؤقت الإخفاء
-
-        function showMenu() {
-            menu.style.display = 'block'; // عرض القائمة
-            setTimeout(() => {
-                menu.style.visibility = 'visible';
-                menu.style.opacity = '1';
-                menu.style.transform = 'translate(-50%, -40%) scale(1)';
-            }, 10);
-
-            // إعداد مؤقت للإخفاء بعد 3 ثوانٍ من ظهور القائمة
-            clearTimeout(hideTimeout);
-            hideTimeout = setTimeout(hideMenu, 3000);
-        }
-
-        function hideMenu() {
-            menu.style.opacity = '0';
-            menu.style.transform = 'translate(-50%, -40%) scale(0.5)';
-            setTimeout(() => {
-                menu.style.visibility = 'hidden';
-                menu.style.display = 'none';
-            }, 300);
-        }
-
-        link.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (menu.style.visibility === 'hidden' || menu.style.visibility === '') {
-                showMenu();
-            }
-        });
-
-        document.addEventListener('click', function (e) {
-            if (menu.style.visibility === 'visible' && !menu.contains(e.target) && !link.contains(e.target)) {
-                hideMenu();
-            }
-        });
-    }
-});
-// =============================================================================================
 // إظهار الفاتورة و النافذة الخاصة بإضافة كوبون الى الفاتورة
 document.addEventListener('DOMContentLoaded', function () {
 

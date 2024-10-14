@@ -24,6 +24,7 @@ class Order(models.Model):
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    serial_number = models.IntegerField(unique=True)
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending')
     old_total = models.IntegerField()
     total_price = models.PositiveIntegerField()
@@ -35,6 +36,21 @@ class Order(models.Model):
     with_message = models.BooleanField(default=False)
     message = models.TextField(blank=True, null=True)
     
+    def save(self, *args, **kwargs):
+        # تعيين الرقم التسلسلي إذا لم يكن موجودًا
+        if not self.serial_number:
+            last_order = Order.objects.order_by('serial_number').last()
+            if last_order:
+                # زيادة الرقم التسلسلي بمقدار 1 وتنسيقه ليكون 6 أرقام
+                new_serial_number = int(last_order.serial_number) + 1
+            else:
+                new_serial_number = 1  # إذا لم يكن هناك طلبات سابقة
+
+            # تنسيق الرقم ليكون 6 أرقام
+            self.serial_number = str(new_serial_number).zfill(6)  # أو استخدم f"{new_serial_number:06}"
+
+        super().save(*args, **kwargs)  # استدعاء دالة الحفظ الأساسية
+  
     def __str__(self):
         return f"طلب من {self.user} [{self.user.phone_number}]"
 

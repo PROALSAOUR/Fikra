@@ -77,9 +77,12 @@ def create_order(request):
                     gift.has_used = True
                     discount_amount = min(gift.sell_value, total_price)
 
-                    if gift.has_recipient():
+                    if gift.has_recipient():  # تحقق مما إذا كان هناك مستلم
                         with_message = True
-                        message = gift.recipients.message
+                        # تحقق من وجود المستلم ثم احصل على الرسالة
+                        gift_recipient = gift.recipients  # سيكون متاحًا الآن
+                        message = gift_recipient.message if gift_recipient else 'لا يوجد رسالة مرفقة'
+
 
                 except GiftItem.DoesNotExist:
                     return JsonResponse({'success': False, 'error': 'كود الهدية الذي ادخلته غير موجود في مخزونك!'})

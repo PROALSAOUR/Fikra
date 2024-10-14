@@ -27,7 +27,6 @@ def main_account_page(request):
     } 
     
     return render(request, 'accounts/account.html', context)
-
 # دالة تسجيل الدخول و انشاء الحساب
 def sign(request):
     """
@@ -76,7 +75,6 @@ def sign(request):
     }     
         
     return render(request, 'accounts/sign.html', context)
-
 # دالة عرض معلومات الحساب 
 @login_required 
 def account_info(request):
@@ -85,7 +83,7 @@ def account_info(request):
     phone_number = user.phone_number
     
     inbox = get_object_or_404(Inbox, user=user)
-    messages = inbox.messages.all().order_by('is_read', '-timestamp')
+    messages = inbox.messages.all().order_by('is_read', '-timestamp')[:25]
     
     context  = {
         'user_name': user_name,
@@ -93,7 +91,6 @@ def account_info(request):
         'messages': messages,
     }
     return render(request, 'accounts/account-info.html', context)
-
 # دالة تحديث حالة الرسالة
 @require_POST
 def mark_as_read(request, message_id):
@@ -110,11 +107,6 @@ def delete_account(request):
         logout(request)  # تسجيل خروج المستخدم بعد الحذف
     return redirect('store:home')  # إعادة توجيه إلى الصفحة الرئيسية
 #  دالة تعديل حساب
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import update_session_auth_hash
-from django.contrib import messages
-from django.contrib.auth.hashers import check_password
-
 @login_required
 def edit_account(request):
     context = {}
