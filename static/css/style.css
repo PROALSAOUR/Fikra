@@ -4193,7 +4193,7 @@ hr.sep {
   justify-content: space-between;
   padding: 15px 10px;
   border-bottom: 2px solid var(--seprator-color);
-  font-size: var(--lab-m-size);
+  font-size: var(--lab-s-size);
   color: var(--main-text-color);
   cursor: pointer;
 }
@@ -4227,8 +4227,10 @@ hr.sep {
   display: none;
 }
 .my-info  .notfication-message .title span{
+  font-size: var(--mob-xs-size);
   display: block;
-  margin-left: 50px;
+  margin-left: 30px;
+  margin-right: 5px;
   text-wrap: nowrap;
 }
 .my-info  .notfication-message .title i{
@@ -4251,7 +4253,12 @@ hr.sep {
     font-size: var(--tab-xl-size);
   }
   .my-info  .notfication-message .title {
-    font-size: var(--tab-m-size);
+    font-size: var(--mob-xs-size);
+  }
+  .my-info  .notfication-message .title span {
+    max-width: 90px;
+    font-size: var(--mob-s-size);
+    margin-left: 20px;
   }
   .my-info  .notfication-message .title p::after {
     font-size: var(--mob-s-size);
@@ -4266,7 +4273,11 @@ hr.sep {
     font-size: var(--mob-xl-size);
   }
   .my-info  .notfication-message .title {
-    font-size: var(--mob-m-size);
+    font-size: var(--mob-s-size);
+  }
+  .my-info  .notfication-message .title span {
+    font-size: 10px;
+    margin-left: 20px;
   }
   .my-info  .notfication-message .title p::after {
     font-size: calc(var(--mob-s-size) - 2px);
@@ -4278,13 +4289,12 @@ hr.sep {
 /* mobile media */
 @media (max-width: 492px) {
   .my-info .notfication-section {
-    max-width: 100%;
+    max-width: 100%;  
   }
-  .my-info  .notfication-message .title {
-    font-size: var(--mob-xs-size);
-  }
-  .my-info  .notfication-message .title span{
-    margin-left: 25px;
+  .my-info  .notfication-message .title span {
+    text-wrap: wrap;
+    text-align: center;
+    max-width: 50px;
   }
 }
 /* mobile media */
@@ -4294,7 +4304,7 @@ hr.sep {
     font-size: calc(var(--mob-s-size) - 4px);
   }
   .my-info  .notfication-message .title span{
-    font-size: var(--mob-s-size);
+    font-size: 8px;
   }
 }
 /* End My Info Section  */
@@ -4318,9 +4328,17 @@ hr.sep {
   -o-border-radius:var(--main-border-radius) ;
 }
 .my-orders .table-header {
+  position: relative;
   text-align: center;
   color: var(--main-color);
   font-size: var(--lab-l-size);
+}
+/* Tab media */
+@media (max-width: 998px) {
+  .my-orders .table-header .exit-button {
+    left:0;
+    top:30px;
+  }
 }
 /* Tab media */
 @media (max-width: 768px) {
@@ -4333,8 +4351,20 @@ hr.sep {
 }
 /* mobile media */
 @media (max-width: 597px) {
+  .my-orders .table-header .exit-button {
+    top:20px;
+  }
   .my-orders .table-header {
-    font-size: var(--mob-l-size);
+    font-size: var(--mob-m-size);
+  }
+}
+@media (max-width: 385px) {
+  .my-orders .table-header .exit-button {
+    top:15px;
+    left: -10px;
+  }
+  .my-orders .table-header {
+    font-size: var(--mob-xs-size);
   }
 }
 .my-orders .table-header h1 {
@@ -4462,9 +4492,20 @@ hr.sep {
     max-width: 95%;
   }
 }
+/* Tab media */
+@media (max-width: 848px) {
+  .Order .container {
+    max-width: 99%;
+    padding: 10px;
+  }
+}
 .Order .order-info {
   position: relative;
   padding: 30px 40px;
+}
+.Order .order-info .exit-button {
+  left:0 ;
+  top: 50px;
 }
 .Order .order-info .order-id-status h3 {
   color: var(--main-color);
@@ -4536,7 +4577,7 @@ hr.sep {
 .Order .products-table thead tr th {
   min-height: 25px;
   padding: 10px 7px;
-  font-size:var(--tab-xs-size); 
+  font-size:var(--tab-s-size); 
 }
 .Order .products-table tbody{
   font-size:var(--tab-s-size); 
@@ -4546,6 +4587,20 @@ hr.sep {
   border-bottom: 2px solid var(--seprator-color);
   padding: 15px; /* زيادة المساحة داخل الخلايا */
   vertical-align: middle;
+}
+.Order .products-table tbody td img {
+  max-width: 60px;
+  aspect-ratio: 1/1;
+}
+@media (max-width: 668px)  {
+  .Order .products-table tbody td img {
+    max-width: 40px;
+  }
+}
+@media (max-width: 496px)  {
+  .Order .products-table tbody td img {
+    max-width: 30px;
+  }
 }
 .Order .products-table tbody tr:last-child td{
   border-bottom: 2px solid var(--disaple-text-color);
@@ -4568,7 +4623,7 @@ hr.sep {
 @media (max-width: 768px) {
   .Order .products-table thead tr th  {
     padding: 10px 5px;
-    font-size:var(--mob-xs-size); 
+    font-size:var(--mob-s-size); 
   }
   .my-orders .products-table tbody{
     font-size:var(--mob-xs-size); 
@@ -4596,7 +4651,7 @@ hr.sep {
 /* small mobile media */
 @media (max-width: 422px) {
   .my-orders .products-table thead tr th  {
-    font-size: calc(var(--mob-s-size) - 1px); 
+    font-size: calc(var(--mob-s-size) - 2px); 
   }
   .Order .products-table tbody{
     font-size: calc(var(--mob-s-size) - 2px); 
@@ -7368,3 +7423,5 @@ input[type="radio"]:checked + .custom-radio::after {
   }
 }
 /* End Edit account */
+
+

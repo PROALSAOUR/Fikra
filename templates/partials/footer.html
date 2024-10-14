@@ -6,7 +6,7 @@
             {% if men_category %}<li><a href=" {% url "store:category" men_category.slug %}"><i class="fa-solid fa-angles-left"></i>المنتجات الرجالية</a></li>{% endif %}
             {% if women_category %}<li><a href=" {% url "store:category" women_category.slug %}"><i class="fa-solid fa-angles-left"></i>المنتجات النسائية</a></li>{% endif %}
             <li><a href="{% url "store:offer_page" %}"><i class="fa-solid fa-angles-left"></i>صفحة العروض</a></li>
-            <li><a href="#"><i class="fa-solid fa-angles-left"></i> طلباتي السابقة</a></li>
+            <li><a href="{% url "orders:my-orders" %}"><i class="fa-solid fa-angles-left"></i> طلباتي السابقة</a></li>
         </ul>
         <ul class="important-links">
             <li><a href="{% url "cards:cards-store" %}"><i class="fa-solid fa-angles-left"></i>متجر البطاقات</a></li>

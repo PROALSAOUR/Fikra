@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render, get_object_or_404
 from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from orders.models import *
@@ -8,11 +8,32 @@ from store.models import Cart
 
 
 # دالة عرض الطلبات
-
-
-
+def my_orders(request):
+    
+    user  = request.user
+    orders = Order.objects.filter(user=user).order_by('-order_date', '-updated_at').prefetch_related('order_items')
+    
+    context = {
+        'orders':orders,
+    }
+    
+    return render(request, 'orders/my-orders.html', context)
 # دالة عرض تفاصيل الطلب
-
+def order_details(request, oid):
+    user  = request.user
+    order = get_object_or_404(Order, pk=oid , user=user)
+    items = order.order_items.prefetch_related('order_item__product_item__product')
+    
+    # إضافة حقل السعر الإجمالي لكل عنصر
+    for item in items:
+        item.total_price = item.qty * item.price
+    
+    context = {
+        'order':order,
+        'items':items,
+    }
+    
+    return render(request, 'orders/order-details.html', context)   
 
 # دالة الغاء الطلب
 

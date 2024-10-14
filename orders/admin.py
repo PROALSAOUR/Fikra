@@ -40,6 +40,12 @@ class MyOrdersAdmin(admin.ModelAdmin):
     exclude = ('with_message',)
     inlines = [OrderItemInline]  
     
+    def get_readonly_fields(self, request, obj=None):
+        """جعل حقل الحالة غير قابل للتعديل إذا كانت الحالة مُلغاة."""
+        if obj and obj.status == 'canceled':
+            return self.readonly_fields + ('status',)
+        return self.readonly_fields
+    
     def colored_status(self, obj):
         """إرجاع الحالة مع تلوين خاص بناءً على القيمة."""
         if obj.status == 'canceled':

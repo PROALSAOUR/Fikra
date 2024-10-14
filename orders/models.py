@@ -36,6 +36,14 @@ class Order(models.Model):
     with_message = models.BooleanField(default=False)
     message = models.TextField(blank=True, null=True)
     
+    def get_total_items(self):
+        total = 0
+        # استخدام related_name للوصول إلى عناصر الطلب
+        order_items = self.order_items.all()  # استرجاع جميع عناصر الطلب
+        for item in order_items:
+            total += item.qty  # جمع الكميات
+        return total  # إرجاع المجموع النهائي
+    
     def save(self, *args, **kwargs):
         # تعيين الرقم التسلسلي إذا لم يكن موجودًا
         if not self.serial_number:
@@ -50,7 +58,7 @@ class Order(models.Model):
             self.serial_number = str(new_serial_number).zfill(6)  # أو استخدم f"{new_serial_number:06}"
 
         super().save(*args, **kwargs)  # استدعاء دالة الحفظ الأساسية
-  
+
     def __str__(self):
         return f"طلب من {self.user} [{self.user.phone_number}]"
 

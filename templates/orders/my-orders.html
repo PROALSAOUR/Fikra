@@ -1,0 +1,75 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="my-orders-page" style="position: relative;">
+    
+    <!-- Start orders Table  -->
+    <div class="my-orders">
+        <div class="container">
+            <div class="table-header">
+                <h1>
+                    طلباتي السابقة  
+                    <a class='edit-exit' href="javascript:void(0);" onclick="goBack()">
+                        <span class="exit-button"><i class="fa-solid fa-arrow-left"></i></span>
+                    </a>
+                </h1>
+            </div>
+            <div class="table-responsive">
+                {% if  orders %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>تاريخ الطلب</th>
+                                <th> عدد المنتجات</th>
+                                <th>إجمالي المبلغ</th>
+                                <th>رؤية الطلب</th>
+                                <th>الحالة</th>
+                                <th>إلغاء</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr class="order-details {% if order.status == 'delivered' %} done {% elif order.status == 'canceled' %}canceled {% else %} in-way{% endif %}"> 
+                                    <td>{{ order.serial_number|stringformat:"06d" }}</td>
+                                    <td>{{ order.order_date|date:" Y/m/d" }}</td>
+                                    <td>{{ order.get_total_items }}</td>
+                                    <td>${{ order.total_price }}</td>
+                                    <td  class="show"><a href="{% url "orders:order-details" order.id %}"> استعراض</a></td>
+                                    <td class="status">{{ order.get_status_display }}</td>
+                                    <td class="cancel">
+                                        <a href="" class="cancel-me"><i class="fa-regular fa-trash-can "></i></a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            
+                        </tbody>
+                    </table>
+                {% else %}
+                    {% include "common/no-result.html" %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- End orders Table  -->
+
+    <!-- Start cancel-order Section -->
+    <div class="Pop-up-page canciling-order ">
+        <div class="logo">
+            <img src="{% static "images/name logo.jpg" %}" alt="">
+        </div>
+        <p>هل انت متأكد  من انك تريد إلغاء طلبك؟</p>
+        <div class="choices">
+            <button class="back">تراجع</button>
+            <button class="cancel-order delete"> إلغاء الطلب </button>
+        </div>
+    </div>
+    <!-- End cancel-order Section -->
+
+</div>
+        
+{% endblock content %}
+
+
