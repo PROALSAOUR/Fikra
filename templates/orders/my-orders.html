@@ -40,7 +40,7 @@
                                     <td  class="show"><a href="{% url "orders:order-details" order.id %}"> استعراض</a></td>
                                     <td class="status">{{ order.get_status_display }}</td>
                                     <td class="cancel">
-                                        <a href="" class="cancel-me"><i class="fa-regular fa-trash-can "></i></a>
+                                        <a href="" class="cancel-me" date-cancel-id="{{ order.id }}"><i class="fa-regular fa-trash-can "></i></a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -61,10 +61,11 @@
             <img src="{% static "images/name logo.jpg" %}" alt="">
         </div>
         <p>هل انت متأكد  من انك تريد إلغاء طلبك؟</p>
-        <div class="choices">
+        <form class="choices" id="cancel-order-form">
+            <input type="hidden" id="cancel-order-id" value="">
             <button class="back">تراجع</button>
-            <button class="cancel-order delete"> إلغاء الطلب </button>
-        </div>
+            <button type='submit' class="cancel-order delete"> إلغاء الطلب </button>
+        </form>
     </div>
     <!-- End cancel-order Section -->
 

@@ -1829,5 +1829,45 @@ function copyLink() {
   alert("تم نسخ رابط المنتج بنجاح!");
 }
 // =============================================================================================
+//  دالة الغاء الطلب 
+document.addEventListener('DOMContentLoaded', function () {
+  const cancelForm = document.getElementById('cancel-order-form');
+  const cancelInput = document.getElementById('cancel-order-id');
+  const cancelButton = document.querySelector('.cancel-order');
 
+  if (cancelForm && cancelButton) {
+      cancelForm.addEventListener('submit', function (e) {
+          e.preventDefault(); // منع إعادة تحميل الصفحة
+
+          const cancelOrderId = cancelInput.value;
+
+          if (cancelOrderId) {
+              fetch('/orders/cancel-order/', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRFToken': getCookie('csrftoken') // الحصول على CSRF Token
+                  },
+                  body: JSON.stringify({
+                    order_id: cancelOrderId 
+                    })
+              })
+              .then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      // التعامل مع النجاح، مثل إخفاء النافذة وتحديث الصفحة
+                      alert('تم إلغاء الطلب بنجاح');
+                      location.reload(); // إعادة تحميل الصفحة لتحديث البيانات
+                  } else {
+                      alert( data.error || 'فشل إلغاء الطلب، يرجى المحاولة لاحقًا.');
+                      location.reload();
+                  }
+              })
+              .catch(error => {
+                  console.error('حدث خطأ:', error);
+              });
+          }
+      });
+  }
+});
 

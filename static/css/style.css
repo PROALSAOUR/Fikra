@@ -4184,7 +4184,7 @@ hr.sep {
 }
 .my-info  .notfication-message{
   background-color: var(--background-color);
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 .my-info  .notfication-message .title{
   position: relative;
@@ -4203,25 +4203,32 @@ hr.sep {
 }
 .my-info  .notfication-message .title p::after{
   display: inline-block;
-  content: 'غير مقروء';
+  content: 'غير مقروءة';
   position: absolute;
   margin-right: 15px;
   padding:2px 5px 4px;
-  top: 50%;
+  top: -24px;
+  right: -24px;
   background-color: #1d9f4d;
   text-wrap: nowrap;
   color: #ffffff;
-  font-size: var(--tab-s-size);
-  transform: translateY(-50%);
-  -webkit-transform: translateY(-50%);
-  -moz-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  -o-transform: translateY(-50%);
-  border-radius: var(--main-border-radius);
-  -webkit-border-radius: var(--main-border-radius);
-  -moz-border-radius: var(--main-border-radius);
-  -ms-border-radius: var(--main-border-radius);
-  -o-border-radius: var(--main-border-radius);
+  font-size: var(--mob-s-size);
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+}
+@media (max-width: 495px) {
+  .my-info  .notfication-message .title p::after{
+    top: -26px;
+  }
+}
+@media (max-width: 402px) {
+  .my-info  .notfication-message .title p::after{
+    top: -20px;
+    right: -14px;
+  }
 }
 .my-info  .notfication-message.read .title p::after{
   display: none;
@@ -7456,4 +7463,3 @@ input[type="radio"]:checked + .custom-radio::after {
   }
 }
 /* End Edit account */
-

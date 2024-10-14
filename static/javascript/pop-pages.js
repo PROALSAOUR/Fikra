@@ -138,51 +138,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 // ===================================================================================================
-// الكود الخاص بإظهار صفحة إلغاء الطلب
-document.addEventListener('DOMContentLoaded', function () {
-    const cancelMenu = document.querySelector('.canciling-order');
-    const cancelLink = document.querySelector('.in-way .cancel .cancel-me');
-    const backButton = document.querySelector('.canciling-order .back');
-    const cancelButton = document.querySelector('.canciling-order .cancel-order');
-
-    // التحقق من وجود العناصر قبل إضافة الأحداث
-    if (cancelMenu && cancelLink && backButton && cancelButton) {
-        function showCancelMenu() {
-            cancelMenu.style.display = 'block'; // يعرض العنصر
-            setTimeout(() => {
-                cancelMenu.style.visibility = 'visible'; // يجعل العنصر مرئيًا
-                cancelMenu.style.opacity = '1'; // يضبط الشفافية لتظهر بشكل كامل
-                cancelMenu.style.transform = 'translate(-50%, -50%) scale(1)'; // يضبط الحجم ليصل للحجم الطبيعي
-            }, 10); // التأخير لتطبيق التحول بشكل صحيح
-        }
-
-        function hideCancelMenu() {
-            cancelMenu.style.opacity = '0'; // يضبط الشفافية لتختفي
-            cancelMenu.style.transform = 'translate(-50%, -50%) scale(0.5)'; // يصغر الحجم مرة أخرى
-            setTimeout(() => {
-                cancelMenu.style.visibility = 'hidden'; // يخفي العنصر
-                cancelMenu.style.display = 'none'; // يزيل العنصر من التدفق الطبيعي للصفحة
-            }, 300); // يجب أن يتطابق مع مدة الـ transition في CSS
-        }
-
-        cancelLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (cancelMenu.style.visibility === 'hidden' || cancelMenu.style.visibility === '') {
-                showCancelMenu();
-            }
-        });
-
-        backButton.addEventListener('click', hideCancelMenu);
-        cancelButton.addEventListener('click', hideCancelMenu);
-
-        document.addEventListener('click', function (e) {
-            if (cancelMenu.style.visibility === 'visible' && !cancelMenu.contains(e.target) && !cancelLink.contains(e.target)) {
-                hideCancelMenu();
-            }
-        });
-    }
-});
-// =================================================================================================== 
 // الكود الخاص بصفحة التحقق من رقم الهاتف
 document.addEventListener('DOMContentLoaded', function () {
     const verifMenu = document.querySelector('.verif-code');
@@ -460,5 +415,56 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 // =============================================================================================
+// الكود الخاص بإظهار صفحة إلغاء الطلب
+document.addEventListener('DOMContentLoaded', function () {
+    const cancelMenu = document.querySelector('.canciling-order');
+    const cancelLinks = document.querySelectorAll('.in-way .cancel .cancel-me');
+    const backButton = document.querySelector('.canciling-order .back');
+    const cancelButton = document.querySelector('.canciling-order .cancel-order');
+    const cancelInput = document.getElementById('cancel-order-id');
 
+    // التحقق من وجود العناصر قبل إضافة الأحداث
+    if (cancelMenu && cancelLinks.length && backButton && cancelButton && cancelInput) {
+        function showCancelMenu() {
+            cancelMenu.style.display = 'block'; // يعرض العنصر
+            setTimeout(() => {
+                cancelMenu.style.visibility = 'visible'; // يجعل العنصر مرئيًا
+                cancelMenu.style.opacity = '1'; // يضبط الشفافية لتظهر بشكل كامل
+                cancelMenu.style.transform = 'translate(-50%, -50%) scale(1)'; // يضبط الحجم ليصل للحجم الطبيعي
+            }, 10); // التأخير لتطبيق التحول بشكل صحيح
+        }
+
+        function hideCancelMenu() {
+            cancelMenu.style.opacity = '0'; // يضبط الشفافية لتختفي
+            cancelMenu.style.transform = 'translate(-50%, -50%) scale(0.5)'; // يصغر الحجم مرة أخرى
+            setTimeout(() => {
+                cancelMenu.style.visibility = 'hidden'; // يخفي العنصر
+                cancelMenu.style.display = 'none'; // يزيل العنصر من التدفق الطبيعي للصفحة
+            }, 300); 
+        }
+
+        cancelLinks.forEach(function (cancelLink) {
+            cancelLink.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // نسخ الـ id الخاص بالطلب الذي تم النقر عليه إلى الحقل المخفي
+                const cancelId = this.getAttribute('date-cancel-id');
+                cancelInput.value = cancelId;
+
+                if (cancelMenu.style.visibility === 'hidden' || cancelMenu.style.visibility === '') {
+                    showCancelMenu();
+                }
+            });
+        });
+
+        backButton.addEventListener('click', hideCancelMenu);
+
+        document.addEventListener('click', function (e) {
+            if (cancelMenu.style.visibility === 'visible' && !cancelMenu.contains(e.target) && !e.target.closest('.cancel-me')) {
+                hideCancelMenu();
+            }
+        });
+    }
+});
+// =================================================================================================== 
 

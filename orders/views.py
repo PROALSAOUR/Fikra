@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
+import json
 from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from orders.models import *
@@ -34,13 +35,41 @@ def order_details(request, oid):
     }
     
     return render(request, 'orders/order-details.html', context)   
-
 # دالة الغاء الطلب
+@login_required
+def cancel_order(request):
+    user = request.user
+    if request.method == 'POST':
+        try:
+            # فك تشفير البيانات من الطلب
+            data = json.loads(request.body)
+            order_id = data.get('order_id')  # الحصول على معرف الطلب من JSON
+            
+            # البحث عن الطلب وإلغاؤه
+            order = Order.objects.get(id=order_id)
+            if order.user != user:
+                return JsonResponse({'success': False, 'error': 'هذا الطلب ليس لك.'})
+            else:
+                if order.status == 'canceled' :
+                    return JsonResponse({'success': False, 'error': 'هذا الطلب تم إلغائه مسبقا بالفعل'})
+                elif order.status == 'delivered' :
+                    return JsonResponse({'success': False, 'error': 'هذا الطلب تم تسليمه اليك بالفعل ولا يمكن إلغائه الأن'})
+                else:
+                    order.status = 'canceled'
+                    order.save()
+                    return JsonResponse({'success': True, 'message': 'تمت عملية إلغاء الطلب بنجاح!'})
+            
+        except Order.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'لم يتم ايجاد الطلب.'})
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'المعذرة يبدو انه هنالك بيانات ناقصة يرجى المحاولة لاحقا.'})
+    
+    return JsonResponse({'success': False, 'error': 'طريقة طلب خاطئة.'})
+
+
 
 
 # دالة تعديل الطلب
-
-
 
 # دالة انشاء طلب من صفحة السلة
 @login_required
