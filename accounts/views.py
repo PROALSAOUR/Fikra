@@ -61,7 +61,7 @@ def sign(request):
             sign_up_form = UserSignUpForm(request.POST or None)
             if sign_up_form.is_valid():
                 new_user = sign_up_form.save()
-                new_user = authenticate(username=sign_up_form.cleaned_data['phone_number'],
+                new_user = authenticate(phone_number=sign_up_form.cleaned_data['phone_number'],
                                         password=sign_up_form.cleaned_data['password1'])
                 if new_user:
                     login(request, new_user)

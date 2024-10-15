@@ -66,8 +66,7 @@ def cancel_order(request):
     
     return JsonResponse({'success': False, 'error': 'طريقة طلب خاطئة.'})
 
-
-
+# دالة حذف منتج من الطلب
 
 # دالة تعديل الطلب
 

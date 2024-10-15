@@ -1,5 +1,5 @@
 from orders.models import Order
-from accounts.models import UserProfile, Message, Inbox
+from accounts.models import UserProfile, Message
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.utils import timezone

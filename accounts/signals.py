@@ -12,6 +12,21 @@ def craete_user_profile_and_inbo(sender, instance, created, **kwargs):
         # إنشاء بروفايل جديد مرتبط بالمستخدم وصندوق البريد
         UserProfile.objects.create(user=instance, inbox=inbox)
         
+        
+        # إنشاء رسالة جديدة وإضافتها إلى صندوق الوارد
+        message = Message(
+            subject= f'اهلا بك في فكرة',
+            content= 
+            f"""
+            مرحبا {instance.first_name}
+            ,لا يسعنا وصف سعادتنا بإنضمامك الى عائلة فكرة , نرجو ان نكون عند حسن ظنك و ان نقدم لك تجربة تسوق استثنائية و مميزة,
+            في حال كان لديك اي استفسار لا تتردد بالتواصل معنا
+            """,
+            timestamp=timezone.now()
+            )
+        message.save()
+        inbox.messages.add(message)
+        
 
 @receiver(pre_save, sender=UserProfile)
 def track_user_profile_points_change(sender, instance,  **kwargs):
