@@ -65,9 +65,43 @@ def cancel_order(request):
             return JsonResponse({'success': False, 'error': 'المعذرة يبدو انه هنالك بيانات ناقصة يرجى المحاولة لاحقا.'})
     
     return JsonResponse({'success': False, 'error': 'طريقة طلب خاطئة.'})
-
 # دالة حذف منتج من الطلب
-
+def remove_order_item(request):
+    user = request.user
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            order_id = data.get('order_id')
+            remove_id = data.get('remove_id')
+            
+            if not remove_id or not order_id :
+                return JsonResponse({'success': False, 'error': 'المعذرة يبدو انه هنالك بيانات ناقصة يرجى المحاولة لاحقا.'})
+            
+            order = Order.objects.get(id=order_id, user=user)
+            
+            if order.status == 'canceled':
+                return JsonResponse({'success': False, 'error': ' نعتذر, هذا الطلب تم إلغاؤه مسبقا لذالك لايمكن تعديله'}) 
+            elif order.status == 'delivered':
+                return JsonResponse({'success': False, 'error': "نعتذر, لا يمكن إلغاء منتج من طلب تم تسليمه بالفعل"}) 
+            elif order.status == 'shipped':
+                return JsonResponse({'success': False, 'error': "المعذرة لكن هذا الطلب تم شحنه اليك بالفعل اذا اردت إلغائه عليك التواصل مع خدمة العملاء"}) 
+            else:
+                order_item = order.order_items.get(id=remove_id)
+                order_item.delete()
+                
+                # التحقق من عدد العناصر المتبقية في الطلب
+                if not order.order_items.exists():  # إذا لم يكن هناك أي عناصر متبقية
+                    order.status = 'canceled'
+                    order.save()
+                    
+                return JsonResponse({'success': True, 'message':'تمت ازالة المنتج من الطلب بنجاح' })
+                  
+        
+        except OrderItem.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'العنصر المطلوب غير موجود'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+        
 # دالة تعديل الطلب
 
 # دالة انشاء طلب من صفحة السلة
@@ -129,7 +163,7 @@ def create_order(request):
                     if gift.has_recipient():  # تحقق مما إذا كان هناك مستلم
                         with_message = True
                         # تحقق من وجود المستلم ثم احصل على الرسالة
-                        gift_recipient = gift.recipients  # سيكون متاحًا الآن
+                        gift_recipient = gift.gift_recipients if hasattr(gift, 'gift_recipients') else None  # استخدم hasattr للتحقق من وجود gift_recipients
                         message = gift_recipient.message if gift_recipient else 'لا يوجد رسالة مرفقة'
 
 

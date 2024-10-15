@@ -45,7 +45,7 @@
                                         <td>${{item.price}}</td>
                                         <td>${{ item.total_price }}</td>
                                         <td class='replace'><i class="fa-solid fa-repeat {% if order.status != 'canceled' %} replace-clicable {% else %}unclicable{% endif %}"></i></td>
-                                        <td class='remove'><i class="fa-solid fa-trash {% if order.status == 'pending' or  order.status == 'checking' %} remove-clicable {% else %}unclicable{% endif %}"></i></td>
+                                        <td class='remove' data-remove-id="{{  item.id }}" data-order-id="{{ order.id }}" ><i class="fa-solid fa-trash {% if order.status == 'pending' or  order.status == 'checking' %} remove-clicable {% else %}unclicable{% endif %}"></i></td>
                                     </tr> 
                                 {% endfor %}
                             </tbody>

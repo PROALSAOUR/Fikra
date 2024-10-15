@@ -1836,7 +1836,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const cancelButton = document.querySelector('.cancel-order');
 
   if (cancelForm && cancelButton) {
-      cancelForm.addEventListener('submit', function (e) {
+      cancelButton.addEventListener('click', function (e) {
           e.preventDefault(); // منع إعادة تحميل الصفحة
 
           const cancelOrderId = cancelInput.value;
@@ -1870,4 +1870,50 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   }
 });
+// =============================================================================================
+// دالة حذف عنصر من عناصر الطلب
+document.addEventListener('DOMContentLoaded', function () {
+  const removeIcons = document.querySelectorAll('.remove-clicable');
+
+  if (removeIcons.length > 0) {
+    removeIcons.forEach(icon => {
+      icon.addEventListener('click', function () {
+          // الحصول على العنصر الأب الذي يحتوي على البيانات
+          const parentElement = this.closest('.remove');
+          const removeId = parentElement.getAttribute('data-remove-id');
+          const orderId = parentElement.getAttribute('data-order-id');
+
+          // تأكيد أن هناك بيانات مطلوبة
+          if (removeId && orderId) {
+              // إرسال البيانات إلى دالة بايثون باستخدام fetch
+              fetch('/orders/remove-order-item/', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRFToken': getCookie('csrftoken') // تضمين CSRFToken إذا كان مطلوبًا
+                  },
+                  body: JSON.stringify({
+                      remove_id: removeId,
+                      order_id: orderId
+                  })
+              })
+              .then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      alert(data.message);
+                      location.reload();                      
+                  } else {
+                      alert(data.error);
+                  }
+              })
+              .catch(error => {
+                  console.error('حدث خطأ:', error);
+              });
+          }
+      });
+    });
+  }
+});
+
+
 

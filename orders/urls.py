@@ -8,6 +8,7 @@ urlpatterns = [
     path("order-details/<oid>", order_details, name="order-details"),
     path("create-order/", create_order, name="create-order"),
     path("cancel-order/", cancel_order, name="cancel-order"),
+    path("remove-order-item/", remove_order_item, name="remove-order-item"),
     
    
     

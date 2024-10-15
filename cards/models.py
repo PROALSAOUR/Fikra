@@ -127,7 +127,7 @@ class GiftItem(models.Model):
         return self.recipient is not None
 
 class GiftRecipient(models.Model):
-    gift_item = models.OneToOneField(GiftItem, on_delete=models.CASCADE, related_name='recipients')
+    gift_item = models.OneToOneField(GiftItem, on_delete=models.CASCADE, related_name='gift_recipients')
     recipient_name = models.CharField(max_length=100, null=True, blank=True)  # اسم المستلم
     recipient_phone = models.CharField(max_length=15, null=True, blank=True)  # هاتف المستلم
     message = models.TextField(blank=True, null=True, max_length=300)  # رسالة شخصية
