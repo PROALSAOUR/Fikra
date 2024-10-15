@@ -1,6 +1,6 @@
 from cards.models import *
 from store.models import *
-from accounts.models import UserProfile
+from accounts.models import UserProfile, Message
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.http import JsonResponse
@@ -11,6 +11,7 @@ import json
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 import phonenumbers
+from django.utils import timezone
 
 
 # ===================================================
@@ -159,6 +160,7 @@ def buy_copon(request, cid):
     copon = get_object_or_404(Copon, id=cid)
     user = request.user
     profile = get_object_or_404(UserProfile, user=user)
+    inbox = profile.inbox
     
     points = profile.points
     
@@ -175,7 +177,21 @@ def buy_copon(request, cid):
         if not user_copon.has_used and user_copon.expire and user_copon.expire > now().date():
             return JsonResponse({'error': 'لديك هذا الكوبون في مخزونك بالفعل'}, status=400)
        
-        
+    
+    # ارسال رسالة عند شراء كوبون
+    message = Message(
+        subject= f'تمت عملية شراء كوبون بنجاح',
+        content= 
+        f"""
+        مرحبا {user_copon.user.first_name}
+        لقد تمت عملية شراء الكوبون ({ user_copon.copon_code }) بنجاح يمكنك العثور عليه الأن داخل مخزونك واستعماله مع احد طلباتك القادمة ,
+        في حال كان لديك اي استفسار يرجى التواصل مع خدمة العملاء وسوف يتم الرد عليك بأسرع وقت ممكن.
+        """,
+        timestamp=timezone.now()
+    )
+            
+    message.save()
+    inbox.messages.add(message)
     
     # خصم النقاط وحفظ التحديثات
     points -= copon.price

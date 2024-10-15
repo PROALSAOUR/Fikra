@@ -5,9 +5,8 @@ from accounts.models import Message, UserProfile
 from django.utils import timezone
 
 
-
 @receiver(post_save, sender=GiftItem)
-def buy_gift(sender, instance, created, **kwargs):
+def buy_gift_message(sender, instance, created, **kwargs):
     """دالة تقوم بإرسال رسالة بشكل تلقائي بمجرد شراء هدية """
     if created:  # يتم تنفيذ الكود فقط إذا تم إنشاء عملية شراء جديدة
 
@@ -50,8 +49,5 @@ def buy_gift(sender, instance, created, **kwargs):
             message.save()
             re_inbox.messages.add(message)
         
-        
-        
-        
-        
+ 
 
