@@ -4621,7 +4621,7 @@ hr.sep {
   padding-right: 30px;
   vertical-align: middle;
 }
-.Order .products-table tfoot td:last-child {
+.Order .products-table tfoot td:not(:first-child) {
   color: var(--main-text-color);
   font-weight: 600;
   text-align: center;
@@ -4670,6 +4670,23 @@ hr.sep {
     font-size: calc(var(--mob-s-size) - 2px); 
     padding: 10px;
   }
+}
+.Order .products-table tbody td.replace , .Order .products-table tbody td.remove {
+  cursor: pointer;
+  width: 0;
+  padding: 0;
+  margin: 0;
+
+}
+.Order .products-table tbody td.replace {
+  color: #29569a;
+}
+.Order .products-table tbody td.remove {
+  color: #a72121;
+}
+.unclicable {
+  cursor: not-allowed;
+  color: var(--disaple-text-color);
 }
 /* End Order Details  */
 /* ==================================== Sign Page  ======================================================= */

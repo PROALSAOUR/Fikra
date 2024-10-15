@@ -22,15 +22,17 @@
                 </div>
                 <div class="order-products">
                     <table class="products-table">
-                        {% if  items %}
+                        {% if items %}
                             <thead>
                                 <tr>
-                                    <th>صورة</th>
+                                    <th>الصورة</th>
                                     <th>id</th>
                                     <th>اسم المتتج</th>
                                     <th>الكمية</th>
                                     <th>السعر</th>
                                     <th>المجموع</th>
+                                    <th>استبدال</th>
+                                    <th>حذف</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -42,7 +44,9 @@
                                         <td>{{ item.qty }}</td>
                                         <td>${{item.price}}</td>
                                         <td>${{ item.total_price }}</td>
-                                    </tr>
+                                        <td class='replace'><i class="fa-solid fa-repeat {% if order.status != 'canceled' %} replace-clicable {% else %}unclicable{% endif %}"></i></td>
+                                        <td class='remove'><i class="fa-solid fa-trash {% if order.status == 'pending' or  order.status == 'checking' %} remove-clicable {% else %}unclicable{% endif %}"></i></td>
+                                    </tr> 
                                 {% endfor %}
                             </tbody>
                             <tfoot>
@@ -50,29 +54,34 @@
                                     <tr>
                                         <td colspan="5">المجموع :</td>
                                         <td>{{ order.old_total }} دل </td>
+                                        <td colspan="2"></td>
                                     </tr>
                                 {% endif %}
                                 {% if order.discount_amount %}
                                     <tr>
                                         <td colspan="5">  قيمة الخصم:</td>
                                         <td>-{{ order.discount_amount }} دل </td>
+                                        <td colspan="2"></td>
                                     </tr>
                                 {% endif %}
                                 {% if order.dlivery_price %}
                                     <tr>
                                         <td colspan="5">تكلفة الشحن:</td>
                                         <td>+{{ order.dlivery_price }} دل </td>
+                                        <td colspan="2"></td>
                                     </tr>
                                 {% endif %}
                                 {% if order.total_points %}
                                     <tr>
                                         <td colspan="5"> النقاط المكتسبة:</td>
                                         <td>+{{ order.total_points }} <i class="fa-solid fa-gem"> </td>
+                                        <td colspan="2"></td>
                                     </tr>  
                                 {% endif %}
                                 <tr>
                                     <td colspan="5"> المجموع النهائي:</td>
-                                    <td>{{ order.total_price }} دل </td>
+                                    <td >{{ order.total_price }} دل </td>
+                                    <td colspan="2"></td>
                                 </tr>  
                             </tfoot>
                         {% else %}

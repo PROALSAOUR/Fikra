@@ -34,7 +34,7 @@ class OrderItemInline(admin.TabularInline):
 class MyOrdersAdmin(admin.ModelAdmin):
     list_display = ('serial_number', 'user', 'total_price', 'colored_status', 'with_message', 'order_date',)
     search_fields = ('user__phone_number',)
-    list_filter = ('status', 'with_message',)
+    list_filter = ('status', 'with_message', 'user__phone_number',)
     ordering = ('-order_date', '-updated_at',)
     readonly_fields = ( 'user', 'serial_number', 'old_total', 'discount_amount', 'dlivery_price', 'total_price', 'total_points',  'order_date',  'message',)
     exclude = ('with_message',)
@@ -59,7 +59,3 @@ class MyOrdersAdmin(admin.ModelAdmin):
     
 admin.site.register(Order, MyOrdersAdmin)
 admin.site.register(DliveryPrice, DliveryPriceAdmin)
-
-
-
-

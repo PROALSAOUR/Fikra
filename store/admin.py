@@ -64,6 +64,10 @@ class ProductAdmin(admin.ModelAdmin):
     ordering = ('updated_at',)   
     inlines = (ProductImagesInline, ProductItemInline,)
     
+    def sales_count(self, obj):
+        return  obj.get_sales_count() 
+    sales_count.short_description = 'sales count'
+    
     def is_available(self, obj):
         return  obj.get_total_stock() 
     is_available.short_description = 'available stock'
