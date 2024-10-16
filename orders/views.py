@@ -55,6 +55,14 @@ def cancel_order(request):
                 elif order.status == 'delivered' :
                     return JsonResponse({'success': False, 'error': 'هذا الطلب تم تسليمه اليك بالفعل ولا يمكن إلغائه الأن'})
                 else:
+                    
+                    # إعادة الكمية إلى المخزون
+                    for item in order.order_items.all():
+                        product_variant = item.order_item
+                        product_variant.update_stock(item.qty)  # زيادة المخزون بناءً على الكمية
+                        product_variant.sold -= item.qty  # انقاص الكمية المباعة بناءً على الكمية
+                        product_variant.save()
+                        
                     order.status = 'canceled'
                     order.save()
                     return JsonResponse({'success': True, 'message': 'تمت عملية إلغاء الطلب بنجاح!'})
@@ -101,7 +109,6 @@ def remove_order_item(request):
                 return JsonResponse({'success': False, 'error': 'العنصر المطلوب غير موجود'})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
-        
 # دالة تعديل الطلب
 
 # دالة انشاء طلب من صفحة السلة

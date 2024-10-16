@@ -36,9 +36,9 @@ class MyOrdersAdmin(admin.ModelAdmin):
     search_fields = ('user__phone_number',)
     list_filter = ('status', 'with_message', 'user__phone_number',)
     ordering = ('-order_date', '-updated_at',)
-    readonly_fields = ( 'user', 'serial_number', 'old_total', 'discount_amount', 'dlivery_price', 'total_price', 'total_points',  'order_date',  'message',)
+    readonly_fields = ( 'user', 'serial_number', 'old_total', 'discount_amount', 'dlivery_price', 'total_price', 'total_points',  'order_date', 'deliverey_date', 'message',)
     exclude = ('with_message',)
-    inlines = [OrderItemInline]  
+    inlines = [OrderItemInline] 
     
     def get_readonly_fields(self, request, obj=None):
         """جعل حقل الحالة غير قابل للتعديل إذا كانت الحالة مُلغاة."""

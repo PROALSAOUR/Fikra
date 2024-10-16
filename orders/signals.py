@@ -36,6 +36,9 @@ def update_user_points(sender, instance, **kwargs):
         message.save()
         user_inbox.messages.add(message)
 
+        # إضافة تاريخ التسليم إلى الطلب
+        instance.deliverey_date = timezone.now()
+
     elif previous_order.status == 'delivered' and instance.status == 'canceled':
         # خصم النقاط من المستخدم
         user_profile.points -= instance.total_points

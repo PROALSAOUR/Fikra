@@ -32,6 +32,7 @@ class Order(models.Model):
     discount_amount = models.IntegerField(default=0)
     dlivery_price = models.IntegerField(default=0)
     order_date = models.DateTimeField(auto_now_add=True)
+    deliverey_date = models.DateTimeField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
     with_message = models.BooleanField(default=False)
     message = models.TextField(blank=True, null=True)
