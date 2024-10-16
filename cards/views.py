@@ -29,8 +29,8 @@ def cards_repo(request):
     # =================================================================
     
     from_self =  GiftItem.objects.filter(has_used=False , buyer=user, recipient=user).prefetch_related('gift').order_by('-purchase_date')
-    from_frind =  GiftItem.objects.filter(has_used=False, recipient=user).exclude(buyer=user).prefetch_related('gift', 'recipients').order_by('-purchase_date')
-    for_frind = GiftItem.objects.filter(buyer=user).exclude(recipient=user).prefetch_related('gift', 'recipients').order_by('-purchase_date')[:12]
+    from_frind =  GiftItem.objects.filter(has_used=False, recipient=user).exclude(buyer=user).prefetch_related('gift', 'gift_recipients').order_by('-purchase_date')
+    for_frind = GiftItem.objects.filter(buyer=user).exclude(recipient=user).prefetch_related('gift', 'gift_recipients').order_by('-purchase_date')[:12]
     
     gifts_count = from_self.count() + from_frind.count() 
     

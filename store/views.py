@@ -6,17 +6,22 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.timezone import now 
+from django.core.cache import cache
 
 
 
 
 # الصفحة الرئيسية
 def index(request):
+    
     # جلب الإعلانات التي يتم عرضها
     ads = AdsSlider.objects.filter(show=True)
     
-    # جلب العلامات التجارية المميزة
-    brands = Brand.objects.filter(featured=True)
+    # جلب العلامات التجارية من الكاش أو قاعدة البيانات
+    brands = cache.get('brands')
+    if not brands:
+        brands = Brand.objects.filter(featured=True)
+        cache.set('brands', brands, 60*15)
     
     #جلب اسم المستخدم الاول اذا كان مسجل دخول 
     user_name = request.user.first_name if request.user.is_authenticated else None
@@ -125,8 +130,14 @@ def brand_page(request, slug):
         products = paginator.page(paginator.num_pages)
 
     # البيانات الإضافية للعرض
-    categories = Category.objects.filter(status='visible')
+    
+    categories = cache.get('categories')
+    if not categories:
+        categories = Category.objects.filter(status='visible')
+        cache.set('categories', categories, 60*15)
+   
     products_count = results.count()
+    
     
     context = {
         'brand': brand,
@@ -315,12 +326,12 @@ def search_page(request):
 # ===================================================
 # صفحة تفاصيل المنتج 
 def product_details(request, pid):
-    product = get_object_or_404(Product, id=pid)
+    product = get_object_or_404(Product.objects.select_related('category', 'brand'), id=pid)
     category = product.category
     brand = product.brand
 
-    related_category_products = Product.objects.filter(category=category).prefetch_related('items__variations').exclude(pk=pid)[:8]
-    related_brand_products = Product.objects.filter(brand=brand).prefetch_related('items__variations').exclude(pk=pid)[:8]
+    related_category_products = Product.objects.filter(category=category).exclude(pk=pid).prefetch_related('items__variations')[:8]
+    related_brand_products = Product.objects.filter(brand=brand).exclude(pk=pid).prefetch_related('items__variations')[:8]
 
     product_images = product.images.all()
     variants = ProductVariation.objects.filter(product_item__product_id=pid, stock__gt=0).select_related('size', 'product_item')

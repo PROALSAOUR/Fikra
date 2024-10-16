@@ -1,4 +1,5 @@
 from django.db.models import Count
+from django.core.cache import cache
 from store.models import *
 from accounts.models import  UserProfile, Inbox
 from cards.models import GiftItem
@@ -7,11 +8,34 @@ def globals(request):
     
     user = request.user
        
-    men_category =  Category.objects.get(slug='men')
-    women_category =  Category.objects.get(slug='women')
+    # تحقق من وجود men_category في الكاش
+    men_category = cache.get('men_category')
+    if not men_category:
+        men_category = Category.objects.get(slug='men')
+        cache.set('men_category', men_category, timeout=60*60)  # تخزينه في الكاش لمدة ساعة
+        
+    # تحقق من وجود women_category في الكاش
+    women_category = cache.get('women_category')
+    if not women_category:
+        women_category = Category.objects.get(slug='women')
+        cache.set('women_category', women_category, timeout=60*60)  # تخزينه في الكاش لمدة ساعة
      
-    men_categories = Category.objects.filter(parent_category=men_category, status='visible').annotate(product_count=Count('products')).order_by('-product_count').only('slug', 'name')[:5]
-    women_categories = Category.objects.filter(parent_category=women_category, status='visible').annotate(product_count=Count('products')).order_by('-product_count')[:5]
+    # تحقق من وجود men_categories في الكاش
+    men_categories = cache.get('men_categories')
+    if not men_categories:
+        men_categories = Category.objects.filter(parent_category=men_category, status='visible') \
+            .annotate(product_count=Count('products')) \
+            .order_by('-product_count') \
+            .only('slug', 'name')[:5]
+        cache.set('men_categories', men_categories, timeout=60*60)  # تخزينه في الكاش لمدة ساعة    women_categories = Category.objects.filter(parent_category=women_category, status='visible').annotate(product_count=Count('products')).order_by('-product_count')[:5]
+    
+    # تحقق من وجود women_categories في الكاش
+    women_categories = cache.get('women_categories')
+    if not women_categories:
+        women_categories = Category.objects.filter(parent_category=women_category, status='visible') \
+            .annotate(product_count=Count('products')) \
+            .order_by('-product_count')[:5]
+        cache.set('women_categories', women_categories, timeout=60*60)  # تخزينه في الكاش لمدة ساعة
     
     if user.is_authenticated:
         

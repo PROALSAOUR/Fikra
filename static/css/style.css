@@ -1708,7 +1708,6 @@ select option::selection {
     margin-top: -80px;
   }
 }
-
 #tranding .tranding-slider {
   display: flex;
   justify-content: center;
@@ -1848,22 +1847,18 @@ select option::selection {
   width: 100%;
   height: 100%;
   background-color: var(--background-color);
-  /*اللونالذيتريدهللخلفية*/border-radius: var(--main-border-radius);
+  border-radius: var(--main-border-radius);
   -webkit-border-radius: var(--main-border-radius);
   -moz-border-radius: var(--main-border-radius);
   -ms-border-radius: var(--main-border-radius);
   -o-border-radius: var(--main-border-radius);
+  overflow: hidden;
 }
 #branding .branding-slide .branding-slide-img img {
   width: 100%;
   height: 100%;
   cursor: pointer;
   object-fit: fill;
-  border-radius: var(--main-border-radius);
-  -webkit-border-radius: var(--main-border-radius);
-  -moz-border-radius: var(--main-border-radius);
-  -ms-border-radius: var(--main-border-radius);
-  -o-border-radius: var(--main-border-radius);
 }
 .swiper-slide-shadow-left,
 .swiper-slide-shadow-right {
