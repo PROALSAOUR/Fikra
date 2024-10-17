@@ -2034,8 +2034,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // إخفاء النافذة عند النقر خارجها
   document.addEventListener('click', function (e) {
-    if (deleteMenu.style.visibility === 'visible' && !deleteMenu.contains(e.target)) {
-      hideDeleteMenu();
+    if (deleteMenu){
+      if (deleteMenu.style.visibility === 'visible' && !deleteMenu.contains(e.target)) {
+        hideDeleteMenu();
+      }
     }
   });
 });

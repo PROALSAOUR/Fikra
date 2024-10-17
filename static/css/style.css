@@ -4695,8 +4695,8 @@ hr.sep {
   position: relative;
   margin: 0 auto;
   width: 450px;
-  min-height: 600px;
-  height: 650px;
+  min-height: 500px;
+  height: 555px;
   box-shadow: var(--main-shadow);
   transform-style: preserve-3d;
   transition: 1s transform;
@@ -4714,16 +4714,23 @@ hr.sep {
 @media (max-width: 768px) {
   .sign-page .sign-card {
     width: 400px;
-    min-height: 550px;
-    height: 600px;
+    min-height: 450px;
+    height: 490px;
   }
 }
 /* mobile media */
 @media (max-width: 597px) {
   .sign-page .sign-card {
     width: 320px;
-    min-height: 520px;
-    height: 560px;
+    min-height: 400px;
+    max-height: 450px;
+    height: 420px;
+  }
+}
+/* mobile media */
+@media (max-width: 357px) {
+  .sign-page .sign-card {
+    width: 300px;
   }
 }
 .sign-page .sign-card .sign-in-face, .sign-page .sign-card .log-in-face{
@@ -4759,9 +4766,9 @@ hr.sep {
   -o-transform: rotateY(180deg);
 }
 .sign-page .sign-card .image {
-  width: 250px;
-  margin: 0px auto 15px;
-  padding-top: 15px;
+  width: 180px;
+  margin: 0px auto 10px;
+  padding-top: 10px;
 }
 .sign-page .sign-card .image img{
   width: 100%;
@@ -4778,7 +4785,7 @@ hr.sep {
   width: 100%;
   text-align: center;
   font-size: var(--lab-l-size);
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 .sign-page .sign-card h1::after{
   content: "";
@@ -4816,15 +4823,14 @@ hr.sep {
   font-weight: 800;
   cursor: pointer;
   text-decoration: underline;
-}
-.sign-page .sign-card form {
+}.sign-page .sign-card form {
   display: flex;
   flex-direction: column;
 }
 .sign-page .sign-card form .name , .sign-card form .phone-number{
   display: flex;
   flex-direction: column;
-  padding:0 20px;
+  padding:0 15px;
   margin-bottom: 20px;
 }
 .sign-page .sign-card form .name {
@@ -4838,11 +4844,11 @@ hr.sep {
 .sign-page .sign-card form label {
   margin-bottom: 10px;
   color: var(--main-color);
-  font-size: var(--lab-xs-size);
+  font-size: var(--lab-s-size);
 }
 .sign-card form input:not([type="submit"]) {
-  height: 40px;
-  width: 95%;
+  height: 35px;
+  width: 90%;
   margin: 0 auto;
   color: var(--main-text-color);
   border:1px solid var(--seprator-color);
@@ -4854,8 +4860,13 @@ hr.sep {
   color: #ffffff;
   padding: 12px 10px;
   width: 150px;
-  margin: 15px auto;
   cursor: pointer;
+}
+.sign-page .sign-card .log-in-face form input[type='submit'] {
+  margin: 35px auto;
+}
+.sign-page .sign-card .sign-in-face form input[type='submit'] {
+  margin: 5px auto;
 }
 .sign-card form .phone-number {
   position: relative;
@@ -4871,7 +4882,7 @@ hr.sep {
 /* Tab media */
 @media (max-width: 768px) {
   .sign-page .sign-card .image {
-    width: 200px;
+    width: 150px;
   }
   .sign-page .sign-card h1{
     font-size: var(--tab-l-size);
@@ -4883,10 +4894,15 @@ hr.sep {
     font-size: var(--mob-s-size);
   }
   .sign-page .sign-card form .name , .sign-card form .phone-number{
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
   .sign-page .sign-card form label {
-    font-size: var(--tab-xs-size);
+    font-size: var(--tab-s-size);
+  }
+  .sign-card form input:not([type="submit"]) {
+    height: 30px;
+    padding: 4px 10px;
+
   }
   .sign-page .sign-card form input[type='submit'] {
     font-size: var(--tab-xs-size);
@@ -4896,8 +4912,7 @@ hr.sep {
 /* mobile media */
 @media (max-width: 597px) {
   .sign-page .sign-card .image {
-    width: 150px;
-    margin-bottom: 10px;
+    width: 120px;
   }
   .sign-page .sign-card h1{
     font-size: var(--mob-l-size);
@@ -4907,12 +4922,13 @@ hr.sep {
     font-size: calc(var(--mob-s-size) - 2px);
   }
   .sign-page .sign-card form label {
-    font-size: var(--mob-xs-size);
+    font-size: 12px;
   }
   .sign-page .sign-card form input[type='submit'] {
     font-size: var(--mob-xs-size);
+    padding: 8px 10px;
     width: 120px;
-    margin-top: 30px;
+    margin-top: 35px;
   }
 }
 .sign-page .error-messages {
@@ -4932,6 +4948,7 @@ hr.sep {
 @media (max-width: 597px) {
   .sign-page .error-messages {
     font-size: var(--mob-s-size);
+    padding: 7px;
   }
 }
 /* End Sign page content  */
