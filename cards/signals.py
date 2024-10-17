@@ -49,5 +49,3 @@ def buy_gift_message(sender, instance, created, **kwargs):
             message.save()
             re_inbox.messages.add(message)
         
-# ارسال رساالة عند شراء هدية لشخص ليس لدسه حساب على فكرة
-

@@ -13,7 +13,7 @@ class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0  # عدم إظهار حقول إضافية
     readonly_fields = ('get_product_image', 'order_item', 'qty', 'price', 'get_total')  # جعل الحقول قابلة للقراءة فقط
-    fields = ('get_product_image', 'order_item', 'qty', 'price', 'get_total', 'returned')  # تحديد ترتيب الحقول
+    fields = ('get_product_image', 'order_item', 'qty', 'price', 'get_total', )  # تحديد ترتيب الحقول
     can_delete = False  # منع حذف العناصر
     max_num = 0  # منع إضافة عناصر جديدة
     show_change_link = True  

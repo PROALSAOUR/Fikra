@@ -27,7 +27,8 @@
                                 <tr>
                                     <th>الصورة</th>
                                     <th>id</th>
-                                    <th>اسم المتتج</th>
+                                    <th>اسم المنتج</th>
+                                    <th>المقاس</th>
                                     <th>الكمية</th>
                                     <th>السعر</th>
                                     <th>المجموع</th>
@@ -41,10 +42,11 @@
                                         <td><img src="{{ item.order_item.product_item.image.url }}"></td>
                                         <td>{{ item.order_item.id }}</td>
                                         <td>{{ item.order_item.product_item.product.name }}</td>
+                                        <td>{{ item.order_item.size }}</td>
                                         <td>{{ item.qty }}</td>
                                         <td>${{item.price}}</td>
                                         <td>${{ item.total_price }}</td>
-                                        <td class='replace'><i class="fa-solid fa-repeat {% if order.status != 'canceled' %} replace-clicable {% else %}unclicable{% endif %}"></i></td>
+                                        <td class='replace' data-item-id="{{ item.id }}"><i class="fa-solid fa-repeat {% if order.status != 'canceled' %} replace-clicable {% else %}unclicable{% endif %}"></i></td>
                                         <td class='remove' data-remove-id="{{  item.id }}" data-order-id="{{ order.id }}" ><i class="fa-solid fa-trash {% if order.status == 'pending' or  order.status == 'checking' %} remove-clicable {% else %}unclicable{% endif %}"></i></td>
                                     </tr> 
                                 {% endfor %}
@@ -52,34 +54,34 @@
                             <tfoot>
                                 {% if order.dlivery_price or order.discount_amount %}
                                     <tr>
-                                        <td colspan="5">المجموع :</td>
+                                        <td colspan="6">المجموع :</td>
                                         <td>{{ order.old_total }} دل </td>
                                         <td colspan="2"></td>
                                     </tr>
                                 {% endif %}
                                 {% if order.discount_amount %}
                                     <tr>
-                                        <td colspan="5">  قيمة الخصم:</td>
+                                        <td colspan="6">  قيمة الخصم:</td>
                                         <td>-{{ order.discount_amount }} دل </td>
                                         <td colspan="2"></td>
                                     </tr>
                                 {% endif %}
                                 {% if order.dlivery_price %}
                                     <tr>
-                                        <td colspan="5">تكلفة الشحن:</td>
+                                        <td colspan="6">تكلفة الشحن:</td>
                                         <td>+{{ order.dlivery_price }} دل </td>
                                         <td colspan="2"></td>
                                     </tr>
                                 {% endif %}
                                 {% if order.total_points %}
                                     <tr>
-                                        <td colspan="5"> النقاط المكتسبة:</td>
+                                        <td colspan="6"> النقاط المكتسبة:</td>
                                         <td>+{{ order.total_points }} <i class="fa-solid fa-gem"> </td>
                                         <td colspan="2"></td>
                                     </tr>  
                                 {% endif %}
                                 <tr>
-                                    <td colspan="5"> المجموع النهائي:</td>
+                                    <td colspan="6"> المجموع النهائي:</td>
                                     <td >{{ order.total_price }} دل </td>
                                     <td colspan="2"></td>
                                 </tr>  
@@ -93,5 +95,7 @@
         </div>
     <!-- End Order Details -->
 </div>
+
+{% include "pop-pages/edit-order.html" %}
 
 {% endblock content %}

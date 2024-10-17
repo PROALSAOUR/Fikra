@@ -1,0 +1,46 @@
+{% load static %}
+
+<!-- Start add-copon-pop-page Section -->
+<div class="Pop-up-page add-copon-pop-page replace-menu">
+    <div class="logo">
+        <img src="{% static "images/name logo.jpg" %}" alt="">
+    </div>
+
+    <p>قم بإضافة المنتج الذي تود التبديل  به الى السلة الخاصة بك ثم اختره من هنا</p>
+   
+    <!-- copons cards -->
+    <form class="choose-to-replace">
+            <input type="hidden" name="replace-product-id" value="">
+            <input type="hidden" name="order-id" value="{{order.id}}">
+            <div class="choose-card">
+                {% if available_items %}
+                    {% for item in available_items %}
+                        <!-- start card -->
+                        <div class="card">
+                            <input type="radio" name="replace-product" id="product-{{ item.product_variation.id }}" value="{{ item.id }}">
+                            <label for="product-{{ item.product_variation.id }}">
+                                <div class="image">
+                                    <img src="{{ item.product_variation.product_item.image.url }}" alt="استبدال منتج">
+                                </div>
+                                <div class="details">
+                                    <h4>{{ item.product_variation.product_item.product.name }}</h4>
+                                    <p> اللون: {{  item.product_variation.product_item.color }}</p>
+                                    <p> المقاس : {{ item.product_variation.size }} </p>
+                                    <p> الكمية : {{ item.qty }} </p>
+                                </div>
+                            </label>
+                        </div>
+                        <!-- end card  -->
+                    {% endfor %}
+                {% else %}
+                    <p>لايوجد منتجات لعرضها, يبدو ان سلتك فارغة.</p>
+                {% endif %}
+            </div>
+            <button type="submit" class="hide-replace-link">
+                استعمال
+            </button>   
+    </form>
+</div>
+<!-- End add-copon-pop-page Section -->
+
+

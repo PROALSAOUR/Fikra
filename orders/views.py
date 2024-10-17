@@ -6,9 +6,10 @@ from django.contrib.auth.decorators import login_required
 from orders.models import *
 from cards.models import GiftItem, CoponUsage
 from store.models import Cart
-
+from django.utils import timezone
 
 # دالة عرض الطلبات
+@login_required
 def my_orders(request):
     
     user  = request.user
@@ -20,6 +21,7 @@ def my_orders(request):
     
     return render(request, 'orders/my-orders.html', context)
 # دالة عرض تفاصيل الطلب
+@login_required
 def order_details(request, oid):
     user  = request.user
     order = get_object_or_404(Order, pk=oid , user=user)
@@ -29,9 +31,33 @@ def order_details(request, oid):
     for item in items:
         item.total_price = item.qty * item.price
     
+    
+    # الحصول على المنتجات في السلة لعرضها بقائمة الاستبدال
+    available_items = []
+    if order.status != 'canceled':
+        try:
+            cart = Cart.objects.get(user=user)
+            cart_items = cart.items.prefetch_related('cart_item__product_item__variations').select_related('cart_item__product_item__product')
+
+            for item in cart_items:
+                product_variation = item.cart_item
+                stock = product_variation.stock if product_variation else 0
+
+                if stock > 0:
+                    available_items.append({
+                        'id': item.id,
+                        'product_variation': product_variation,
+                        'cart_item': item,
+                        'qty': item.qty,
+                    })
+                
+        except Exception:
+            available_items = None    
+    
     context = {
         'order':order,
         'items':items,
+        'available_items':available_items,
     }
     
     return render(request, 'orders/order-details.html', context)   
@@ -74,6 +100,7 @@ def cancel_order(request):
     
     return JsonResponse({'success': False, 'error': 'طريقة طلب خاطئة.'})
 # دالة حذف منتج من الطلب
+@login_required
 def remove_order_item(request):
     user = request.user
     if request.method == 'POST':
@@ -102,11 +129,17 @@ def remove_order_item(request):
                 product_variant.sold -= order_item.qty  # انقاص الكمية المباعة بناءً على الكمية
                 product_variant.save()
                 
+                 
                 # التحقق من عدد العناصر المتبقية في الطلب
                 if not order.order_items.exists():  # إذا لم يكن هناك أي عناصر متبقية
                     order.status = 'canceled'
-                    order.save()
-                    
+                else:     
+                    # تجديد بيانات الطلب بعد حذف المنتج  
+                    order.old_total -= order_item.price * order_item.qty
+                    order.total_price = order.old_total + order.dlivery_price - order.discount_amount
+                    order.total_points -= order_item.points * order_item.qty
+                  
+                order.save()  
                 return JsonResponse({'success': True, 'message':'تمت ازالة المنتج من الطلب بنجاح' })
                   
         
@@ -115,7 +148,75 @@ def remove_order_item(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 # دالة تعديل الطلب
+@login_required
+def edit_order(request):
+    user = request.user
+    if request.method == 'POST':
+        # الحصول على البيانات المرسلة من الفورم
+        order_id = request.POST.get('order_id')
+        replace_item_id = request.POST.get('replace_product_id')
+        selected_new_item = request.POST.get('selected_product_id')
+        # تأكد من أن البيانات موجودة
+        if replace_item_id and selected_new_item and order_id :
+            
+            try:
+                #  تحقق من حالة الطلب
+                order = Order.objects.get(id=order_id, user=user)
+                if order.status == 'canceled':
+                    return JsonResponse({'success': False, 'error': "نعتذر. لايمكن تعديل الطلبات التي تم إلغائها"})
+                if order.status == 'delivered' and order.deliverey_date: # لو مضى اكثر من 3 ايام على تاريخ التسليم
+                    # احسب الفرق بين التاريخ الحالي وتاريخ التسليم
+                    days_since_delivery = (timezone.now() - order.deliverey_date).days
+                    # تحقق مما إذا كانت المدة أكبر من 3 أيام
+                    if days_since_delivery > 3:
+                        return JsonResponse({'success': False, 'error': "نعتذر. اقصى مدة لإستبدال المنتجات هي بعد تاريخ التسليم بثلاثة ايام "})
+               
+                
+                try:                        
+                    item =  order.order_items.get(id=replace_item_id) # الحصول على عنصر السلة المراد استبداله
+                    cart = Cart.objects.get(user=user)
+                    new_item = cart.items\
+                    .prefetch_related('cart_item__product_item__variations__size')\
+                    .select_related('cart_item__product_item').get(id=selected_new_item) # الحصول على عنصر السلة الجديد 
+                    
+                    parent_product = new_item.cart_item.product_item.product
+                    
+                    if new_item.cart_item.stock <= 0: #  تحقق من المنتج  الجديد هل متاح
+                        return JsonResponse({'success': False, 'error': 'المنتج المستبدل غير متاح حاليا'})
+                    else:
+                        # ازالة بيانات القديم من الطلب
+                        order.old_total -= item.price * item.qty
+                        order.total_price = order.old_total + order.dlivery_price - order.discount_amount
+                        order.total_points -= item.points * item.qty
+                        
+                        # استبدال بيانات القديم بالجديد
+                        item.order_item = new_item.cart_item
+                        item.qty = new_item.qty
+                        item.price = parent_product.get_price()
+                        item.points = parent_product.bonus
+                        
+                        item.save()
+                        
+                        # تحديث بيانات الطلب وفقا  للجديد
+                        order.old_total += item.price * item.qty
+                        order.total_price = order.old_total + order.dlivery_price - order.discount_amount
+                        order.total_points += item.points * item.qty
+                        
+                        order.save() # تعديل الاجمالي للطلب
+                        
+                        # إذا كانت العملية ناجحة:
+                        return JsonResponse({'success': True, 'message': 'تم استبدال المنتج بنجاح'})
+                                        
+                except :
+                    return JsonResponse({'success': False, 'error': 'المنتج المستبدل غير موجود'  })             
+            except :
+                return JsonResponse({'success': False, 'error': 'الطلب الذي تحاول تعديله غير صالح' }) 
+        else:
+            # إذا كانت البيانات مفقودة أو غير صالحة:
+            return JsonResponse({'success': False, 'error': 'نعتذر يبدو انه هنالك بيانات ناقصة'})
 
+    # إذا كان الطلب ليس POST:
+    return JsonResponse({'success': False, 'error': 'طريقة وصول خاطئة'})
 # دالة انشاء طلب من صفحة السلة
 @login_required
 def create_order(request):
@@ -145,6 +246,7 @@ def create_order(request):
                         'product_variation': product_variation,
                         'cart_item': item,
                         'qty': item.qty,
+                        'points': product_variation.product_item.product.bonus
                     })
                     total_price += product_variation.product_item.product.get_price() * item.qty
                     total_bonus += product_variation.product_item.product.bonus * item.qty
@@ -215,6 +317,7 @@ def create_order(request):
                 order=order,
                 order_item=item['product_variation'],
                 qty=item['qty'],
+                points = item['points'],
                 price=item['product_variation'].product_item.product.get_price(),
             )
             item['product_variation'].sell(item['qty'])

@@ -37,6 +37,8 @@ class Order(models.Model):
     with_message = models.BooleanField(default=False)
     message = models.TextField(blank=True, null=True)
     
+        
+    
     def get_total_items(self):
         total = 0
         # استخدام related_name للوصول إلى عناصر الطلب
@@ -72,7 +74,7 @@ class OrderItem(models.Model):
     order_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='order_items')
     qty = models.PositiveIntegerField(default=1)
     price = models.PositiveIntegerField()
-    returned = models.BooleanField(default=False)
+    points = models.IntegerField(null=True)
     
     def __str__(self):
         return f"{self.order_item.product_item.product.name}"
