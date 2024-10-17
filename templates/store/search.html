@@ -8,8 +8,10 @@
     <div class="search-bar">
         <div class="container">
             <form id="filter-form" method="get" action="{% url 'store:search_page' %}" class="search">
+                {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.category or request.GET.brand %}
+                    <button class='clear-search' OnClick="resetFilters();"><i class="fa-solid fa-xmark"></i><p>إلغاء الفلترة</p></button>
+                {% endif %}
                 <input type="search" class="search-input" id="search-query" name="q" placeholder="ما الذي تبحث عنه؟" value="{{ request.GET.q }}">
-                
                 <div class="filter-container">
                     <button type="button" class="filter-toggle">
                         <i class="fa-solid fa-sliders"></i>

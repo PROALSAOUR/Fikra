@@ -9,6 +9,9 @@
                 <div class="container">
                     <form id="filter-form" method="get" class="search" action="{% url 'store:favourite_page' %}">
                         {% if products %}
+                            {% if request.GET.q  %}
+                                <button class='clear-search' OnClick="resetFilters();"><i class="fa-solid fa-xmark"></i><p>إلغاء </p></button>
+                            {% endif %}
                             <input type="search" class="search-input" id="search-query" name="q" placeholder="ما الذي تبحث عنه؟" value="{{ request.GET.q }}">                   
                             
                             <button id="clear-favourites-btn" type="button" class="empty">

@@ -72,3 +72,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+// ======================================================
+//  دالة زر إلغاء الفلترة
+function resetFilters() {
+   // إعادة تعيين حقول الإدخال
+   const q = document.getElementById('search-query');
+   const min = document.getElementById('price_min');
+   const max = document.getElementById('price_max');
+   const category = document.getElementById('category_filter');
+   const brand = document.getElementById('brand_filter'); 
+
+   if (q) {
+    q.value = '';
+   }
+   if (min) {
+    min.value = '';
+   }
+   if (max) {
+    max.value = '';
+   }
+   if (category) {
+    category.selectedIndex = 0;
+   }
+   if (brand) {
+    brand.selectedIndex = 0;
+   }
+
+}
