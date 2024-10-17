@@ -33,7 +33,7 @@
         </a> 
         {% if gift_item in from_frind or gift_item in for_frind %}
 
-            {% if gift_item.recipients %}
+            {% if gift_item %}
                 <div class='clik-to-surprise' data-related-gift="forgiftitem-{{ gift_item.id }}">استعراض <i class="fa-solid fa-eye"></i></div>
                 {% include "pop-pages/surprise.html" %}
             {% endif %}

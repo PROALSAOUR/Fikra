@@ -37,7 +37,7 @@ def order_details(request, oid):
     return render(request, 'orders/order-details.html', context)   
 # دالة الغاء الطلب
 @login_required
-def cancel_order(request):
+def cancel_order(request):  
     user = request.user
     if request.method == 'POST':
         try:
@@ -96,6 +96,11 @@ def remove_order_item(request):
             else:
                 order_item = order.order_items.get(id=remove_id)
                 order_item.delete()
+                
+                product_variant = order_item.order_item 
+                product_variant.update_stock(order_item.qty)  # زيادة المخزون بناءً على الكمية
+                product_variant.sold -= order_item.qty  # انقاص الكمية المباعة بناءً على الكمية
+                product_variant.save()
                 
                 # التحقق من عدد العناصر المتبقية في الطلب
                 if not order.order_items.exists():  # إذا لم يكن هناك أي عناصر متبقية

@@ -1,0 +1,34 @@
+{
+    "name": "Fikra",
+    "short_name": "Fikra",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#232323",
+    "theme_color": "#292929",
+    "icons": [
+      {
+        "src": "/static/icons/logo.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/static/icons/logo2.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "screenshots": [
+    {
+      "src": "/static/screenshots/screenshot1.jpg",
+      "sizes": "687x1280",
+      "type": "image/jpg",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/static/screenshots/screenshot1.jpg",
+      "sizes": "687x1280",
+      "type": "image/jpg",
+      "form_factor": "narrow"
+    }
+  ]
+  }

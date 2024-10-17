@@ -218,7 +218,7 @@ def buy_gift(request, gid):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            buy_for = data.get('buy_for')
+            buy_for = data.get('buy_for') # قيمة الراديو العائد من الفورم 
             recipient = user  # افتراضياً المشتري هو المستلم
             
             if buy_for == 'for-me':
@@ -245,7 +245,7 @@ def buy_gift(request, gid):
                 except User.DoesNotExist:
                     # إذا لم يكن المستخدم موجودًا على فكرة 
                     
-                    # انشاء كود استلام للهدية كي يتمنك المستخدم من استلام هديته بعد انشاء حساب على فكرة
+                    # انشاء كود استلام للهدية كي يتمكن المستخدم من استلام هديته بعد انشاء حساب على فكرة
                     receive = ReceiveGift.objects.create(
                         value = gift.value,
                         gift = gift,
@@ -258,6 +258,7 @@ def buy_gift(request, gid):
                         sell_price=gift.price,
                         sell_value=gift.value,
                         receive = receive,
+                        message = message_content,
                     )
                     
                     profile.points -= gift.price
@@ -265,7 +266,7 @@ def buy_gift(request, gid):
                     gift.sales_count += 1
                     gift.save()
                     
-                    return JsonResponse({'success': 'تم إرسال إشعار خدمة العملاء.'}, status=200)
+                    return JsonResponse({'success': 'تم إرسال إشعار خدمة العملاء , ستم التواصل مع المستلم قريبا لتسليمه هديته'}, status=200)
 
             # إنشاء كائن GiftItem
             gift_item = GiftItem.objects.create(
@@ -351,6 +352,7 @@ def buy_gift2(request, gid):
                         sell_price=gift.price,
                         sell_value=gift.value,
                         receive = receive,
+                        message = message_content,
                     )
                     
                     profile.points -= gift.price
@@ -401,31 +403,39 @@ def buy_gift2(request, gid):
 def verfie_code(request):
     user = request.user
 
-    if request.method == 'POST':
-        print(request.body)
-        
+    if request.method == 'POST':        
         try:
             data = json.loads(request.body)
             verfie_code = data.get('verfie-code')
         
             try:
-                gift = ReceiveGift.objects.get(code=verfie_code)
+                verfie_gift = ReceiveGift.objects.get(code=verfie_code)
+                dealing = verfie_gift.dealing.first()
 
-                if gift.is_used:
+                if verfie_gift.is_used:
                     return JsonResponse({"success": False, "message": "الكود الذي ادخلته مستخدم بالفعل"})
 
                 # إنشاء GiftItem جديد
-                GiftItem.objects.create(
-                    buyer=user,
-                    gift=gift.gift,
+                gift_item = GiftItem.objects.create(
+                    buyer=dealing.buyer, # not user but how create the dealing
+                    gift=verfie_gift.gift,
                     sell_price=0,
-                    sell_value=gift.value,
+                    sell_value=verfie_gift.value,
                     recipient=user,
                 )
+                
+                # إنشاء كائن GiftRecipient
+                GiftRecipient.objects.create(
+                    gift_item=gift_item,
+                    recipient_name= user.first_name,
+                    recipient_phone=user.phone_number,
+                    message=dealing.message,
+                )
+                
 
                 # تحديث حالة الكود إلى "مستخدم"
-                gift.is_used = True
-                gift.save()
+                verfie_gift.is_used = True
+                verfie_gift.save()
 
                 return JsonResponse({"success": True, "message": 'تهانينا! تم استلام كود الهدية بنجاح.'})
 

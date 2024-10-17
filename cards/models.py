@@ -147,6 +147,9 @@ class ReceiveGift(models.Model):
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
         
+    def __str__(self):
+        return f'{self.gift.name}, {self.value}'
+        
     class Meta:
         verbose_name = 'كود استلام هدية'
         verbose_name_plural = 'اكواد استلام هدايا'
@@ -156,13 +159,16 @@ class GiftDealing(models.Model):
     في حال ارسل احدهم هدية الى شخص ولم يكن مستعملا للبرنامج
     يتم التواصل معه بواسطة خدمة العملاء من هنا
     '''
+    
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gift_dealing_buyer', null=True)  # المستخدم الذي اشترى الهدية
     sell_price = models.PositiveIntegerField(default=0) # سعر  عندما اشتراه المستخدم
     sell_value = models.PositiveIntegerField(default=0) # القيمة عند الشراء
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     receiver_name = models.CharField(max_length=50)
     receiver_phone = models.CharField(max_length=20)
+    message = models.TextField(blank=True, null=True, max_length=300)  # رسالة شخصية
     is_dealt = models.BooleanField(default=False)
-    receive = models.ForeignKey(ReceiveGift, on_delete=models.CASCADE)
+    receive = models.ForeignKey(ReceiveGift, on_delete=models.CASCADE, related_name='dealing', null=True)
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
     

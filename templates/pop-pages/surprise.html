@@ -17,10 +17,10 @@
             <div class="back" style="background-image:url({% static "images/g-b.png" %}); ">
                 <div class="content">
                         <!-- اقصى طول للرسالة 300 حرف -->
-                        {% if gift_item.recipients.message %}
-                            <p>{{ gift_item.recipients.message|slice:":300" }}</p>
+                        {% if gift_item.gift_recipients.message %}
+                            <p>{{ gift_item.gift_recipients.message|slice:":300" }}</p>
                         {% else %}
-                            <p> المعذرة يا {{ gift_item.recipients.recipient_name }} 
+                            <p> المعذرة 
                                 يبدو ان {{ gift_item.buyer }} قد نسي كتابة الرسالة 😅
                             </p>
                         {% endif %}
