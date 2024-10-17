@@ -160,7 +160,6 @@ class GiftDealing(models.Model):
     يتم التواصل معه بواسطة خدمة العملاء من هنا
     '''
     
-    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gift_dealing_buyer', null=True)  # المستخدم الذي اشترى الهدية
     sell_price = models.PositiveIntegerField(default=0) # سعر  عندما اشتراه المستخدم
     sell_value = models.PositiveIntegerField(default=0) # القيمة عند الشراء
     sender = models.ForeignKey(User, on_delete=models.CASCADE)

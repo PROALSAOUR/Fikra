@@ -36,7 +36,6 @@ def cards_repo(request):
     
     # =================================================================
 
-     
     context  = {
         'active_copons': active_copons,
         'expired_copons': expired_copons,
@@ -261,6 +260,21 @@ def buy_gift(request, gid):
                         message = message_content,
                     )
                     
+                     # رسالة الى المشتري تخبره ان المستلم ليس لديه حساب على فكرة وانه سيتم التواصل معه
+                    message = Message(
+                        subject= f'تمت عملية شراء الهدية بنجاح',
+                        content= 
+                        f"""
+                        مرحبا {user.first_name}
+                        لقد تمت عملية شراء الهدية ({ gift }) بنجاح, يبدو ان  ({recipient_name}[{recipient_phone}]) غير مسجل في قاعدة البيانات الخاصة بمتجرنا لكن لاتقلق سوف يتواصل معه احد موظفينا لإيصال هديتك اليه,
+                        في حال كان لديك اي استفسار يرجى التواصل مع خدمة العملاء وسوف يتم الرد عليك بأسرع وقت ممكن.
+                        """,
+                        timestamp=timezone.now()
+                    )
+                    
+                    message.save()
+                    profile.inbox.messages.add(message)
+                    
                     profile.points -= gift.price
                     profile.save()
                     gift.sales_count += 1
@@ -338,7 +352,7 @@ def buy_gift2(request, gid):
                     recipient = User.objects.get(phone_number=recipient_phone)
                 except User.DoesNotExist:
                     
-                    # انشاء كود استلام للهدية كي يتمنك المستخدم من استلام هديته بعد انشاء حساب على فكرة
+                    # انشاء كود استلام للهدية كي يتمكن المستخدم من استلام هديته بعد انشاء حساب على فكرة
                     receive = ReceiveGift.objects.create(
                         value = gift.value,
                         gift = gift,
@@ -354,6 +368,22 @@ def buy_gift2(request, gid):
                         receive = receive,
                         message = message_content,
                     )
+                    
+                    # رسالة الى المشتري تخبره ان المستلم ليس لديه حساب على فكرة وانه سيتم التواصل معه
+                    message = Message(
+                        subject= f'تمت عملية شراء الهدية بنجاح',
+                        content= 
+                        f"""
+                        مرحبا {user.first_name}
+                        لقد تمت عملية شراء الهدية ({ gift }) بنجاح, يبدو ان  ({recipient_name}[{recipient_phone}]) غير مسجل في قاعدة البيانات الخاصة بمتجرنا لكن لاتقلق سوف يتواصل معه احد موظفينا لإيصال هديتك اليه,
+                        في حال كان لديك اي استفسار يرجى التواصل مع خدمة العملاء وسوف يتم الرد عليك بأسرع وقت ممكن.
+                        """,
+                        timestamp=timezone.now()
+                    )
+            
+                    message.save()
+                    profile.inbox.messages.add(message)
+                    
                     
                     profile.points -= gift.price
                     profile.save()
@@ -417,7 +447,7 @@ def verfie_code(request):
 
                 # إنشاء GiftItem جديد
                 gift_item = GiftItem.objects.create(
-                    buyer=dealing.buyer, # not user but how create the dealing
+                    buyer=dealing.sender, # not user but how create the dealing
                     gift=verfie_gift.gift,
                     sell_price=0,
                     sell_value=verfie_gift.value,

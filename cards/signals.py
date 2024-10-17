@@ -36,7 +36,7 @@ def buy_gift_message(sender, instance, created, **kwargs):
             re_inbox = re_profile.inbox  # الحصول على صندوق الوارد الخاص بالمستخدم
             
             message = Message(
-                subject= f'تمت عملية شراء الهدية بنجاح',
+                subject= f' ارسل احدهم هدية اليك!',
                 content= 
                 f"""
                 مرحبا {instance.recipient.first_name}

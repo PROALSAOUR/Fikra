@@ -57,7 +57,7 @@ def globals(request):
         unread_messages_count = unread_messages.count()
         
         #  التحقق انه  لدى المستخدم هدايا جديدة
-        gift = GiftItem.objects.filter(recipient=user, is_seen=False).exclude(buyer=user).prefetch_related('gift', 'recipients').order_by('-purchase_date').last()
+        gift = GiftItem.objects.filter(recipient=user, is_seen=False).exclude(buyer=user).prefetch_related('gift', 'gift_recipients').order_by('-purchase_date').last()
     else:
         favourite_products = []
         user_points = 0
