@@ -41,20 +41,23 @@ class ProfileAdmin(admin.ModelAdmin):
     search_fields = ('user__phone_number','user__first_name','user__last_name',)
 
 class PointsUsageAdmin(admin.ModelAdmin):
-    list_display = ('user_profile__user', 'old_points', 'colored_new_points', 'created_at',)
+    list_display = ('user_profile__user', 'old_points', 'new_points', 'get_difference', 'created_at',)
     search_fields = ('user_profile__user', 'user_profile__user__phone_number')
     list_filter = ('user_profile__user',)
     exclude = ['created_at', 'old_points',]
     readonly_fields = ['user_profile', 'old_points', 'new_points', 'created_at',]    # تحديد الحقول التي لا يمكن تعديلها
     
-    def colored_new_points(self, obj):
-        """إرجاع الحالة مع تلوين خاص بناءً على القيمة."""
-        if obj.old_points > obj.new_points :
-            return format_html('<span style="color: red;">{}</span>', obj.new_points)
-        elif obj.old_points < obj.new_points :
-            return format_html('<span style="color:#28a745; font-weight:900;">{}</span>', obj.new_points)
-    colored_new_points.short_description = 'new points'  
     
+    def get_difference(self, obj):
+        '''
+        دالة تستعمل لإيجاد الفارق بين النقاط القديمة و الجديدة
+        '''
+        difference = obj.new_points - obj.old_points 
+        if difference > 0 : # حدثت زيادة بالنقاط
+            return format_html('<span style="color:#28a745; font-weight:900;">+{}</span>', difference)
+        elif difference < 0  :  # حدث نقصان بالنقاط
+            return format_html('<span style="color: red;">{}</span>', difference)
+    get_difference.short_description = 'difference' 
     
     def has_delete_permission(self, request, obj=None):
         """منع حذف سجلات النقاط من لوحة الإدارة"""
