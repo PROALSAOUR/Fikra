@@ -83,7 +83,7 @@ def account_info(request):
     phone_number = user.phone_number
     
     inbox = get_object_or_404(Inbox, user=user)
-    messages = inbox.messages.all().order_by('is_read', '-timestamp')[:25]
+    messages = inbox.messages.all().order_by('is_read', '-timestamp')[:15]
     
     context  = {
         'user_name': user_name,

@@ -1,5 +1,6 @@
 from store.models import *
 from cards.models import GiftItem, CoponUsage
+from orders.models import DliveryPrice
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -434,12 +435,13 @@ def clear_favourites(request):
 def cart_page(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
     cart_items = cart.items.prefetch_related('cart_item__product_item__variations__size').select_related('cart_item__product_item__product').all()  
-
+    delivery_price = DliveryPrice.objects.first()
+    
     available_items = []
     unavailable_items = []
     
     total_qty = 0  # عدد المنتجات الاجمالي
-    total_price = 0  # حساب السعر الاجمالي 
+    total_price = delivery_price.price  # (متضمن سعر التوصيل)حساب السعر الاجمالي 
     total_bonus = 0  # حساب  الـبونس الاجمالي
 
     for item in cart_items:
@@ -491,6 +493,7 @@ def cart_page(request):
         'total_qty': total_qty,
         'total_price': total_price,
         'total_bonus': total_bonus,
+        'delivery': delivery_price.price,
         'user_copons': user_copons,
         'user_gifts': user_gifts,
     }

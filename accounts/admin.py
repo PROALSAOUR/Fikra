@@ -63,7 +63,6 @@ class PointsUsageAdmin(admin.ModelAdmin):
         """منع حذف سجلات النقاط من لوحة الإدارة"""
         return False
 
-
 admin.site.register(User, UserAdmin)
 admin.site.register(UserProfile, ProfileAdmin)
 admin.site.register(Message, SendMessageAdmin)

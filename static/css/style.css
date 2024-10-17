@@ -3530,6 +3530,13 @@ hr.sep {
   -ms-transition: all 0.3s;
   -o-transition: all 0.3s;
 }
+.cart .cart-delivery {
+  color: var(--disaple-text-color);
+  font-size: var(--mob-xs-size);
+  display: block;
+  width: 100%;
+  text-align: end;
+}
 /* Tab media */
 @media (max-width: 992px) {
   .cart .searched-products {
@@ -3809,8 +3816,24 @@ hr.sep {
   -ms-border-radius: 5px;
   -o-border-radius: 5px;
 }
-
 /* End add-copon-pop-page  */
+@media (max-width: 602px) {
+  .add-copon-pop-page form .choose-card {
+    width: 95%;
+  }
+  .add-copon-pop-page form .card {
+    overflow: hidden;
+  }
+  .add-copon-pop-page form .image {
+    object-fit: cover;
+    width: 100px !important;
+    aspect-ratio: 1/1;
+  }
+  .add-copon-pop-page form p {
+    margin-top: 8px !important;
+    padding: 0;
+  }
+}
 /* Start avilable status  */
 .cart .av-status {
   position: relative;
@@ -4587,8 +4610,13 @@ hr.sep {
 }
 .Order .products-table tbody td {
   border-bottom: 2px solid var(--seprator-color);
-  padding: 15px; /* زيادة المساحة داخل الخلايا */
+  padding: 10px; /* زيادة المساحة داخل الخلايا */
   vertical-align: middle;
+}
+@media (max-width: 386px)  {
+  .Order .products-table tbody td {
+    padding: 5px; 
+  }
 }
 .Order .products-table tbody td img {
   max-width: 60px;
@@ -4604,6 +4632,7 @@ hr.sep {
     max-width: 30px;
   }
 }
+
 .Order .products-table tbody tr:last-child td{
   border-bottom: 2px solid var(--disaple-text-color);
 }
