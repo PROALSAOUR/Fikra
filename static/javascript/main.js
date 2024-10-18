@@ -2009,7 +2009,7 @@ document.addEventListener('DOMContentLoaded', function () {
                   hideDeleteMenu();
                   setTimeout(function() {
                     location.reload(); // تحديث الصفحة بعد 3 ثوانٍ
-                  }, 3000); 
+                  }, 1000); 
                 } else {
                   alert(data.error || 'حدث خطأ ما');
                 }

@@ -3865,10 +3865,16 @@ hr.sep {
   -ms-border-radius: 5px;
   -o-border-radius: 5px;
 }
+/* edit order pop-page */
+form.choose-to-replace {
+  display: flex;
+  flex-direction: column;
+}
 /* End add-copon-pop-page  */
 @media (max-width: 602px) {
   .add-copon-pop-page form .choose-card {
     width: 95%;
+
   }
   .add-copon-pop-page form .card {
     overflow: hidden;
@@ -3913,16 +3919,17 @@ hr.sep {
 .ordered-done-pop-page p {
   text-align: center;
 }
-.ordered-done-pop-page i {
+.ordered-done-pop-page > i {
   font-size: calc(var(--lab-xxl-size) + 4px);
   color: #1d9f4d;
   width: 100%;
   text-align: center;
   margin: 10px;
 }
-.ordered-done-pop-page .confirm-order-message {
+.ordered-done-pop-page .confirm-order-message a {
   font-size: var(--mob-xs-size) ;
   color: var(--disaple-text-color);
+  cursor: pointer;
   width: 70%;
   text-align: center;
   margin: 0 auto;

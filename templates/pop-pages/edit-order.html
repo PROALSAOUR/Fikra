@@ -36,9 +36,12 @@
                     <p>لايوجد منتجات لعرضها, يبدو ان سلتك فارغة.</p>
                 {% endif %}
             </div>
-            <button type="submit" class="hide-replace-link">
-                استعمال
-            </button>   
+            {% if available_items %}
+                <button type="submit" class="hide-replace-link">
+                    استعمال
+                </button>
+            {% endif %}
+   
     </form>
 </div>
 <!-- End add-copon-pop-page Section -->

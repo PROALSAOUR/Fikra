@@ -14,7 +14,7 @@ from django.utils import timezone
 def my_orders(request):
     
     user  = request.user
-    orders = Order.objects.filter(user=user).order_by('-order_date', '-updated_at').prefetch_related('order_items')
+    orders = Order.objects.filter(user=user).order_by('-order_date', '-updated_at').prefetch_related('order_items')[:25]
     
     context = {
         'orders':orders,
@@ -157,87 +157,93 @@ def edit_order(request):
         order_id = request.POST.get('order_id')
         replace_item_id = request.POST.get('replace_product_id')
         selected_new_item = request.POST.get('selected_product_id')
+        
         # تأكد من أن البيانات موجودة
-        if replace_item_id and selected_new_item and order_id :
-            
+        if replace_item_id and selected_new_item and order_id:
             try:
-                #  تحقق من حالة الطلب
+                # تحقق من حالة الطلب
                 order = Order.objects.get(id=order_id, user=user)
                 if order.status == 'canceled':
-                    return JsonResponse({'success': False, 'error': "نعتذر. لايمكن تعديل الطلبات التي تم إلغائها"})
-                if order.status == 'delivered' and order.deliverey_date: # لو مضى اكثر من 3 ايام على تاريخ التسليم
+                    return JsonResponse({'success': False, 'error': "نعتذر. لا يمكن تعديل الطلبات التي تم إلغاؤها"})
+                if order.status == 'delivered' and order.deliverey_date:
                     # احسب الفرق بين التاريخ الحالي وتاريخ التسليم
                     days_since_delivery = (timezone.now() - order.deliverey_date).days
                     # تحقق مما إذا كانت المدة أكبر من 3 أيام
                     if days_since_delivery > 3:
-                        return JsonResponse({'success': False, 'error': "نعتذر. اقصى مدة لإستبدال المنتجات هي بعد تاريخ التسليم بثلاثة ايام "})
+                        return JsonResponse({'success': False, 'error': "نعتذر. أقصى مدة لاستبدال المنتجات هي بعد تاريخ التسليم بثلاثة أيام"})
                
-                
-                try:                        
-                    item =  order.order_items.get(id=replace_item_id) # الحصول على عنصر السلة المراد استبداله
+                try:
+                    # الحصول على عنصر الطلب المراد استبداله
+                    item = order.order_items.get(id=replace_item_id)
                     cart = Cart.objects.get(user=user)
-                    new_item = cart.items\
-                    .prefetch_related('cart_item__product_item__variations__size')\
-                    .select_related('cart_item__product_item').get(id=selected_new_item) # الحصول على عنصر السلة الجديد 
+                    # الحصول على عنصر السلة الجديد
+                    new_item = cart.items.prefetch_related('cart_item__product_item__variations__size')\
+                        .select_related('cart_item__product_item').get(id=selected_new_item)
                     
-                    parent_product = new_item.cart_item.product_item.product
+                    old_variation = item.order_item  # متغير المنتج القديم
+                    new_variation = new_item.cart_item  # متغير المنتج الجديد
                     
-                    if new_item.cart_item.stock <= 0: #  تحقق من المنتج  الجديد هل متاح
+                    if new_item.cart_item.stock <= 0:  # تحقق من توفر المنتج الجديد
                         return JsonResponse({'success': False, 'error': 'المنتج المستبدل غير متاح حاليا'})
-                    else:
-                        
-                        
-                        old_points =  order.total_points
-                        
-                        # ازالة بيانات القديم من الطلب
-                        order.old_total -= item.price * item.qty
-                        order.total_price = order.old_total + order.dlivery_price - order.discount_amount
-                        order.total_points -= item.points * item.qty
-                        
-                        # استبدال بيانات القديم بالجديد
-                        item.order_item = new_item.cart_item
+                    
+                    # التحقق مما إذا كان المنتج القديم والجديد مرتبطين بنفس متغير المنتج
+                    if old_variation == new_variation:
+                        # تحديث الكمية والسعر فقط دون حذف العنصر القديم
                         item.qty = new_item.qty
-                        item.price = parent_product.get_price()
-                        item.points = parent_product.bonus
-                        
+                        item.price = new_item.cart_item.product_item.product.get_price()  # تحديث السعر بناءً على المتغير الجديد
+                        item.points = new_item.cart_item.product_item.product.bonus
                         item.save()
-                        order.save() # تعديل الاجمالي للطلب    
 
-                        # تحديث بيانات الطلب وفقا  للجديد
-                        order.old_total += item.price * item.qty
-                        order.total_price = order.old_total + order.dlivery_price - order.discount_amount
-                        order.total_points += item.points * item.qty
+                    else:
+                        # التحقق مما إذا كان العنصر الجديد موجودًا بالفعل في الطلب
+                        existing_order_item = order.order_items.filter(order_item=new_item.cart_item).first()
                         
-                        new_points =  order.total_points
+                        if existing_order_item:
+                            # دمج الكميات وتحديث السعر إذا كانت العناصر موجودة بالفعل في الطلب
+                            existing_order_item.qty += new_item.qty
+                            existing_order_item.price = new_item.cart_item.product_item.product.get_price()  # تحديث السعر بناءً على الكمية الجديدة
+                            existing_order_item.points = new_item.cart_item.product_item.product.bonus
+                            existing_order_item.save()
 
-                        # خصم النقاط الخاصة بالطلب قبل التعديل اذا كان الطلب مسلم بالفعل 
-                        if order.status == 'delivered':
-                            profile = UserProfile.objects.get(user=user)
-                            change = 0  
-                            
-                            if new_points > old_points: # اضافة الفارق الى نقاط المستخدم
-                                change = new_points - old_points
-                                profile.points += change
-                                
-                            elif new_points < old_points: # خصم الفارق من نقاط المستخدم
-                                change = old_points - new_points
-                                profile.points -= change
+                            # إزالة العنصر القديم
+                            item.delete()
 
-                        
-                        profile.save() # تعديل النقاط
-                        order.save() # تعديل الاجمالي للطلب    
-                        # إذا كانت العملية ناجحة:
-                        return JsonResponse({'success': True, 'message': 'تم استبدال المنتج بنجاح'})
-                                        
-                except :
-                    return JsonResponse({'success': False, 'error': 'المنتج المستبدل غير موجود'  })             
-            except :
-                return JsonResponse({'success': False, 'error': 'الطلب الذي تحاول تعديله غير صالح' }) 
+                        else:
+                            # استبدال العنصر القديم بالجديد
+                            item.order_item = new_item.cart_item
+                            item.qty = new_item.qty
+                            item.price = new_item.cart_item.product_item.product.get_price()
+                            item.points = new_item.cart_item.product_item.product.bonus
+                            item.save()
+
+                    # تحديث إجمالي الطلب
+                    order.old_total = sum([i.price * i.qty for i in order.order_items.all()])
+                    order.total_price = order.old_total + order.dlivery_price - order.discount_amount
+                    order.total_points = sum([i.points * i.qty for i in order.order_items.all()])
+                    
+                    # التحقق من أن السعر الإجمالي لا يمكن أن يكون أقل من الصفر
+                    if order.total_price < 0:
+                        order.total_price = 0
+                    
+                    order.save()
+
+                    # تعديل النقاط إذا كان الطلب قد تم تسليمه بالفعل
+                    if order.status == 'delivered':
+                        profile = UserProfile.objects.get(user=user)
+                        profile.points = order.total_points  # تعديل النقاط بناءً على الطلب المعدل
+                        profile.save()
+
+                    return JsonResponse({'success': True, 'message': 'تم تعديل المنتج بنجاح'})
+
+                except OrderItem.DoesNotExist:
+                    return JsonResponse({'success': False, 'error': 'المنتج المستبدل غير موجود'})
+            except Order.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'الطلب الذي تحاول تعديله غير صالح'})
         else:
-            # إذا كانت البيانات مفقودة أو غير صالحة:
-            return JsonResponse({'success': False, 'error': 'نعتذر يبدو انه هنالك بيانات ناقصة'})
+            # إذا كانت البيانات مفقودة أو غير صالحة
+            return JsonResponse({'success': False, 'error': 'نعتذر، يبدو أن هناك بيانات ناقصة'})
 
-    # إذا كان الطلب ليس POST:
+    # إذا كان الطلب ليس POST
     return JsonResponse({'success': False, 'error': 'طريقة وصول خاطئة'})
 # دالة انشاء طلب من صفحة السلة
 @login_required
