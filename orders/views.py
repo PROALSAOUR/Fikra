@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from orders.models import *
 from cards.models import GiftItem, CoponUsage
 from store.models import Cart
+from accounts.models import UserProfile
 from django.utils import timezone
 
 # دالة عرض الطلبات
@@ -184,6 +185,10 @@ def edit_order(request):
                     if new_item.cart_item.stock <= 0: #  تحقق من المنتج  الجديد هل متاح
                         return JsonResponse({'success': False, 'error': 'المنتج المستبدل غير متاح حاليا'})
                     else:
+                        
+                        
+                        old_points =  order.total_points
+                        
                         # ازالة بيانات القديم من الطلب
                         order.old_total -= item.price * item.qty
                         order.total_price = order.old_total + order.dlivery_price - order.discount_amount
@@ -196,14 +201,31 @@ def edit_order(request):
                         item.points = parent_product.bonus
                         
                         item.save()
-                        
+                        order.save() # تعديل الاجمالي للطلب    
+
                         # تحديث بيانات الطلب وفقا  للجديد
                         order.old_total += item.price * item.qty
                         order.total_price = order.old_total + order.dlivery_price - order.discount_amount
                         order.total_points += item.points * item.qty
                         
-                        order.save() # تعديل الاجمالي للطلب
+                        new_points =  order.total_points
+
+                        # خصم النقاط الخاصة بالطلب قبل التعديل اذا كان الطلب مسلم بالفعل 
+                        if order.status == 'delivered':
+                            profile = UserProfile.objects.get(user=user)
+                            change = 0  
+                            
+                            if new_points > old_points: # اضافة الفارق الى نقاط المستخدم
+                                change = new_points - old_points
+                                profile.points += change
+                                
+                            elif new_points < old_points: # خصم الفارق من نقاط المستخدم
+                                change = old_points - new_points
+                                profile.points -= change
+
                         
+                        profile.save() # تعديل النقاط
+                        order.save() # تعديل الاجمالي للطلب    
                         # إذا كانت العملية ناجحة:
                         return JsonResponse({'success': True, 'message': 'تم استبدال المنتج بنجاح'})
                                         
