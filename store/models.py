@@ -155,6 +155,7 @@ class Product(models.Model):
     bonus =  models.IntegerField(blank=True, null=True, default=20)
     offer = models.BooleanField(default=False)
     ready_to_sale = models.BooleanField(default=False)
+    total_sales = models.IntegerField(blank=True, null=True, default=0)
     upload_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)     
     
@@ -197,7 +198,10 @@ class Product(models.Model):
         for item in self.items.all():
             for variation in item.variations.all():
                 total_sales_count  += variation.sold
-        return total_sales_count 
+        
+        self.total_sales =  total_sales_count
+        self.save()
+    
     
     class Meta:
         verbose_name = 'منتج'

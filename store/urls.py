@@ -13,6 +13,8 @@ urlpatterns = [
     path("ad-details/<slug:slug>/", ads_page, name="ad_details"),
     
     path("offer/", offer_page, name="offer_page"),
+    
+    path("best-sales/", best_sales, name="best-sales"),
         
     path("search/", search_page, name="search_page"),
     

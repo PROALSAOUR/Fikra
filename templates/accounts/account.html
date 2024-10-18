@@ -6,12 +6,12 @@
     <div class="account-page" style="position: relative;">
         <!-- Start Ponits Section -->
         <div class="account-points">
-            <a href="">
+            <a href="#">
                 <div class="container">
                     <div class="my-points">
                         <h3>نقاطي:</h3>
                         <div class="points">
-                            <a href="">
+                            <a href="#">
                                 <span>{{ user_points }}</span>
                                 <i class="fa-solid fa-gem"></i>                
                             </a>
@@ -129,9 +129,9 @@
         <!-- Start Products Section -->
         <hr class="sep">
         <section  id="products">
-            <a href="{% url 'store:category' 'all' %}">
+            <a href="{% url 'store:best-sales' %}">
                 <div class="title">
-                    <h2> منتجات من اجلك</h2>
+                    <h2>المنتجات الاعلى مبيعا</h2>
                     <i class="fa-solid fa-angles-left"></i>
                 </div>
             </a>  
@@ -146,8 +146,6 @@
         <!-- End Products Section -->
     </div>
       
-      
-            
       
       
 {% endblock content %}

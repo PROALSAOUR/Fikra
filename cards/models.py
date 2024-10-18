@@ -1,12 +1,15 @@
 from django.db import models
+from django.utils import timezone
 from django.utils.timezone import now  # لجلب التاريخ الحالي
 from shortuuid.django_fields import ShortUUIDField
 from store.models import Tag
 import string
-from accounts.models import User
+from accounts.models import User, Message, UserProfile 
 from django.utils.html import mark_safe
 from django.core.exceptions import ValidationError
 from datetime import timedelta
+
+
 
 
 # ============================= Cards ====================================
@@ -53,7 +56,6 @@ class CoponUsage(models.Model):
     purchase_date = models.DateTimeField(auto_now_add=True)  # وقت شراء الرمز
     expire = models.DateField(null=True, blank=True)
     
-    
     def is_expire(self):
         if self.expire:
             if self.expire >= now().date():
@@ -74,10 +76,11 @@ class CoponUsage(models.Model):
     
     def __str__(self):
         return f"{self.user.first_name} - {self.copon_code.code}"
-    
+        
     class Meta:
         verbose_name = 'سجلات شراء الكوبونات'
         verbose_name_plural = 'سجلات شراء الكوبونات'
+    
 
 class Gift(models.Model):
     code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_uppercase + string.digits)
@@ -179,4 +182,5 @@ class GiftDealing(models.Model):
         verbose_name = 'ايصال هدية'
         verbose_name_plural = 'ايصال هدايا'
       
-# =======================================================================
+# ================== Functions ================================================
+

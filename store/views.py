@@ -259,6 +259,33 @@ def offer_page(request):
     }
     return render(request, 'store/offer-products.html', context)
 # ===================================================
+# صفحة اعلى المبيعات
+def best_sales(request):
+    products = Product.objects.filter(ready_to_sale=True, total_sales__gt=0).prefetch_related('items__variations').order_by('-total_sales')
+    products_count = products.count()
+    
+    paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
+    page = request.GET.get('page', 1)
+
+    try:
+        best_products = paginator.page(page)
+    except PageNotAnInteger:
+        best_products = paginator.page(1)
+    except EmptyPage:
+        best_products = paginator.page(paginator.num_pages)
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        results_data = list(best_products.object_list.values())
+        return JsonResponse({'results': results_data})
+    
+    
+    context  ={
+        'best_products': best_products,
+        'products_count': products_count,
+    }
+    return render(request, 'store/best-sales.html', context)
+
+# ===================================================
 # صفحة البحث
 def search_page(request):
     query = request.GET.get('q', '')

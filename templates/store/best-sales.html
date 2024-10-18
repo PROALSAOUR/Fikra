@@ -1,0 +1,82 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="search-page">
+        <div class="search" style='padding-top:100px;'>
+            <div class="search-title" style='background-color:#41723d;'>
+                <div class="title-image">
+                    <img src="{% static "/images/best_sales.jpg" %}" alt="تخفيضات ملابس">
+                </div>
+                <h2 style='color:#ffffff;'>الأعلى مبيعاً 🔥<span style='color:#ffffff;'>({{ products_count }})</span></h2>
+            </div>
+            <!-- Start Offer Products  -->
+            <div id="products-container" class="searched-products">
+                <div class="container">
+                    <div class="products-cards">
+                        {% if best_products %}
+                            {% for product in best_products %}
+                                {% if product.get_total_stock > 0 %}
+                                    <!-- product-start -->
+                                    <div class="specific">
+                                        {% include "common/product-card.html" with product=product %}
+                                    </div>
+                                    <!-- product-end -->
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {% include "common/no-result.html" %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- End Offer Products  -->
+        </div>
+        <!-- Start Pagination -->
+        {% if best_products %}
+            <div class="pagination-container">
+                <div class="container">
+                    <div class="pagination">
+                        <!-- Previous Page Link -->
+                        {% if best_products.has_previous %}
+                            <a href="?page={{ best_products.previous_page_number }}" class="previous">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        {% else %}
+                            <div class="previous disapled">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </div>
+                        {% endif %}
+
+                        <!-- Page Number Display -->
+                        <div class="page-number">
+                            <span class="in-page">{{ best_products.number }}</span>
+                            <span class="from">من</span>
+                            <span class="total-pages">{{ best_products.paginator.num_pages }}</span>
+                        </div>
+
+                        <!-- Next Page Link -->
+                        {% if best_products.has_next %}
+                            <a href="?page={{ best_products.next_page_number }}" class="next">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </a>
+                        {% else %}
+                            <div class="next disapled">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <!-- End Pagination -->
+    </div>
+{% endblock content %}
+
+        
+
+
+
+
+
+

@@ -20,7 +20,8 @@ def main_account_page(request):
 
     
     # استدعاء المنتجات التي ستعرض اسفل الصفحة
-    products = Product.objects.filter(ready_to_sale=True).order_by('updated_at')[:8]
+    products = Product.objects.filter(ready_to_sale=True, total_sales__gt=0).prefetch_related('items__variations').order_by('-total_sales')[:8]
+
     
     context = {
         'products' : products ,
