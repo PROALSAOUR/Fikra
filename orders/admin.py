@@ -52,10 +52,50 @@ class MyOrdersAdmin(admin.ModelAdmin):
             return format_html('<span style="color: red;">{}</span>', obj.get_status_display())
         elif obj.status == 'delivered':
             return format_html('<span style="color:#28a745; font-weight:900;">{}</span>', obj.get_status_display())
-        else:
+        elif obj.status == 'shipped':
+             return format_html('<span style="color:#215ee1; font-weight:900;">{}</span>', obj.get_status_display())
+        elif obj.status == 'checking':
+             return format_html('<span style="color:#ff7623; font-weight:900;">{}</span>', obj.get_status_display())
+        else: # status = pending
             return format_html('<span style="color:#e1d221; font-weight:900;">{}</span>', obj.get_status_display())
-    colored_status.short_description = 'status'  
+    colored_status.short_description = 'status'   
+
+class DealingInline(admin.TabularInline):
+    model = DealingItem
+    extra = 0  # عدم إظهار حقول إضافية
+    readonly_fields = ('old_item', 'new_item', 'new_qty', 'price_difference', 'status', ) 
+    fields = ('old_item', 'new_item', 'new_qty', 'price_difference', 'is_dealt', 'status' )  # تحديد ترتيب الحقول
+    can_delete = False  # منع حذف العناصر
+    max_num = 0  # منع إضافة عناصر جديدة
+    show_change_link = True  
     
+class DealingAdmin(admin.ModelAdmin):
+    list_display = ('order__user', 'order', 'status', 'get_modifications', 'is_dealt', 'created_at', )    
+    search_fields = ('order__user__phone_number', )
+    list_filter = ('order', 'is_dealt',)
+    ordering = ('-updated_at', '-created_at',)
+    readonly_fields = ( 'order', 'total_price_difference', 'created_at', 'updated_at',)
+    inlines = [DealingInline] 
     
+    def get_modifications(self, obj):
+        return obj.modifications_numbers()
+    get_modifications.short_description = 'edits'
+
+  
+    def status(self, obj):
+        """إرجاع الحالة مع تلوين خاص بناءً على القيمة."""
+        if obj.order.status == 'canceled':
+            return format_html('<span style="color: red;">{}</span>', obj.order.get_status_display())
+        elif obj.order.status == 'delivered':
+            return format_html('<span style="color:#28a745; font-weight:900;">{}</span>', obj.order.get_status_display())
+        elif obj.order.status == 'shipped':
+             return format_html('<span style="color:#215ee1; font-weight:900;">{}</span>', obj.order.get_status_display())
+        elif obj.order.status == 'checking':
+             return format_html('<span style="color:#ff7623; font-weight:900;">{}</span>', obj.order.get_status_display())
+        else: # status = pending
+            return format_html('<span style="color:#e1d221; font-weight:900;">{}</span>', obj.order.get_status_display())
+    status.short_description = 'order status'   
+
 admin.site.register(Order, MyOrdersAdmin)
 admin.site.register(DliveryPrice, DliveryPriceAdmin)
+admin.site.register(OrderDealing, DealingAdmin)

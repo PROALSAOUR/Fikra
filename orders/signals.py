@@ -39,23 +39,5 @@ def update_user_points(sender, instance, **kwargs):
         # إضافة تاريخ التسليم إلى الطلب
         instance.deliverey_date = timezone.now()
 
-    elif previous_order.status == 'delivered' and instance.status == 'canceled':
-        # خصم النقاط من المستخدم
-        user_profile.points -= instance.total_points
-        user_profile.save()
-
-        # إنشاء رسالة جديدة وإضافتها إلى صندوق الوارد
-        message = Message(
-            subject= f'تم خصم نقاط الطلب [{str(instance.serial_number).zfill(6)}] !',
-            content= 
-            f"""
-            مرحبا {instance.user} 
-            لقد تم خصم النقاط التابعة للطلب [{str(instance.serial_number).zfill(6)}]  الذي الغيته والتي قيمتها {instance.total_points} نقطة من حسابك, 
-            نرجو لك وقتا سعيداً.
-            """,
-            timestamp=timezone.now()
-            )
-        message.save()
-        user_inbox.messages.add(message)
 
     user_inbox.save()  # حفظ تحديثات صندوق الوارد

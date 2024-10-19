@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.html import mark_safe
 from store.models import ProductVariation
+from django.core.exceptions import ValidationError
 from accounts.models import User
        
 class DliveryPrice(models.Model):
@@ -18,7 +19,7 @@ class Order(models.Model):
     ORDER_STATUS = [
         ('pending', 'جاري المعالجة'),
         ('checking', 'جاري التجهيز'),
-        ('shipped', 'تم الشحن'),
+        ('shipped', 'جاري الشحن'),
         ('delivered', 'تم التسليم'),
         ('canceled', 'تم الإلغاء'),
     ]
@@ -63,7 +64,7 @@ class Order(models.Model):
         super().save(*args, **kwargs)  # استدعاء دالة الحفظ الأساسية
 
     def __str__(self):
-        return f"طلب من {self.user} [{self.user.phone_number}]"
+        return f"طلب رقم [{self.serial_number}] من [{self.user.phone_number}]"
 
     class Meta:
         verbose_name = 'طلب '
@@ -78,5 +79,82 @@ class OrderItem(models.Model):
     
     def __str__(self):
         return f"{self.order_item.product_item.product.name}"
+ 
+class OrderDealing(models.Model):
+    order = models.OneToOneField(Order, on_delete=models.CASCADE)
+    is_dealt = models.BooleanField(default=False)
+    total_price_difference = models.IntegerField(default=0, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
+    def update_total_price_difference_and_is_dealt(self):
+        # لأنو اذا ما كان مستلم لسا مافي داعي نعمل تغيير بالسعر لأنو اصلا مادفع
+        if self.order.status == 'delivered' :  
+            # حساب مجموع price_difference لجميع DealingItem المرتبطة
+            total_price_diff = sum(
+                deal.price_difference for deal in self.deals.all() 
+                if deal.price_difference is not None and not deal.is_dealt
+            )
+            self.total_price_difference = total_price_diff
+                   
+        # تحقق من حالة is_dealt لجميع DealingItem المرتبطة
+        if all(deal.is_dealt for deal in self.deals.all()):
+            self.is_dealt = True
+        else:
+            self.is_dealt = False
 
+        # حفظ التحديثات
+        self.save()
+
+    def modifications_numbers(self):
+        # حساب عدد DealingItem المرتبطة بـ OrderDealing
+        return self.deals.count()
+    
+    def save(self, *args, **kwargs):
+        if self.order.status != 'delivered':
+            self.total_price_difference = None
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"ملخص تعديلات الطلب {self.order.serial_number} "
+
+    class Meta:
+        verbose_name = 'عملية تعديل الطلب'
+        verbose_name_plural = 'عمليات تعديل الطلب'
+ 
+class DealingItem(models.Model):
+    
+    Dealing_status = [
+        ('return', 'إرجاع'),
+        ('replace', 'إستبدال'),
+    ]
+    
+    order_dealing = models.ForeignKey(OrderDealing, on_delete=models.CASCADE, related_name='deals')
+    old_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='old_deals')
+    new_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='new_deals', null=True, blank=True)
+    new_qty = models.IntegerField(null=True, blank=True)
+    price_difference = models.IntegerField(null=True, blank=True)  # تم تعديل التسمية
+    is_dealt = models.BooleanField(default=False) # هل تم تنفيذ عملية التعديل  
+    status = models.CharField(max_length=20, choices=Dealing_status, blank=True)  # تمت إضافة choices و blank=True
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def clean(self):
+        if self.status == 'replace':
+            if not self.new_item or not self.new_qty:
+                raise ValidationError("عند الاستبدال، يجب توفير المنتج الجديد والكمية الجديدة.")
+        elif self.status == 'return':
+            self.new_item = None
+            self.new_qty = None
+
+    def save(self, *args, **kwargs):
+        # حفظ DealingItem أولاً
+        super().save(*args, **kwargs)
+        
+        # تحديث total_price_difference و is_dealt في OrderDealing
+        self.order_dealing.update_total_price_difference_and_is_dealt()
+
+    def __str__(self) -> str:
+        return f'{self.order_dealing.order.user} => {self.order_dealing.order.serial_number}'
+    
+    

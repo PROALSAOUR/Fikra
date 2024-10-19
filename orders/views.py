@@ -141,6 +141,23 @@ def remove_order_item(request):
                     order.total_points -= order_item.points * order_item.qty
                   
                 order.save()  
+                
+                # انشاء معاملة لإخبار الموظفين انه هنالك عملية إلغاء منتجات حصلت
+                dealing, created = OrderDealing.objects.get_or_create(order=order)
+                
+                DealingItem.objects.create(
+                    order_dealing= dealing,
+                    old_item = product_variant,
+                    status = 'return',
+                    price_difference = 0,
+                    )
+                
+                dealing.save()
+                
+                
+              
+                
+                
                 return JsonResponse({'success': True, 'message':'تمت ازالة المنتج من الطلب بنجاح' })
                   
         
@@ -216,6 +233,9 @@ def edit_order(request):
                             item.points = new_item.cart_item.product_item.product.bonus
                             item.save()
 
+                    # تخزين السعر القديم للطلب قبل التعديل  لإستعماله في جلب الفارق بين المنتجين المعدلين
+                    old_total =  order.total_price  
+                        
                     # تحديث إجمالي الطلب
                     order.old_total = sum([i.price * i.qty for i in order.order_items.all()])
                     order.total_price = order.old_total + order.dlivery_price - order.discount_amount
@@ -224,6 +244,9 @@ def edit_order(request):
                     # التحقق من أن السعر الإجمالي لا يمكن أن يكون أقل من الصفر
                     if order.total_price < 0:
                         order.total_price = 0
+                        
+                    # تخزين السعر الجديد للطلب بعد التعديل  لإستعماله في جلب الفارق بين المنتجين المعدلين
+                    new_total =  order.total_price
                     
                     order.save()
 
@@ -232,6 +255,35 @@ def edit_order(request):
                         profile = UserProfile.objects.get(user=user)
                         profile.points = order.total_points  # تعديل النقاط بناءً على الطلب المعدل
                         profile.save()
+                        
+                    
+                    
+                    # **تحديث المخزون والمبيعات**
+                    if old_variation and old_variation.stock + item.qty <= old_variation.stock:
+                        old_variation.update_stock(item.qty)  # إضافة الكمية المبيعة للمنتج القديم إلى المخزون
+                        old_variation.sold -= item.qty  # خصم الكمية من المبيعات
+
+                    if new_variation and new_item.qty > 0:
+                        new_variation.sell(new_item.qty)  # إضافة الكمية الخاصة بالمنتج الجديد إلى المبيعات
+                        new_variation.update_stock(-new_item.qty)  # خصم الكمية من المخزون
+                    
+                    
+                        
+                    # انشاء معاملة لإخبار الموظفين انه هنالك عملية إلغاء منتجات حصلت
+                    dealing, created = OrderDealing.objects.get_or_create(order=order)
+                
+                    DealingItem.objects.create(
+                        order_dealing= dealing,
+                        old_item = old_variation,
+                        new_item = new_variation,
+                        new_qty = item.qty,
+                        status = 'replace',
+                        price_difference = new_total - old_total,
+                    )
+                
+                    dealing.save()
+
+                        
 
                     return JsonResponse({'success': True, 'message': 'تم تعديل المنتج بنجاح'})
 

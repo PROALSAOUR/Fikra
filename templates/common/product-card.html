@@ -7,7 +7,7 @@
                     <span>تخفيض </span>
                 {% endif %}
             </div>
-            <img src="{{ product.thumbnail_img.url }}" alt="{{ product.name}}">
+            <img src="{{ product.thumbnail_img.url }}" alt="{{ product.name}}" loading="lazy">
         </div>
         <div class="product-info">
             <h4 class="product-name"> {{ product.name|slice:":20" }}{% if product.name|length > 20 %}...{% endif %}</h4> <!-- اقصى طول 20 حرف -->
