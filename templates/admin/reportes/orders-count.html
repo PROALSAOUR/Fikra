@@ -1,0 +1,124 @@
+{% extends "admin/base_site.html" %}
+
+
+{% block content %}
+
+    {% comment %} daily chart {% endcomment %}
+    <h1 style="text-align:center;width:100%;color:#B18E4B;font-size:24px;" >عدد الطلبات  يوميا</h1>
+    <div id="daily-chart" data-list="{{ daily_stats }}" style="width:90%;margin:10px auto 0;"></div>
+    <hr style="width:100%;background-color:#B18E4B;height: 2px;" >
+
+    {% comment %} weekly chart {% endcomment %}
+    <h1 style="text-align:center;width:100%;color:#B18E4B;font-size:24px;" >عدد الطلبات  اسبوعياً</h1>
+    <div id="weekly-chart" data-list="{{ weekly_stats }}" style="width:90%;margin:10px auto 0;"></div>
+    <hr style="width:100%;background-color:#B18E4B;height: 2px;" >
+
+    {% comment %} monthly chart {% endcomment %}
+    <h1 style="text-align:center;width:100%;color:#B18E4B; margin-top:20px;font-size:24px;" >عدد الطلبات  شهريا</h1>
+    <div id="monthly-chart" data-list="{{ monthly_stats }}" style="width:90%;margin:10px auto 0;"></div>
+    <hr style="width:100%;background-color:#B18E4B;height: 2px;" >
+
+    {% comment %} yearly chart {% endcomment %}
+    <h1 style="text-align:center;width:100%;color:#B18E4B; margin-top:20px;font-size:24px;" >عدد الطلبات  سنوياً</h1>
+    <div id="yearly-chart" data-list="{{ yearly_stats }}" style="width:90%;margin:10px auto 0;"></div>
+    <hr style="width:100%;background-color:#B18E4B;height: 2px;" >
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        // Daily chart
+        const daily_stats = JSON.parse(document.getElementById('daily-chart').dataset.list);
+        const uniqueDates = [...new Set(daily_stats.map(e => `${e.year}-${e.month}-${e.day}`))];
+
+        const deliveredData = uniqueDates.map(date => {
+            const statsForDate = daily_stats.filter(e => `${e.year}-${e.month}-${e.day}` === date && e.status === 'delivered');
+            return statsForDate.reduce((acc, e) => acc + e.order_count, 0);
+        });
+
+        const canceledData = uniqueDates.map(date => {
+            const statsForDate = daily_stats.filter(e => `${e.year}-${e.month}-${e.day}` === date && e.status === 'canceled');
+            return statsForDate.reduce((acc, e) => acc + e.order_count, 0);
+        });
+
+        const daily_chart = new ApexCharts(document.querySelector("#daily-chart"), {
+            chart: { type: 'bar', height: 350 },
+            series: [{ name: 'Delivered', data: deliveredData }, { name: 'Canceled', data: canceledData }],
+            xaxis: { categories: uniqueDates },
+            plotOptions: { bar: { horizontal: false, columnWidth: '50%' } },
+            colors: ['#00E396', '#FF4560']
+        });
+        daily_chart.render();
+
+        // Weekly chart
+        const weekly_stats = JSON.parse(document.getElementById('weekly-chart').dataset.list);
+        const weeks = [...new Set(weekly_stats.map(e => `${e.year}-W${e.week}`))];
+
+        const weekly_delivered = weeks.map(week => {
+            const statsForWeek = weekly_stats.filter(e => `${e.year}-W${e.week}` === week && e.status === 'delivered');
+            return statsForWeek.reduce((acc, e) => acc + e.order_count, 0);
+        });
+
+        const weekly_canceled = weeks.map(week => {
+            const statsForWeek = weekly_stats.filter(e => `${e.year}-W${e.week}` === week && e.status === 'canceled');
+            return statsForWeek.reduce((acc, e) => acc + e.order_count, 0);
+        });
+
+        const weekly_chart = new ApexCharts(document.querySelector("#weekly-chart"), {
+            chart: { type: 'bar', height: 350 },
+            series: [{ name: 'Delivered', data: weekly_delivered }, { name: 'Canceled', data: weekly_canceled }],
+            xaxis: { categories: weeks },
+            plotOptions: { bar: { horizontal: false, columnWidth: '50%' } },
+            colors: ['#00E396', '#FF4560']
+        });
+        weekly_chart.render();
+
+        // Monthly chart
+        const monthly_stats = JSON.parse(document.getElementById('monthly-chart').dataset.list);
+        const months = [...new Set(monthly_stats.map(e => `${e.year}-${e.month}`))];
+
+        const monthly_delivered = months.map(month => {
+            const statsForMonth = monthly_stats.filter(e => `${e.year}-${e.month}` === month && e.status === 'delivered');
+            return statsForMonth.reduce((acc, e) => acc + e.order_count, 0);
+        });
+
+        const monthly_canceled = months.map(month => {
+            const statsForMonth = monthly_stats.filter(e => `${e.year}-${e.month}` === month && e.status === 'canceled');
+            return statsForMonth.reduce((acc, e) => acc + e.order_count, 0);
+        });
+
+        const monthly_chart = new ApexCharts(document.querySelector("#monthly-chart"), {
+            chart: { type: 'bar', height: 350 },
+            series: [{ name: 'Delivered', data: monthly_delivered }, { name: 'Canceled', data: monthly_canceled }],
+            xaxis: { categories: months },
+            plotOptions: { bar: { horizontal: false, columnWidth: '50%' } },
+            colors: ['#00E396', '#FF4560']
+        });
+        monthly_chart.render();
+
+        // Yearly chart
+        const yearly_stats = JSON.parse(document.getElementById('yearly-chart').dataset.list);
+        const years = [...new Set(yearly_stats.map(e => e.year))];
+
+        const yearly_delivered = years.map(year => {
+            const statsForYear = yearly_stats.filter(e => e.year === year && e.status === 'delivered');
+            return statsForYear.reduce((acc, e) => acc + e.order_count, 0);
+        });
+
+        const yearly_canceled = years.map(year => {
+            const statsForYear = yearly_stats.filter(e => e.year === year && e.status === 'canceled');
+            return statsForYear.reduce((acc, e) => acc + e.order_count, 0);
+        });
+
+        const yearly_chart = new ApexCharts(document.querySelector("#yearly-chart"), {
+            chart: { type: 'bar', height: 350 },
+            series: [{ name: 'Delivered', data: yearly_delivered }, { name: 'Canceled', data: yearly_canceled }],
+            xaxis: { categories: years },
+            plotOptions: { bar: { horizontal: false, columnWidth: '50%' } },
+            colors: ['#00E396', '#FF4560']
+        });
+        yearly_chart.render();
+    </script>
+
+    
+    
+{% endblock content %}

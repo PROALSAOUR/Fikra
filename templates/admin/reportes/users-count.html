@@ -1,0 +1,75 @@
+{% extends "admin/base_site.html" %}
+
+
+{% block content %}
+
+    {% comment %} weekly chart {% endcomment %}
+    <h1 style="text-align:center;width:100%;color:#B18E4B;font-size:24px;" >عدد المستخدمين  اسبوعياً</h1>
+    <div id="weekly-chart" data-list="{{ weekly_stats }}" style="width:90%;margin:10px auto 0;"></div>
+    <hr style="width:100%;background-color:#B18E4B;height: 2px;" >
+
+    {% comment %} monthly chart {% endcomment %}
+    <h1 style="text-align:center;width:100%;color:#B18E4B; margin-top:20px;font-size:24px;" >عدد المستخدمين  شهريا</h1>
+    <div id="monthly-chart" data-list="{{ monthly_stats }}" style="width:90%;margin:10px auto 0;"></div>
+    <hr style="width:100%;background-color:#B18E4B;height: 2px;" >
+
+    {% comment %} yearly chart {% endcomment %}
+    <h1 style="text-align:center;width:100%;color:#B18E4B; margin-top:20px;font-size:24px;" >عدد المستخدمين  سنوياً</h1>
+    <div id="yearly-chart" data-list="{{ yearly_stats }}" style="width:90%;margin:10px auto 0;"></div>
+    <hr style="width:100%;background-color:#B18E4B;height: 2px;" >
+    
+
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        const weekly_stats = JSON.parse(document.getElementById('weekly-chart').dataset.list);
+        const monthly_stats = JSON.parse(document.getElementById('monthly-chart').dataset.list);
+        const yearly_stats = JSON.parse(document.getElementById('yearly-chart').dataset.list);
+    
+        const weekly_chart = new ApexCharts(document.querySelector("#weekly-chart"),{
+            chart: {
+                type: 'line',
+                height: 200
+            },
+            series: [{
+                name: 'عدد المستخدمين',
+                data: weekly_stats.map(e => e.user_count)
+            }],
+            xaxis: {
+                categories: weekly_stats.map(e => `${e.year}/W${e.week}`)
+            }
+        });
+        weekly_chart.render();
+    
+        const monthly_chart = new ApexCharts(document.querySelector("#monthly-chart"),{
+            chart: {
+                type: 'line',
+                height: 200
+            },
+            series: [{
+                name: 'عدد المستخدمين',
+                data: monthly_stats.map(e => e.user_count)
+            }],
+            xaxis: {
+                categories: monthly_stats.map(e => `${e.year}-${e.month}`)
+            }
+        });
+        monthly_chart.render();
+    
+        const yearly_chart = new ApexCharts(document.querySelector("#yearly-chart"),{
+            chart: {
+                type: 'line',
+                height: 200
+            },
+            series: [{
+                name: 'عدد المستخدمين ',
+                data: yearly_stats.map(e => e.user_count)
+            }],
+            xaxis: {
+                categories: yearly_stats.map(e => e.year)
+            }
+        });
+        yearly_chart.render();
+    </script>
+    
+{% endblock content %}
