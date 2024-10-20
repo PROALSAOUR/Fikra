@@ -1,0 +1,47 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+
+    {{ block.super }}
+
+    {% comment %} <hr style="width:100%;background-color:#B18E4B;height:1px;margin:20px auto 20px;" > {% endcomment %}
+    <h1 style="text-align:center;width:90%;color:#B18E4B;font-size:24px;" >نسبة مشاركة الشركاء</h1>
+    <div id="partners-donut" style="width:90%;margin:10px auto 0;"></div>
+    <hr style="width:100%;background-color:#B18E4B;height: 2px;" >
+
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    
+    <script>
+        // جلب البيانات من الـ context الخاص بـ Django
+        const partnerData = JSON.parse('{{ partner_data|escapejs }}');
+        const names = partnerData.map(partner => partner.name);
+        const percentages = partnerData.map(partner => partner.share_percentage);
+
+        // إعدادات الرسم البياني على شكل دونات
+        const options = {
+            chart: {
+                type: 'pie',
+                height: 350
+            },
+            series: percentages,
+            labels: names,
+            colors: ['#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0', '#546E7A', '#26A69A', '#D10CE8'],
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 300
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }]
+        };
+
+        const chart = new ApexCharts(document.querySelector("#partners-donut"), options);
+        chart.render();
+    </script>
+
+{% endblock %}

@@ -8,6 +8,8 @@ from django.db.models.functions import ExtractYear, ExtractMonth, ExtractWeek, E
 from django.template.response import TemplateResponse
 from django.utils import timezone
 import json
+from django.utils.html import format_html
+
 
 # دالة عدد المستخدمين الاجمالي
 @admin.register(UserReports)
@@ -99,7 +101,7 @@ class UserReportsAdmin(admin.ModelAdmin):
         context['total_users'] = total_users
         
         return TemplateResponse(request, self.change_list_template, context)
-#========================================================= 
+# ========================================================= 
 # دالة عدد الطلبات
 @admin.register(OrdersCount)
 class OrdersCountAdmin(admin.ModelAdmin):
@@ -162,12 +164,83 @@ class OrdersCountAdmin(admin.ModelAdmin):
         }
 
         return TemplateResponse(request, self.change_list_template, context)
-#========================================================= 
-
-
-
-
-
+# ========================================================= 
+# دالة عرض الشركاء
+class PartnersAdmin(admin.ModelAdmin):
+    list_display = ('name', 'get_percent')
+    search_fields = ('name',)
+    order_by = ('-share_percentage')
     
+    def get_percent(self, obj):
+        return f"{obj.share_percentage:.2f}%"
+    get_percent.short_description = 'النسبة'
 
+    change_list_template = "admin/reportes/partners_changelist.html"  # تخصيص قالب عرض القائمة
+
+    def changelist_view(self, request, extra_context=None):
+        # جلب بيانات الشركاء ونسبهم
+        partners = Partners.objects.all()
+        partner_data = [{"name": partner.name, "share_percentage": float(partner.share_percentage)} for partner in partners]
+
+        extra_context = extra_context or {}
+        extra_context['partner_data'] = json.dumps(partner_data)
+
+        return super().changelist_view(request, extra_context=extra_context)
+# ========================================================= 
+# دالة تكاليف التغليف للطلب الواحد
+class PackagingAdmin(admin.ModelAdmin):
+    list_display = ('bag_price', 'packaging_paper_price', 'thanks_card_price', 'total')
+    readonly_fields = ('total',)
     
+    def has_add_permission(self, request, obj=None):
+        # السماح بالإضافة فقط إذا لم يكن هناك أي صفحة اسئلة موجودة
+        return not Packaging.objects.exists()
+# ========================================================= 
+class CostInline(admin.TabularInline):
+    model = Cost
+    extra = 0  
+    fields = ('title', 'value', 'description')  # تحديد ترتيب الحقول
+    can_delete = True  
+    show_change_link = True  
+    
+class AdditionalInline(admin.TabularInline):
+    model = AdditionalIncome
+    extra = 0  
+    fields = ('title', 'value', 'description')  # تحديد ترتيب الحقول
+    can_delete = True  
+    show_change_link = True  
+
+class PackForMonthInline(admin.TabularInline):
+    model = PackForMonth
+    extra = 0  
+    fields = ('one_order_packing_cost', )  # تحديد ترتيب الحقول
+    can_delete = False  
+    max_num = 0
+    show_change_link = False  
+
+class MonthlyTotalAdmin(admin.ModelAdmin):
+    list_display = ('history', 'total_income', 'show_total_profit' ,'sales_number')
+    search_fields = ('history',)
+    ordering = ('-month', '-year')
+    readonly_fields = ('total_income', 'additional_income', 'total_costs', 'total_packaging', 'goods_price', 'total_profit', 'sales_number',)
+    inlines = [CostInline, AdditionalInline, PackForMonthInline]
+
+    def history(self, obj):
+        return f'{obj.year}/{obj.month}'
+    history.short_description = 'إحصائية شهر'
+
+    def show_total_profit(self, obj):
+        if obj.total_profit:
+            if obj.total_profit > 0:
+                return format_html('<span style="color:#28a745;">{}</span>', obj.total_profit)
+            elif obj.total_profit < 0:
+                return format_html('<span style="color: red;">{}</span>', obj.total_profit)
+            else: # = 0
+                return format_html('<span style="color: #e1d221;">{}</span>', obj.total_profit)
+        else:
+            return '-'
+    show_total_profit.short_description = 'الأرباح'
+
+admin.site.register(Partners, PartnersAdmin)
+admin.site.register(Packaging, PackagingAdmin)
+admin.site.register(MonthlyTotal, MonthlyTotalAdmin)    

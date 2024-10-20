@@ -3,10 +3,10 @@ from django.db import models
 # For Blog pages in the Blog =========================
 
 class BlogPage(models.Model):
-    title = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100, unique=True,)
-    order = models.IntegerField(default=0)
-    image = models.ImageField(upload_to='blog/pages', null=True, blank=True)
+    title = models.CharField(max_length=100, verbose_name='العنوان')
+    slug = models.SlugField(max_length=100, unique=True, verbose_name='slug')
+    order = models.IntegerField(default=0, verbose_name='الترتيب')
+    image = models.ImageField(upload_to='blog/pages', null=True, blank=True , verbose_name='الخلفية')
     
     def __str__(self):
         return self.title
@@ -16,10 +16,10 @@ class BlogPage(models.Model):
         verbose_name_plural = 'صفحات المدونة '
 
 class PageSection(models.Model):
-    blog_page = models.ForeignKey(BlogPage, on_delete=models.CASCADE, related_name='sections' )
-    title = models.CharField(max_length=255)
-    content = models.TextField()
-    order = models.IntegerField(default=100)
+    blog_page = models.ForeignKey(BlogPage, on_delete=models.CASCADE, related_name='sections', verbose_name='الصفحة' )
+    title = models.CharField(max_length=255, verbose_name='العنوان')
+    content = models.TextField(verbose_name='المحتوى')
+    order = models.IntegerField(default=100 , verbose_name='الترتيب')
  
     def __str__(self):
         return self.title
@@ -27,8 +27,8 @@ class PageSection(models.Model):
 # For Question Page in the Blog ======================
 
 class QuestionPage(models.Model):
-    title = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='blog/questions/', null=True, blank=True)
+    title = models.CharField(max_length=100 , verbose_name='العنوان')
+    image = models.ImageField(upload_to='blog/questions/', null=True, blank=True, verbose_name='الخلفية')
 
     def __str__(self):
         return self.title
@@ -38,9 +38,9 @@ class QuestionPage(models.Model):
         verbose_name_plural = 'صفحة الاسئلة '
      
 class QuestionContent(models.Model):
-    questions_page = models.ForeignKey(QuestionPage, on_delete=models.CASCADE, related_name='questions')
-    slug = models.SlugField(max_length=100, unique=True)
-    title = models.CharField(max_length=255)
-    content = models.TextField()
-    order = models.IntegerField(default=100)
+    questions_page = models.ForeignKey(QuestionPage, on_delete=models.CASCADE, related_name='questions', verbose_name='الصفحة')
+    slug = models.SlugField(max_length=100, unique=True, verbose_name='slug')
+    title = models.CharField(max_length=255, verbose_name='العنوان')
+    content = models.TextField( verbose_name='المحتوى')
+    order = models.IntegerField(default=100, verbose_name='الترتيب')
 

@@ -47,10 +47,10 @@ class User(AbstractUser):
         verbose_name_plural = 'مستخدمين'
     
 class Message(models.Model):
-    subject = models.CharField(max_length=250)
-    content = models.TextField()
-    is_read = models.BooleanField(default=False)
-    timestamp = models.DateTimeField(default=timezone.now) 
+    subject = models.CharField(max_length=250 , verbose_name='العنوان')
+    content = models.TextField( verbose_name='المحتوى')
+    is_read = models.BooleanField(default=False , verbose_name='مقروئة؟')
+    timestamp = models.DateTimeField(default=timezone.now , verbose_name='التاريخ') 
 
     
     def __str__(self):
@@ -61,8 +61,8 @@ class Message(models.Model):
         verbose_name_plural = 'رسائل'
 
 class Inbox(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='inbox')
-    messages = models.ManyToManyField(Message, related_name='inboxes')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='inbox', verbose_name='المستخدم')
+    messages = models.ManyToManyField(Message, related_name='inboxes', verbose_name='الرسائل')
 
     def __str__(self):
         return f"Inbox for {self.user}"
@@ -72,11 +72,11 @@ class Inbox(models.Model):
         verbose_name_plural = 'البريد'
     
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    points = models.IntegerField(default=0)
-    inbox = models.OneToOneField(Inbox, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile' , verbose_name='المستخدم')
+    points = models.IntegerField(default=0, verbose_name='الرصيد')
+    inbox = models.OneToOneField(Inbox, on_delete=models.CASCADE, verbose_name='البريد')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الإنشاء')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')
 
     def __str__(self):
         return self.user.first_name
@@ -86,12 +86,12 @@ class UserProfile(models.Model):
         verbose_name_plural = 'بروفايل'
   
 class PointsUsage(models.Model): # تتبع النقاط
-    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    old_points = models.IntegerField()
-    new_points = models.IntegerField()
-    description = models.CharField(max_length=255, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE , verbose_name='البروفايل')
+    old_points = models.IntegerField(verbose_name='الرصيد القديم')
+    new_points = models.IntegerField(verbose_name='الرصيد الجديد')
+    description = models.CharField(max_length=255, blank=True, null=True , verbose_name='التفاصيل')
+    created_at = models.DateTimeField(auto_now_add=True , verbose_name='تاريخ الإنشاء')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')
     
     def __str__(self):
         return f'سجل النقاط الخاص ب: {self.user_profile.user}'

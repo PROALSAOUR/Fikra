@@ -11,22 +11,22 @@ import string
 class AdsSlider(models.Model):
     
     ads_options = [
-        ('category', 'اعلان لتصنيف'),
-        ('one_product', 'اعلان لمنتج معين'),
-        ('special_products', 'اعلان لعدة منتجات خاصة'),
+        ('category', 'تصنيف'),
+        ('one_product', 'منتج معين'),
+        ('special_products', ' منتجات خاصة'),
         ('just_show', 'منظر فقط'),
     ]
     
-    title = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=100, unique=True)
-    img = models.ImageField( upload_to='store/Ads')
-    show = models.BooleanField( default=False)
-    info = models.TextField(null=True, blank=True)
-    ads_for = models.CharField(choices=ads_options, max_length=20, default='special_products')
-    category = models.ForeignKey('Category', null=True, blank=True, related_name='ads', on_delete=models.CASCADE)
-    one_product = models.ForeignKey('Product', null=True, blank=True, related_name='ads', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    title = models.CharField(max_length=255 , verbose_name='العنوان')
+    slug = models.SlugField(max_length=100, unique=True , verbose_name='slug')
+    img = models.ImageField( upload_to='store/Ads' , verbose_name='الصورة')
+    show = models.BooleanField( default=False , verbose_name='عرض')
+    info = models.TextField(null=True, blank=True , verbose_name='الوصف')
+    ads_for = models.CharField(choices=ads_options, max_length=20, default='special_products' , verbose_name='إعلان من اجل ')
+    category = models.ForeignKey('Category', null=True, blank=True, related_name='ads', on_delete=models.CASCADE , verbose_name='اعلان للتصنيف ..')
+    one_product = models.ForeignKey('Product', null=True, blank=True, related_name='ads', on_delete=models.CASCADE , verbose_name='اعلان للمنتج..')
+    created_at = models.DateTimeField(auto_now_add=True , verbose_name='تاريخ الإنشاء')
+    updated_at = models.DateTimeField(auto_now=True , verbose_name='تاريخ التحديث')
     
     def get_ad_url(self):
         if self.ads_for == 'category':
@@ -57,13 +57,13 @@ class AdsSlider(models.Model):
         verbose_name_plural = 'الاعلانات'
     
 class AdsProducts(models.Model):
-    product =  models.ManyToManyField('Product', related_name='products') 
-    Ads_name = models.ForeignKey(AdsSlider, null=True, blank=True, related_name='adsproducts', on_delete=models.CASCADE)
+    product =  models.ManyToManyField('Product', related_name='products' , verbose_name='المنتج') 
+    Ads_name = models.ForeignKey(AdsSlider, null=True, blank=True, related_name='adsproducts', on_delete=models.CASCADE , verbose_name='الإعلان')
    
 class Brand(models.Model):
-    title = models.CharField(max_length=255)
-    img = models.ImageField( upload_to='store/Brands')
-    featured = models.BooleanField(default=False)
+    title = models.CharField(max_length=255 , verbose_name='الاسم')
+    img = models.ImageField( upload_to='store/Brands' , verbose_name='الصورة')
+    featured = models.BooleanField(default=False , verbose_name='مميز')
         
     def __str__(self) -> str:
         return self.title
@@ -79,7 +79,7 @@ class Brand(models.Model):
         verbose_name_plural = 'العلامات تجارية'
 
 class SizeCategory(models.Model):
-    name = models.CharField(max_length=80)
+    name = models.CharField(max_length=80 , verbose_name='اسم الفئة')
     
     def __str__(self) -> str:
         return self.name
@@ -89,8 +89,8 @@ class SizeCategory(models.Model):
         verbose_name_plural = 'فئات المقاسات'
 
 class SizeOption(models.Model):
-    value = models.CharField(max_length=20)
-    size_category = models.ForeignKey(SizeCategory, on_delete=models.CASCADE, related_name='size_options')
+    value = models.CharField(max_length=20 , verbose_name='القيمة')
+    size_category = models.ForeignKey(SizeCategory, on_delete=models.CASCADE, related_name='size_options' , verbose_name='فئة المقاس')
     
     def __str__(self) -> str:
         return self.value
@@ -105,14 +105,14 @@ class Category(models.Model):
         ('hiddin', 'مخفي'),
     ]
     
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100, unique=True)
-    img = models.ImageField( upload_to='store/categories') 
-    gender_cat = models.BooleanField(default=False) 
-    featured = models.BooleanField(default=False)
-    status = models.CharField(choices=status_choices, max_length=20, default='visible')
-    size_category = models.ForeignKey(SizeCategory, on_delete=models.CASCADE, null=True, blank=True)
-    parent_category = models.ForeignKey('self', on_delete=models.CASCADE,  null=True, blank=True)
+    name = models.CharField(max_length=100 , verbose_name='الاسم')
+    slug = models.SlugField(max_length=100, unique=True , verbose_name='slug')
+    img = models.ImageField( upload_to='store/categories' , verbose_name='الصورة') 
+    gender_cat = models.BooleanField(default=False , verbose_name='تصنيف جنسي؟') 
+    featured = models.BooleanField(default=False , verbose_name='مميز؟')
+    status = models.CharField(choices=status_choices, max_length=20, default='visible' , verbose_name='الظهور')
+    size_category = models.ForeignKey(SizeCategory, on_delete=models.CASCADE, null=True, blank=True , verbose_name='فئة المقاس')
+    parent_category = models.ForeignKey('self', on_delete=models.CASCADE,  null=True, blank=True , verbose_name='التصنيف الأب')
     
     def category_image(self):
         return mark_safe("<img src='%s' width='50' height='50'/>" % (self.img.url) )
@@ -128,7 +128,7 @@ class Category(models.Model):
         verbose_name_plural = 'التصنيفات'
 
 class Tag(models.Model):
-    name = models.CharField(max_length=20, blank=True)
+    name = models.CharField(max_length=20, blank=True , verbose_name='الإسم')
     
     def __str__(self) -> str:
         return self.name
@@ -141,23 +141,23 @@ class Tag(models.Model):
         verbose_name_plural = 'هاشتاج'
 
 class Product(models.Model):
-    pid = ShortUUIDField(unique=True, length=12, max_length=30, prefix='pr', alphabet= string.ascii_lowercase + string.digits)
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-    brand = models.ForeignKey(Brand, related_name='products', on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
-    tag = models.ManyToManyField(Tag, related_name='products')
-    thumbnail_img = models.ImageField(upload_to='store/Products/thumbnails')
-    featured = models.BooleanField(default=False)
-    purchase_price =  models.IntegerField(default=0) 
-    price = models.IntegerField(default=0) 
-    new_price = models.DecimalField(decimal_places=2, max_digits=10, blank=True, null=True)
-    bonus =  models.IntegerField(blank=True, null=True, default=20)
-    offer = models.BooleanField(default=False)
-    ready_to_sale = models.BooleanField(default=False)
-    total_sales = models.IntegerField(blank=True, null=True, default=0)
-    upload_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)     
+    pid = ShortUUIDField(unique=True, length=12, max_length=30, prefix='pr', alphabet= string.ascii_lowercase + string.digits , verbose_name='المعرف')
+    name = models.CharField(max_length=255 , verbose_name='الاسم')
+    description = models.TextField(verbose_name='الوصف')
+    brand = models.ForeignKey(Brand, related_name='products', on_delete=models.CASCADE , verbose_name='البراند')
+    category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE , verbose_name='التصنيف')
+    tag = models.ManyToManyField(Tag, related_name='products' , verbose_name='الهاشتاج')
+    thumbnail_img = models.ImageField(upload_to='store/Products/thumbnails' , verbose_name='صورة العرض')
+    featured = models.BooleanField(default=False , verbose_name='مميز؟')
+    purchase_price =  models.IntegerField(default=0 , verbose_name='سعر الشراء') 
+    price = models.IntegerField(default=0 , verbose_name='سعر البيع') 
+    new_price = models.DecimalField(decimal_places=2, max_digits=10, blank=True, null=True , verbose_name='سعر التخفيض')
+    bonus =  models.IntegerField(blank=True, null=True, default=20 , verbose_name='المكافأة')
+    offer = models.BooleanField(default=False , verbose_name='مخفض؟')
+    ready_to_sale = models.BooleanField(default=False , verbose_name='معروض؟')
+    total_sales = models.IntegerField(blank=True, null=True, default=0 , verbose_name='إجمالي البيع')
+    upload_at = models.DateTimeField(auto_now_add=True , verbose_name='تاريخ الإنشاء')
+    updated_at = models.DateTimeField(auto_now=True , verbose_name='تاريخ التحديث')     
     
 
     def __str__(self) -> str:
@@ -208,8 +208,8 @@ class Product(models.Model):
         verbose_name_plural = 'المنتجات'
 
 class ProductImages(models.Model):
-    product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='store/Products/images')
+    product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE , verbose_name='المنتج')
+    image = models.ImageField(upload_to='store/Products/images' , verbose_name='الصورة')
     
     def __str__(self):
         return self.product.name
@@ -219,10 +219,10 @@ class ProductImages(models.Model):
         verbose_name_plural = 'صور المنتج'
 
 class ProductItem(models.Model):
-    product = models.ForeignKey(Product, related_name='items', on_delete=models.CASCADE)
-    sku = ShortUUIDField(unique=True, prefix='sku',  length=8, max_length=20, alphabet= string.ascii_lowercase + string.digits)
-    color =  models.CharField(max_length=255)
-    image = models.ImageField(upload_to='store/Products/product_items/', null=True)
+    product = models.ForeignKey(Product, related_name='items', on_delete=models.CASCADE , verbose_name='المنتج')
+    sku = ShortUUIDField(unique=True, prefix='sku',  length=8, max_length=20, alphabet= string.ascii_lowercase + string.digits , verbose_name='sku')
+    color =  models.CharField(max_length=255 , verbose_name='اللون')
+    image = models.ImageField(upload_to='store/Products/product_items/', null=True , verbose_name='الصورة')
     
     def item_image(self):
         return mark_safe("<img src='%s' width='50' height='50'/>" % (self.image.url) )
@@ -235,12 +235,12 @@ class ProductItem(models.Model):
         verbose_name_plural = 'متغيرات المنتج'
 
 class ProductVariation(models.Model):
-    product_item = models.ForeignKey(ProductItem, related_name='variations', on_delete=models.PROTECT,)
-    size = models.ForeignKey(SizeOption, related_name='variations', on_delete=models.PROTECT)
-    stock = models.IntegerField(default=0)  # الكمية المتاحة
-    sold = models.IntegerField(default=0)  # الكمية المباعة
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    product_item = models.ForeignKey(ProductItem, related_name='variations', on_delete=models.PROTECT, verbose_name='العنصر')
+    size = models.ForeignKey(SizeOption, related_name='variations', on_delete=models.PROTECT , verbose_name='المقاس')
+    stock = models.IntegerField(default=0 , verbose_name='الكمية')  # الكمية المتاحة
+    sold = models.IntegerField(default=0 , verbose_name='المباع')  # الكمية المباعة
+    created_at = models.DateTimeField(auto_now_add=True , verbose_name='تاريخ الإنشاء')
+    updated_at = models.DateTimeField(auto_now=True , verbose_name='تاريخ التعديل')
 
     def __str__(self):
         return f"{self.product_item} - {self.product_item.product.name} - {self.product_item.color} - {self.size}"
@@ -271,8 +271,8 @@ class ProductVariation(models.Model):
 # ========================== Favourite ===================================
 
 class Favourite(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favourites')
-    products = models.ManyToManyField(Product)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favourites' , verbose_name='المستخدم')
+    products = models.ManyToManyField(Product , verbose_name='المنتج')
     
     def __str__(self):
         return f"{self.user.phone_number}قائمة المفضلة الخاصة ب"
@@ -280,15 +280,15 @@ class Favourite(models.Model):
 # ============================= Order ====================================
 
 class Cart(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts' , verbose_name='المستخدم')
     
     def __str__(self) -> str:
         return f'سلة : {self.user.first_name} {self.user.last_name}'
     
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
-    cart_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='cart_variations')
-    qty = models.PositiveIntegerField(default=1)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items' , verbose_name='السلة')
+    cart_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='cart_variations' , verbose_name='عنصر السلة')
+    qty = models.PositiveIntegerField(default=1 , verbose_name='الكمية')
     
     def get_stock_quantity(self):
         """

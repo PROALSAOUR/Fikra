@@ -57,7 +57,7 @@ class PointsUsageAdmin(admin.ModelAdmin):
             return format_html('<span style="color:#28a745; font-weight:900;">+{}</span>', difference)
         elif difference < 0  :  # حدث نقصان بالنقاط
             return format_html('<span style="color: red;">{}</span>', difference)
-    get_difference.short_description = 'difference' 
+    get_difference.short_description = 'الفارق' 
     
     def has_delete_permission(self, request, obj=None):
         """منع حذف سجلات النقاط من لوحة الإدارة"""

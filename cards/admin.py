@@ -11,22 +11,26 @@ class CoponAdmin(admin.ModelAdmin):
     
     def get_value_display(self, obj):
         return f"{obj.value}%"
-    get_value_display.short_description = 'value' # عنوان العمود في الواجهة
+    get_value_display.short_description = 'القيمة' # عنوان العمود في الواجهة
     
 class CoponUsageAdmin(admin.ModelAdmin):
-    list_display = ('get_gift_image', 'copon_code__name', 'user','sell_price', 'get_now_price', 'has_used', 'expire',)
+    list_display = ('get_gift_image', 'get_copon__name', 'user','sell_price', 'get_now_price', 'has_used', 'expire',)
     search_fields = ('name','value',)
     list_filter = ('has_used','user',)
     ordering = ('purchase_date',)   
     exclude = ('has_used',)
     
+    def get_copon__name(self, obj):
+        return f"{obj.copon_code.name}"
+    get_copon__name.short_description = ' الكوبون' # عنوان العمود في الواجهة
+    
     def get_gift_image(self, obj):
         return f"{obj.copon_code.copon_image()}"
-    get_gift_image.short_description = 'image' # عنوان العمود في الواجهة
+    get_gift_image.short_description = 'الصورة' # عنوان العمود في الواجهة
     
     def get_now_price(self, obj):
         return f"{obj.copon_code.price}"
-    get_now_price.short_description = 'Current price' # عنوان العمود في الواجهة
+    get_now_price.short_description = 'السعر الحالي' # عنوان العمود في الواجهة
 
 class GiftAdmin(admin.ModelAdmin):
     list_display = ('gift_image', 'name', 'get_value_display', 'price', 'sales_count', 'is_active',)
@@ -37,7 +41,7 @@ class GiftAdmin(admin.ModelAdmin):
     
     def get_value_display(self, obj):
         return f"{obj.value}"
-    get_value_display.short_description = 'value' # عنوان العمود في الواجهة
+    get_value_display.short_description = 'القيمة' # عنوان العمود في الواجهة
 
 class GiftItemAdmin(admin.ModelAdmin):
     list_display = ('get_gift_image', 'gift__name', 'buyer', 'recipient','sell_value', 'sell_price', 'get_now_price', 'is_seen', 'has_used', 'purchase_date',)
@@ -49,11 +53,11 @@ class GiftItemAdmin(admin.ModelAdmin):
     
     def get_gift_image(self, obj):
         return f"{obj.gift.gift_image()}"
-    get_gift_image.short_description = 'gift image' # عنوان العمود في الواجهة
+    get_gift_image.short_description = 'الصورة' # عنوان العمود في الواجهة
     
     def get_now_price(self, obj):
         return f"{obj.gift.price}"
-    get_now_price.short_description = 'now price' # عنوان العمود في الواجهة
+    get_now_price.short_description = 'السعر الحالي' # عنوان العمود في الواجهة
 
 class GiftDealingAdmin(admin.ModelAdmin):
     list_display = ('sender', 'receiver_name', 'receiver_phone', 'is_dealt', 'created_at', 'updated_at',)
@@ -72,7 +76,7 @@ class ReceiveGiftAdmin(admin.ModelAdmin):
     
     def get_gift_image(self, obj):
         return f"{obj.gift.gift_image()}"
-    get_gift_image.short_description = 'gift image' # عنوان العمود في الواجهة
+    get_gift_image.short_description = 'الصورة' # عنوان العمود في الواجهة
     
 class GiftmessageAdmin(admin.ModelAdmin):
     list_display = ('gift_item','recipient_name', 'message')

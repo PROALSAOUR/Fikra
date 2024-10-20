@@ -67,7 +67,7 @@ class ProductAdmin(admin.ModelAdmin):
     
     def is_available(self, obj):
         return  obj.get_total_stock() 
-    is_available.short_description = 'available stock'
+    is_available.short_description = 'الكمية المتاحة'
     
 admin.site.register(AdsSlider, AdsSliderAdmin)
 admin.site.register(Brand, BrandAdmin)

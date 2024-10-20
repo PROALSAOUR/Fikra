@@ -22,14 +22,14 @@ class OrderItemInline(admin.TabularInline):
         if obj.qty is not None and obj.price is not None:
             return obj.qty * obj.price
         return 0 
-    get_total.short_description = 'total'  
+    get_total.short_description = 'الإجمالي'  
     
     def get_product_image(self, obj):
         # التأكد من وجود صورة مرتبطة بعنصر المنتج
         if obj.order_item and obj.order_item.product_item.image:
             return mark_safe("<img src='%s' width='50' height='50' />" % (obj.order_item.product_item.image.url))
         return "No Image"
-    get_product_image.short_description = 'Image' 
+    get_product_image.short_description = 'الصورة' 
     
 class MyOrdersAdmin(admin.ModelAdmin):
     list_display = ('serial_number', 'user', 'total_price', 'colored_status', 'with_message', 'order_date',)
@@ -58,7 +58,7 @@ class MyOrdersAdmin(admin.ModelAdmin):
              return format_html('<span style="color:#ff7623; font-weight:900;">{}</span>', obj.get_status_display())
         else: # status = pending
             return format_html('<span style="color:#e1d221; font-weight:900;">{}</span>', obj.get_status_display())
-    colored_status.short_description = 'status'   
+    colored_status.short_description = 'الحالة'   
 
 class DealingInline(admin.TabularInline):
     model = DealingItem
@@ -79,7 +79,7 @@ class DealingAdmin(admin.ModelAdmin):
     
     def get_modifications(self, obj):
         return obj.modifications_numbers()
-    get_modifications.short_description = 'edits'
+    get_modifications.short_description = 'التعديلات'
 
   
     def status(self, obj):
@@ -94,7 +94,7 @@ class DealingAdmin(admin.ModelAdmin):
              return format_html('<span style="color:#ff7623; font-weight:900;">{}</span>', obj.order.get_status_display())
         else: # status = pending
             return format_html('<span style="color:#e1d221; font-weight:900;">{}</span>', obj.order.get_status_display())
-    status.short_description = 'order status'   
+    status.short_description = 'حالة الطلب'   
 
 admin.site.register(Order, MyOrdersAdmin)
 admin.site.register(DliveryPrice, DliveryPriceAdmin)

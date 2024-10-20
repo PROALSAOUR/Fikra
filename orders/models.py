@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from accounts.models import User
        
 class DliveryPrice(models.Model):
-    price = models.IntegerField(default=0)     
+    price = models.IntegerField(default=0 , verbose_name='سعر التوصيل')     
     
     def __str__(self):
         return f"سعر التوصيل {self.price}"
@@ -24,22 +24,20 @@ class Order(models.Model):
         ('canceled', 'تم الإلغاء'),
     ]
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
-    serial_number = models.IntegerField(unique=True)
-    status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending')
-    old_total = models.IntegerField()
-    total_price = models.PositiveIntegerField()
-    total_points = models.PositiveIntegerField(null=True)
-    discount_amount = models.IntegerField(default=0)
-    dlivery_price = models.IntegerField(default=0)
-    order_date = models.DateTimeField(auto_now_add=True)
-    deliverey_date = models.DateTimeField(null=True, blank=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    with_message = models.BooleanField(default=False)
-    message = models.TextField(blank=True, null=True)
-    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders' , verbose_name='المستخدم')
+    serial_number = models.IntegerField(unique=True, verbose_name='الرقم التسلسلي')
+    status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending' , verbose_name='الحالة')
+    old_total = models.IntegerField(verbose_name='الإجمالي القديم')
+    total_price = models.PositiveIntegerField(verbose_name='الإجمالي')
+    total_points = models.PositiveIntegerField(null=True, verbose_name='المكافأة')
+    discount_amount = models.IntegerField(default=0, verbose_name='قيمة الخصم')
+    dlivery_price = models.IntegerField(default=0, verbose_name='سعر التوصيل')
+    order_date = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الطلب')
+    deliverey_date = models.DateTimeField(null=True, blank=True, verbose_name='تاريخ التسليم')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')
+    with_message = models.BooleanField(default=False, verbose_name='مع رسالة؟')
+    message = models.TextField(blank=True, null=True, verbose_name='الرسالة')
         
-    
     def get_total_items(self):
         total = 0
         # استخدام related_name للوصول إلى عناصر الطلب
@@ -71,21 +69,21 @@ class Order(models.Model):
         verbose_name_plural = 'الطلبات'
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
-    order_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='order_items')
-    qty = models.PositiveIntegerField(default=1)
-    price = models.PositiveIntegerField()
-    points = models.IntegerField(null=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items', verbose_name='الطلب')
+    order_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='order_items' , verbose_name='المنتج')
+    qty = models.PositiveIntegerField(default=1, verbose_name='الكمية')
+    price = models.PositiveIntegerField(verbose_name='السعر')
+    points = models.IntegerField(null=True, verbose_name='المكافأة')
     
     def __str__(self):
         return f"{self.order_item.product_item.product.name}"
  
 class OrderDealing(models.Model):
-    order = models.OneToOneField(Order, on_delete=models.CASCADE)
-    is_dealt = models.BooleanField(default=False)
-    total_price_difference = models.IntegerField(default=0, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    order = models.OneToOneField(Order, on_delete=models.CASCADE , verbose_name='الطلب')
+    is_dealt = models.BooleanField(default=False, verbose_name='الاستجابة')
+    total_price_difference = models.IntegerField(default=0, null=True , verbose_name='فرق السعر')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الإنشاء')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')
     
     def update_total_price_difference_and_is_dealt(self):
         # لأنو اذا ما كان مستلم لسا مافي داعي نعمل تغيير بالسعر لأنو اصلا مادفع
@@ -129,15 +127,15 @@ class DealingItem(models.Model):
         ('replace', 'إستبدال'),
     ]
     
-    order_dealing = models.ForeignKey(OrderDealing, on_delete=models.CASCADE, related_name='deals')
-    old_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='old_deals')
-    new_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='new_deals', null=True, blank=True)
-    new_qty = models.IntegerField(null=True, blank=True)
-    price_difference = models.IntegerField(null=True, blank=True)  # تم تعديل التسمية
-    is_dealt = models.BooleanField(default=False) # هل تم تنفيذ عملية التعديل  
-    status = models.CharField(max_length=20, choices=Dealing_status, blank=True)  # تمت إضافة choices و blank=True
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    order_dealing = models.ForeignKey(OrderDealing, on_delete=models.CASCADE, related_name='deals' , verbose_name='طلب المعالجة')
+    old_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='old_deals' , verbose_name='المنتج القديم')
+    new_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='new_deals', null=True, blank=True , verbose_name='المنتج الجديد')
+    new_qty = models.IntegerField(null=True, blank=True , verbose_name='الكمية الجديدة')
+    price_difference = models.IntegerField(null=True, blank=True , verbose_name='فرق السعر')  
+    is_dealt = models.BooleanField(default=False , verbose_name='المعالجة') # هل تم تنفيذ عملية التعديل  
+    status = models.CharField(max_length=20, choices=Dealing_status, blank=True , verbose_name='الحالة') 
+    created_at = models.DateTimeField(auto_now_add=True , verbose_name='تاريخ الإنشاء')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')
     
     def clean(self):
         if self.status == 'replace':

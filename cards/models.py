@@ -1,30 +1,26 @@
 from django.db import models
-from django.utils import timezone
-from django.utils.timezone import now  # لجلب التاريخ الحالي
+from django.utils.timezone import now  
 from shortuuid.django_fields import ShortUUIDField
 from store.models import Tag
+from accounts.models import User
 import string
-from accounts.models import User, Message, UserProfile 
 from django.utils.html import mark_safe
 from django.core.exceptions import ValidationError
 from datetime import timedelta
 
-
-
-
 # ============================= Cards ====================================
 
 class Copon(models.Model):
-    code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_uppercase + string.digits)
-    name = models.CharField(max_length=30)
-    img = models.ImageField(upload_to='store/Cards/Copons')
-    value = models.PositiveIntegerField()
-    min_bill_price = models.PositiveIntegerField()
-    price = models.PositiveIntegerField(default=0)
-    is_active = models.BooleanField(default=True)
-    expiration_days = models.IntegerField(default=365) # عدد الايام التي يفسد بعدها الكوبون
-    sales_count = models.PositiveIntegerField(default=0)  # عدد مرات بيع الكوبون
-    tags = models.ManyToManyField(Tag,  blank=True)
+    code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_uppercase + string.digits , verbose_name='الكود')
+    name = models.CharField(max_length=30 , verbose_name='الاسم')
+    img = models.ImageField(upload_to='store/Cards/Copons', verbose_name='الصورة')
+    value = models.PositiveIntegerField( verbose_name='القيمة')
+    min_bill_price = models.PositiveIntegerField(verbose_name='اقل قيمة للإستعمال')
+    price = models.PositiveIntegerField(default=0, verbose_name='السعر')
+    is_active = models.BooleanField(default=True, verbose_name='مفعل؟')
+    expiration_days = models.IntegerField(default=365, verbose_name='يفسد بعد') # عدد الايام التي يفسد بعدها الكوبون
+    sales_count = models.PositiveIntegerField(default=0, verbose_name='عدد المبيعات')  # عدد مرات بيع الكوبون
+    tags = models.ManyToManyField(Tag,  blank=True, verbose_name='الهاشتاج')
 
     def __str__(self):
         return self.name
@@ -49,12 +45,12 @@ class Copon(models.Model):
         verbose_name_plural = 'كوبونات الخصم'
     
 class CoponUsage(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # المستخدم الذي اشترى الرمز
-    copon_code = models.ForeignKey(Copon, on_delete=models.CASCADE, related_name='copon_usage')  # رمز الخصم
-    sell_price = models.IntegerField(default=0) # سعر الكوبون عندما اشتراه المستخدم
-    has_used = models.BooleanField(default=False)  # لتتبع إذا استخدم المستخدم الرمز
-    purchase_date = models.DateTimeField(auto_now_add=True)  # وقت شراء الرمز
-    expire = models.DateField(null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE , verbose_name='المشتري')  # المستخدم الذي اشترى الرمز
+    copon_code = models.ForeignKey(Copon, on_delete=models.CASCADE, related_name='copon_usage' , verbose_name='الكود')  # رمز الخصم
+    sell_price = models.IntegerField(default=0, verbose_name='السعر') # سعر الكوبون عندما اشتراه المستخدم
+    has_used = models.BooleanField(default=False, verbose_name='حالة الاستعمال')  # لتتبع إذا استخدم المستخدم الرمز
+    purchase_date = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الشراء')  # وقت شراء الرمز
+    expire = models.DateField(null=True, blank=True, verbose_name='تاريخ انتهاء الصلاحية')
     
     def is_expire(self):
         if self.expire:
@@ -81,16 +77,15 @@ class CoponUsage(models.Model):
         verbose_name = 'سجلات شراء الكوبونات'
         verbose_name_plural = 'سجلات شراء الكوبونات'
     
-
 class Gift(models.Model):
-    code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_uppercase + string.digits)
-    name = models.CharField(max_length=30)
-    img = models.ImageField(upload_to='store/Cards/Gifts')
-    value = models.PositiveIntegerField()  # قيمة الهدية
-    price = models.PositiveIntegerField()  # سعر الشراء بالنقاط أو المال
-    is_active = models.BooleanField(default=True)  # حالة الهدية (نشطة أو غير نشطة)
-    sales_count = models.PositiveIntegerField(default=0)  # عدد مرات بيع الهدية
-    tags = models.ManyToManyField(Tag, blank=True)
+    code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_uppercase + string.digits , verbose_name='الكود')
+    name = models.CharField(max_length=30, verbose_name='الاسم')
+    img = models.ImageField(upload_to='store/Cards/Gifts', verbose_name='الصورة')
+    value = models.PositiveIntegerField( verbose_name='القيمة')  # قيمة الهدية
+    price = models.PositiveIntegerField(verbose_name='السعر')  # سعر الشراء بالنقاط أو المال
+    is_active = models.BooleanField(default=True , verbose_name='مفعل؟')  # حالة الهدية (نشطة أو غير نشطة)
+    sales_count = models.PositiveIntegerField(default=0, verbose_name='عدد المبيعات')  # عدد مرات بيع الهدية
+    tags = models.ManyToManyField(Tag, blank=True, verbose_name='الهاشتاج')
     
     def __str__(self):
         return self.name
@@ -103,14 +98,14 @@ class Gift(models.Model):
         verbose_name_plural = 'كروت هدايا'   
 
 class GiftItem(models.Model):
-    gift = models.ForeignKey(Gift, on_delete=models.CASCADE, related_name='gift_items')
-    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gift_items_buyer')  # المستخدم الذي اشترى الهدية
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gift_items_recipient', null=True)  # المستخدم الذي له الهدية
-    purchase_date = models.DateTimeField(auto_now_add=True)  # وقت الشراء
-    sell_price = models.PositiveIntegerField(default=0) # سعر  عندما اشتراه المستخدم
-    sell_value = models.PositiveIntegerField(default=0) # القيمة عند الشراء
-    has_used = models.BooleanField(default=False) # هل تم استخدام الهدية أم لا
-    is_seen = models.BooleanField(default=False) # هل شاهد المستخدم الهدية؟
+    gift = models.ForeignKey(Gift, on_delete=models.CASCADE, related_name='gift_items', verbose_name='الهدية')
+    buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gift_items_buyer', verbose_name='المشتري')  # المستخدم الذي اشترى الهدية
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='gift_items_recipient', null=True, verbose_name='المستلم')  # المستخدم الذي له الهدية
+    purchase_date = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الشراء')  # وقت الشراء
+    sell_price = models.PositiveIntegerField(default=0, verbose_name='سعر الشراء') # سعر  عندما اشتراه المستخدم
+    sell_value = models.PositiveIntegerField(default=0, verbose_name='القيمة') # القيمة عند الشراء
+    has_used = models.BooleanField(default=False, verbose_name='مستعمل؟') # هل تم استخدام الهدية أم لا
+    is_seen = models.BooleanField(default=False, verbose_name='مشاهدة؟') # هل شاهد المستخدم الهدية؟
 
     def save(self, *args, **kwargs):
         if self.buyer == self.recipient:
@@ -130,10 +125,10 @@ class GiftItem(models.Model):
         return self.recipient is not None
 
 class GiftRecipient(models.Model):
-    gift_item = models.OneToOneField(GiftItem, on_delete=models.CASCADE, related_name='gift_recipients')
-    recipient_name = models.CharField(max_length=100, null=True, blank=True)  # اسم المستلم
-    recipient_phone = models.CharField(max_length=15, null=True, blank=True)  # هاتف المستلم
-    message = models.TextField(blank=True, null=True, max_length=300)  # رسالة شخصية
+    gift_item = models.OneToOneField(GiftItem, on_delete=models.CASCADE, related_name='gift_recipients', verbose_name='عنصر الهدية')
+    recipient_name = models.CharField(max_length=100, null=True, blank=True, verbose_name='اسم المستلم')  # اسم المستلم
+    recipient_phone = models.CharField(max_length=15, null=True, blank=True, verbose_name='رقم الهاتف')  # هاتف المستلم
+    message = models.TextField(blank=True, null=True, max_length=300, verbose_name='الرسالة')  # رسالة شخصية
     
     def __str__(self):
         return f"هدية{self.gift_item.pk} إلى: {self.recipient_name or 'نفسه'}"
@@ -143,12 +138,12 @@ class GiftRecipient(models.Model):
         verbose_name_plural = 'مستلمو الهدايا'
 
 class ReceiveGift(models.Model):
-    gift = models.ForeignKey(Gift, on_delete=models.CASCADE, related_name='receive_gift')
-    code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_uppercase + string.digits)  # كود فريد لهذه الهدية المشتراة
-    is_used = models.BooleanField(default=False)
-    value = models.PositiveIntegerField()
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+    gift = models.ForeignKey(Gift, on_delete=models.CASCADE, related_name='receive_gift', verbose_name='الهدية')
+    code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_uppercase + string.digits, verbose_name='الكود')  # كود فريد لهذه الهدية المشتراة
+    is_used = models.BooleanField(default=False, verbose_name='مستعمل؟')
+    value = models.PositiveIntegerField(verbose_name='القيمة')
+    created_at = models.DateField(auto_now_add=True, verbose_name='تاريخ الإنشاء')
+    updated_at = models.DateField(auto_now=True, verbose_name='تاريخ التعديل')
         
     def __str__(self):
         return f'{self.gift.name}, {self.value}'
@@ -163,16 +158,16 @@ class GiftDealing(models.Model):
     يتم التواصل معه بواسطة خدمة العملاء من هنا
     '''
     
-    sell_price = models.PositiveIntegerField(default=0) # سعر  عندما اشتراه المستخدم
-    sell_value = models.PositiveIntegerField(default=0) # القيمة عند الشراء
-    sender = models.ForeignKey(User, on_delete=models.CASCADE)
-    receiver_name = models.CharField(max_length=50)
-    receiver_phone = models.CharField(max_length=20)
-    message = models.TextField(blank=True, null=True, max_length=300)  # رسالة شخصية
-    is_dealt = models.BooleanField(default=False)
-    receive = models.ForeignKey(ReceiveGift, on_delete=models.CASCADE, related_name='dealing', null=True)
-    created_at = models.DateField(auto_now_add=True)
-    updated_at = models.DateField(auto_now=True)
+    sell_price = models.PositiveIntegerField(default=0, verbose_name='السعر') # سعر  عندما اشتراه المستخدم
+    sell_value = models.PositiveIntegerField(default=0, verbose_name='القيمة') # القيمة عند الشراء
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='المرسل')
+    receiver_name = models.CharField(max_length=50, verbose_name='اسم المستلم')
+    receiver_phone = models.CharField(max_length=20, verbose_name='رقم المستلم')
+    message = models.TextField(blank=True, null=True, max_length=300, verbose_name='الرسالة')  # رسالة شخصية
+    is_dealt = models.BooleanField(default=False, verbose_name='معالجة؟')
+    receive = models.ForeignKey(ReceiveGift, on_delete=models.CASCADE, related_name='dealing', null=True, verbose_name='كود الاستلام')
+    created_at = models.DateField(auto_now_add=True, verbose_name='تاريخ الإنشاء')
+    updated_at = models.DateField(auto_now=True, verbose_name='تاريخ التعديل')
     
         
     def __str__(self):
