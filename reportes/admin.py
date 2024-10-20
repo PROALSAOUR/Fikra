@@ -175,7 +175,7 @@ class PartnersAdmin(admin.ModelAdmin):
         return f"{obj.share_percentage:.2f}%"
     get_percent.short_description = 'النسبة'
 
-    change_list_template = "admin/reportes/partners_changelist.html"  # تخصيص قالب عرض القائمة
+    change_list_template = "admin/reportes/partners.html"  # تخصيص قالب عرض القائمة
 
     def changelist_view(self, request, extra_context=None):
         # جلب بيانات الشركاء ونسبهم
@@ -240,6 +240,44 @@ class MonthlyTotalAdmin(admin.ModelAdmin):
         else:
             return '-'
     show_total_profit.short_description = 'الأرباح'
+    
+    change_list_template = "admin/reportes/monthly-statis.html"  
+    def changelist_view(self, request, extra_context=None):
+        # جلب جميع البيانات الخاصة بالأرباح مرتبة حسب السنة والشهر
+        unsorted_profit_data = (
+            MonthlyTotal.objects
+            .values('year', 'month', 'total_profit', 'sales_number')
+            .order_by('-year', '-month')[:24]  # اخذ اخر 24 شهر فقط
+        )
+        # ترتيب الشهور من الاصغر الى الاكبر
+        profit_data =  sorted(unsorted_profit_data, key=lambda x: (x['year'], x['month']))
+
+        # إعداد البيانات للرسم البياني
+        months = [f"{item['year']}/{item['month']}" for item in profit_data]
+        profits = [float(item['total_profit']) if item['total_profit'] else 0 for item in profit_data]
+        sales = [item['sales_number'] if item['sales_number'] else 0 for item in profit_data]
+
+        # إضافة شهر جديد مع قيم صفر
+        if months:  # تأكد من وجود بيانات
+            last_month = months[0]
+            year, month = map(int, last_month.split('/'))
+            previous_month = f"{year}/{month - 1 if month > 1 else 12}"  # الشهر السابق
+
+            # إضافة الشهر السابق إلى البيانات
+            months.insert(0, previous_month)
+            profits.insert(0, 0)  # قيمة الربح
+            sales.insert(0, 0)  # عدد المبيعات
+
+        # تمرير البيانات إلى الـ context
+        extra_context = extra_context or {}
+        extra_context['profit_data'] = json.dumps({
+            'months': months,
+            'profits': profits,
+            'sales': sales,
+        })
+
+        return super().changelist_view(request, extra_context=extra_context)
+
 
 admin.site.register(Partners, PartnersAdmin)
 admin.site.register(Packaging, PackagingAdmin)

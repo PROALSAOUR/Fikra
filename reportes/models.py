@@ -35,7 +35,7 @@ class Partners(models.Model):
         verbose_name = 'شريك'
         verbose_name_plural = 'الشركاء'
 # ======================== Total Profits & Costs ================================
-# كلاس لكل شهر
+# كلاس احصائية لكل شهر
 class MonthlyTotal(models.Model):
     month = models.IntegerField(verbose_name='الشهر') # رقم الشهر
     year = models.IntegerField(verbose_name='السنة') # رقم السنة
@@ -52,7 +52,7 @@ class MonthlyTotal(models.Model):
     
     class Meta:
         verbose_name = 'المجموع الشهري' 
-        verbose_name_plural = 'الإحصائيات الشهرية' 
+        verbose_name_plural = 'الإحصائيات الشهرية'         
 # كلاس للتغليف
 class Packaging(models.Model):
     bag_price = models.DecimalField(max_digits=5, decimal_places=3 ,verbose_name="سعر الكيس")
