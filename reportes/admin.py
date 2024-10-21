@@ -225,7 +225,7 @@ class GroupMembersInline(admin.TabularInline):
         
     def get_readonly_fields(self, request, obj=None):
         """منع اضافة اعضاء اذا كانت حالة المجموعة جاهزة او مكتملة"""
-        if obj and obj.ready or obj.completed :
+        if obj and obj.ready  :
             self.show_change_link=False 
             self.can_delete=False 
             self.max_num = 0
@@ -235,13 +235,19 @@ class GroupMembersInline(admin.TabularInline):
 #  دالة عرض المجموعات الستثمارية
 class InvestmentGroupAdmin(admin.ModelAdmin):
     
-    list_display = ('name', 'value', 'remaining_amount' ,'refund_amount', 'completed')
+    list_display = ('name', 'value', 'remaining_amount' ,'refund_amount', 'ready', 'completed')
     search_fields = ('name',)
     list_filter = ('completed',)
     ordering = ('-created_at', '-updated_at')
-    fields = ('value', 'remaining_amount', 'refund_amount', 'completed', 'ready' )
+    fields = ('name', 'value', 'remaining_amount', 'refund_amount', 'completed', 'ready' )
     readonly_fields = ('value', 'remaining_amount', 'refund_amount', 'completed',)
     inlines = [GroupMembersInline,]
+    
+    def get_readonly_fields(self, request, obj=None):
+        """منع تعديل حالة الجهوزية اذا كانت حالة المجموعة جاهزة  """
+        if obj and obj.ready :
+            return self.readonly_fields + ('ready',) 
+        return self.readonly_fields
 
 # ========================================================= 
 
@@ -293,7 +299,7 @@ class MonthlyInvestmentGroupInline(admin.TabularInline):
     model = MonthlyInvestmentGroup
     extra = 0  # عدد الصفوف الإضافية
     max_num = 0
-    readonly_fields = ('monthly_total', 'investment_group', "monthly_percentage", 'goods_amount', 'profit_amount')    
+    readonly_fields = ('monthly_total', 'investment_group', "monthly_percentage", 'goods_amount', 'profit_amount', 'total_amount')    
     can_delete = False  
     show_change_link = False 
     verbose_name_plural = 'الاستثمارات'

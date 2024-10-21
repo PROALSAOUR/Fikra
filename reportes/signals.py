@@ -83,6 +83,49 @@ def update_monthly_totals(sender, created, instance, **kwargs):
     else: # اذا لم يكن الطلب مسلما بعد تجاهل كل هذا
         return
 
+@receiver(post_save, sender=MonthlyTotal)
+def calc_groups_incomes(sender, created, instance, **kwargs):
+    """
+    دالة وظيفتها حساب نصيب المجموعات الاستثمارية من المجموع الشهري
+    """
+    all_groups = InvestmentGroup.objects.filter(ready=True, completed=False, remaining_amount__gt=0) # جلب جميع المجموعات
+    
+    if not all_groups: # اذا لم يكن هنالك مجموعات اخرج
+        return
+    
+    # جلب احصائيات الشهر
+    total_goods_amount = instance.goods_price
+    total_profits = instance.total_profit - (instance.total_profit * decimal.Decimal(0.1)) # ايجاد اجمالي الربح بعد خصم نسبة الشركاء
+    
+    
+    
+    #  ايجاد مجموع الحصص لجميع المجموعات
+    total_shares = decimal.Decimal(0)
+    for group in all_groups:
+        total_shares += group.remaining_amount # جلب قيمة الاستثمار المتبقية بكل مجموعة
+            
+    
+    # ايجاد نسبة كل مجموعة من اجمالي الحصص
+    for group in all_groups:
+        group_share = group.remaining_amount / total_shares 
+        monthly_group , create = MonthlyInvestmentGroup.objects.get_or_create(
+            monthly_total= instance,
+            investment_group = group,
+        )
+        monthly_group.monthly_percentage = group_share
+        monthly_group.goods_amount = total_goods_amount * group_share
+        monthly_group.profit_amount = total_profits * group_share
+        monthly_group.total_amount = monthly_group.goods_amount + monthly_group.profit_amount
+        monthly_group.save()
+        
+        # حدث قيمة المتبقي الخاص بكل مجموعة
+        group.remaining_amount = group.value # اعد ضبط المتبقي اولا
+        all_group_months = MonthlyInvestmentGroup.objects.filter(investment_group=group) # جلب جميع روابط الشهور بالمجموعة المحددة
+        
+        for group_month in all_group_months:
+            group.remaining_amount -= group_month.goods_amount # ازالة سعر البضاعة التي بيعت من المتبقي
+            group.save() 
+
 @receiver(post_save, sender=InvestmentGroupMember)
 def update_investment_Group(sender, created, instance, **kwargs):
     """
@@ -102,6 +145,7 @@ def update_investment_Group(sender, created, instance, **kwargs):
                     group_value += member.investment_value 
                     
                 group.value = group_value 
+                group.remaining_amount = group_value
                 group.save()  # حفظ البيانات الجديدة
 
 @receiver(post_save, sender=InvestmentGroup)

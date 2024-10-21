@@ -155,16 +155,16 @@ class MonthlyInvestmentGroup(models.Model):
     monthly_total = models.ForeignKey("MonthlyTotal", on_delete=models.CASCADE, verbose_name='إحصائية شهرية', related_name='investment_groups')
     investment_group = models.ForeignKey(InvestmentGroup, on_delete=models.CASCADE, verbose_name='المجموعة', related_name='monthly_totals')
     monthly_percentage = models.DecimalField(max_digits=3, decimal_places=2, verbose_name="النسبة الشهرية", null=True)
-    goods_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="المبلغ المسترد", null=True)
-    profit_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=" الربح", null=True)
-    
+    goods_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="من البضاعة", null=True)
+    profit_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="من الربح", null=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=" الإجمالي", null=True)
     def __str__(self):
         return f"{self.monthly_total} - {self.investment_group}"
 
     class Meta:
         verbose_name = 'مجموعة استثمارية شهرية'
         verbose_name_plural = 'المجموعات الاستثمارية الشهرية'
-        
+    
 # ======================== Total Profits & Costs ================================
 # كلاس احصائية لكل شهر
 class MonthlyTotal(models.Model):
