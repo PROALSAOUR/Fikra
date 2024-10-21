@@ -40,18 +40,19 @@ def update_monthly_totals(sender, created, instance, **kwargs):
             status='delivered'
         ).prefetch_related('order_items__order_item__product_item__product')   
         all_orders_count = all_orders.count() 
-        
-        # ========= الحصول على عدد المنتجات المباعة  خلال الشهر وسعر جملتها والمبلغ الاجمالي القادم من بيع المنتجات ============
+        # ============== الحصول على المبلغ الاجمالي القادم من بيع المنتجات ===============
+        total_income = 0
+        for x in all_orders:
+            total_income +=  x.total_price
+        # ========= الحصول على عدد المنتجات المباعة  خلال الشهر وسعر جملتها  ============
         
         sales_number = 0
         goods_price = 0
-        total_income = 0
 
         for order in all_orders:
             for item in order.order_items.all():
                 sales_number += item.qty
                 goods_price += item.qty * item.order_item.product_item.product.purchase_price 
-                total_income +=  item.qty * item.order_item.product_item.product.get_price()
                 
         # ================= الحصول على سعر التغليف ==============
 
