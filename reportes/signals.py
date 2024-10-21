@@ -1,9 +1,9 @@
 from reportes.models import *
 from orders.models import Order
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
-from django.db.models import Q
+import decimal
 
 
 @receiver(post_save, sender=Order)
@@ -83,4 +83,87 @@ def update_monthly_totals(sender, created, instance, **kwargs):
     else: # اذا لم يكن الطلب مسلما بعد تجاهل كل هذا
         return
 
+@receiver(post_save, sender=InvestmentGroupMember)
+def update_investment_Group(sender, created, instance, **kwargs):
+    """
+    دالة وظيفتها تحديث بيانات المجموعة الاستثمارية وايجاد حصتها عند اضافة عضو جديد  
+    """
+    if created:
+        group = instance.group # جلب المجموعة المطلوبة
+        
+        if not group.ready and not group.completed : # يجب ان تكون المجموعة غير جاهزة ولا مكتملة
+        
+            group_members = InvestmentGroupMember.objects.filter(group=group)
+            
+            if group_members:
+                group_value = decimal.Decimal(0) 
+                
+                for member in group_members: # حساب الحصة الاجمالية للمجموعة
+                    group_value += member.investment_value 
+                    
+                group.value = group_value 
+                group.save()  # حفظ البيانات الجديدة
 
+@receiver(post_save, sender=InvestmentGroup)
+def update_Group_members_percentage(sender, created, instance, **kwargs):
+    """
+    دالة وظيفتها حساب نسبة كل عضو بالمجموعة
+    """ 
+    if not created :
+        group = instance # جلب المجموعة المطلوبة
+        
+        if not group.ready and not group.completed : # يجب ان تكون المجموعة غير جاهزة ولا مكتملة
+    
+            group_members = InvestmentGroupMember.objects.filter(group=group)
+            
+            if group_members:
+                group_value = group.value
+                
+                for member in group_members: # حساب نسبة كل فرد من المجموعة
+                    member.investment_percentage = ( member.investment_value  / group_value ) * decimal.Decimal(100)
+                    member.save()
+                    
+@receiver(post_save, sender=MonthlyTotal)
+def update_partners_profit(sender, created, instance, **kwargs):
+    " دالة وظيفتها حساب ربح الشركاء عند حفظ  احصائية شهرية"
+    if instance.total_profit > 0 : # تحقق انه يوجد ربح هذا الشهر
+        partners = Partners.objects.all() # جلب جميع الشركاء
+
+        if partners.exists():  # تحقق من وجود الشركاء
+            total_profit = instance.total_profit
+            total_partners_profit = total_profit * decimal.Decimal(0.1)  # جلب نسبة الشركاء الإجمالية من الربح
+
+            for partner in partners:
+                partner_profit, created = PartnersProfit.objects.get_or_create(
+                    month=instance,
+                    partner=partner,
+                )
+                partner_profit.profit = total_partners_profit * (decimal.Decimal(partner.share_percentage / 100)) # حساب ربح كل شريك
+                partner_profit.save()       
+                            
+@receiver(pre_save, sender=PartnersProfit)
+def prevent_received_false(sender, instance, **kwargs):
+    """تمنع إعادة تعيين حالة الاستلام من True إلى False."""
+    if instance.pk:  # تأكد من أن الكائن موجود (تم إنشاؤه سابقًا)
+        try:
+            original_instance = PartnersProfit.objects.get(pk=instance.pk)
+            if original_instance.received and not instance.received:
+                instance.received = True  # استعادة القيمة الأصلية
+        except PartnersProfit.DoesNotExist:
+            pass 
+        
+@receiver(pre_save, sender=InvestigatorProfit)
+def prevent_received_false(sender, instance, **kwargs):
+    """تمنع إعادة تعيين حالة الاستلام من True إلى False."""
+    if instance.pk:  # تأكد من أن الكائن موجود (تم إنشاؤه سابقًا)
+        try:
+            original_instance = InvestigatorProfit.objects.get(pk=instance.pk)
+            if original_instance.received and not instance.received:
+                instance.received = True  # استعادة القيمة الأصلية
+        except InvestigatorProfit.DoesNotExist:
+            pass 
+        
+
+
+
+    

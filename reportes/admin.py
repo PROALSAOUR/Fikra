@@ -165,11 +165,22 @@ class OrdersCountAdmin(admin.ModelAdmin):
 
         return TemplateResponse(request, self.change_list_template, context)
 # ========================================================= 
-# دالة عرض الشركاء
+# دالة ربح الشركاء
+class PartnersProfitInline(admin.TabularInline):
+    model = PartnersProfit
+    extra = 0  
+    max_num = 0
+    readonly_fields = ('month', 'profit', )  
+    fields = ('month', 'profit', "received")  
+    can_delete = False  
+    show_change_link = False 
+        
+# دالة الشركاء
 class PartnersAdmin(admin.ModelAdmin):
-    list_display = ('name', 'get_percent')
-    search_fields = ('name',)
+    list_display = ('name', 'phone_number', 'get_percent')
+    search_fields = ('name', 'phone_number',)
     order_by = ('-share_percentage')
+    inlines = [PartnersProfitInline,]
     
     def get_percent(self, obj):
         return f"{obj.share_percentage:.2f}%"
@@ -186,7 +197,54 @@ class PartnersAdmin(admin.ModelAdmin):
         extra_context['partner_data'] = json.dumps(partner_data)
 
         return super().changelist_view(request, extra_context=extra_context)
+
+# دالة ربح المستثمرين
+class InvestigatorProfitInline(admin.TabularInline):
+    model = InvestigatorProfit
+    extra = 0  
+    max_num = 0
+    readonly_fields = ('month', 'profit', )  
+    fields = ('month', 'profit', "received")  
+    can_delete = False  
+    show_change_link = False 
+
+# دالة عرض المستثمرين
+class InvestigatorAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone_number', )
+    search_fields = ('name', 'phone_number',)
+    inlines = [InvestigatorProfitInline,]
+
+# دالة اعضاءالمجموعة الاستثمارية
+class GroupMembersInline(admin.TabularInline):
+    model = InvestmentGroupMember
+    extra = 0  
+    fields = ('investigator', 'investment_value', "investment_percentage", 'profit_value', 'created_at', )  
+    readonly_fields = ('investment_percentage', 'profit_value', 'created_at', )  
+    can_delete = True  
+    show_change_link = True 
+        
+    def get_readonly_fields(self, request, obj=None):
+        """منع اضافة اعضاء اذا كانت حالة المجموعة جاهزة او مكتملة"""
+        if obj and obj.ready or obj.completed :
+            self.show_change_link=False 
+            self.can_delete=False 
+            self.max_num = 0
+            return self.readonly_fields + ('investigator', 'investment_value', "investment_percentage", 'profit_value', 'created_at', ) 
+        return self.readonly_fields
+    
+#  دالة عرض المجموعات الستثمارية
+class InvestmentGroupAdmin(admin.ModelAdmin):
+    
+    list_display = ('name', 'value', 'remaining_amount' ,'refund_amount', 'completed')
+    search_fields = ('name',)
+    list_filter = ('completed',)
+    ordering = ('-created_at', '-updated_at')
+    fields = ('value', 'remaining_amount', 'refund_amount', 'completed', 'ready' )
+    readonly_fields = ('value', 'remaining_amount', 'refund_amount', 'completed',)
+    inlines = [GroupMembersInline,]
+
 # ========================================================= 
+
 # دالة تكاليف التغليف للطلب الواحد
 class PackagingAdmin(admin.ModelAdmin):
     list_display = ('bag_price', 'packaging_paper_price', 'thanks_card_price', 'total')
@@ -195,21 +253,24 @@ class PackagingAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
         # السماح بالإضافة فقط إذا لم يكن هناك أي صفحة اسئلة موجودة
         return not Packaging.objects.exists()
+
 # ========================================================= 
+# قيمة المصاريف داخل الاحصائية 
 class CostInline(admin.TabularInline):
     model = Cost
     extra = 0  
     fields = ('title', 'value', 'description')  # تحديد ترتيب الحقول
     can_delete = True  
     show_change_link = True  
-    
+
+# قيمة الاضافات داخل الاحصائية 
 class AdditionalInline(admin.TabularInline):
     model = AdditionalIncome
     extra = 0  
     fields = ('title', 'value', 'description')  # تحديد ترتيب الحقول
     can_delete = True  
     show_change_link = True  
-
+# سعر تغليف الطلب الواحد داخل الاحصائية
 class PackForMonthInline(admin.TabularInline):
     model = PackForMonth
     extra = 0  
@@ -218,12 +279,32 @@ class PackForMonthInline(admin.TabularInline):
     max_num = 0
     show_change_link = False  
 
+# ارباح الشركاء داخل الاحصائية الشهرية
+class MonthPartnersProfitInline(admin.TabularInline):
+    model = PartnersProfit
+    extra = 0  
+    max_num = 0
+    readonly_fields = ('partner', 'profit', "received")    
+    can_delete = False  
+    show_change_link = False 
+
+# دالة ربح المجموعات دالة الاحصائية
+class MonthlyInvestmentGroupInline(admin.TabularInline):
+    model = MonthlyInvestmentGroup
+    extra = 0  # عدد الصفوف الإضافية
+    max_num = 0
+    readonly_fields = ('monthly_total', 'investment_group', "monthly_percentage", 'goods_amount', 'profit_amount')    
+    can_delete = False  
+    show_change_link = False 
+    verbose_name_plural = 'الاستثمارات'
+    
+# دالة عرض الاحصائية الرئيسية
 class MonthlyTotalAdmin(admin.ModelAdmin):
     list_display = ('history', 'total_income', 'show_total_profit' ,'sales_number')
     search_fields = ('history',)
     ordering = ('-month', '-year')
     readonly_fields = ('total_income', 'additional_income', 'total_costs', 'total_packaging', 'goods_price', 'total_profit', 'sales_number',)
-    inlines = [CostInline, AdditionalInline, PackForMonthInline]
+    inlines = [CostInline, AdditionalInline, PackForMonthInline, MonthPartnersProfitInline, MonthlyInvestmentGroupInline]
 
     def history(self, obj):
         return f'{obj.year}/{obj.month}'
@@ -280,5 +361,7 @@ class MonthlyTotalAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Partners, PartnersAdmin)
+admin.site.register(Investigator, InvestigatorAdmin)
 admin.site.register(Packaging, PackagingAdmin)
 admin.site.register(MonthlyTotal, MonthlyTotalAdmin)    
+admin.site.register(InvestmentGroup, InvestmentGroupAdmin)

@@ -57,7 +57,7 @@ class Order(models.Model):
                 new_serial_number = 1  # إذا لم يكن هناك طلبات سابقة
 
             # تنسيق الرقم ليكون 6 أرقام
-            self.serial_number = str(new_serial_number).zfill(6)  # أو استخدم f"{new_serial_number:06}"
+            self.serial_number = str(new_serial_number).zfill(6)  
 
         super().save(*args, **kwargs)  # استدعاء دالة الحفظ الأساسية
 
