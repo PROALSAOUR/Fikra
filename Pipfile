@@ -10,6 +10,9 @@ django-jazzmin = "*"
 django-debug-toolbar = "*"
 psycopg2 = "*"
 phonenumbers = "*"
+django-celery-beat = "*"
+celery = "*"
+redis = "*"
 
 [dev-packages]
 

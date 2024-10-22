@@ -2,10 +2,9 @@ from reportes.models import *
 from orders.models import Order
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from django.utils import timezone
 import decimal
 from Fikra.settings import PARTNERS_PERCENTAGE
-
+from datetime import datetime
 
 @receiver(post_save, sender=Order)
 def update_monthly_totals(sender, created, instance, **kwargs):
@@ -146,7 +145,7 @@ def calc_groups_incomes(sender, created, instance, **kwargs):
                 group.remaining_amount -= group_month.goods_amount # ازالة سعر البضاعة التي بيعت من المتبقي
                 group.refund_amount += group_month.total_amount 
                 group.save() 
-    
+
 @receiver(post_save, sender=InvestmentGroupMember)
 def update_investment_Group(sender, created, instance, **kwargs):
     """
@@ -233,8 +232,32 @@ def prevent_received_false(sender, instance, **kwargs):
                 instance.received = True  # استعادة القيمة الأصلية
         except InvestigatorProfit.DoesNotExist:
             pass 
-        
+    
+# @receiver(post_save, sender=MonthlyTotal)
+# def temprary(sender, created, instance, **kwargs):
+#     "دالة مؤقتة تزال لاحقا وظيفتها توزيع ارباح الشهور على المستثمرين"
+#     year = 2024
+#     month = 9
 
+#     month_statis = MonthlyTotal.objects.get(month=month, year=year)
+#     if month_statis:
+#         # جيب جميع روابط المجموعات و الاحصائية
+#         all_monthly_groups = MonthlyInvestmentGroup.objects.filter(monthly_total=month_statis).prefetch_related('investment_group')
 
+#         for monthly_group in all_monthly_groups:
+#             # جيب اجمالي كل مجموعة بالشهر
+#             monthly_total = monthly_group.total_amount # ربح المجموعة الاجمالي بالشهر
+#             group = monthly_group.investment_group # جلب المجموعة من الروابط
+#             all_members = group.members.all() # جيب كل اعضاء المجموعة      
+#             for member in all_members: 
+#                 investigator = member.investigator # جلب المستثمر
+#                 percentage = decimal.Decimal(member.investment_percentage / 100 ) # احسب النسبة
+#                 # انشئ ربح مستثمر مرتبط بالشهر 
+#                 InvestigatorProfit.objects.create(
+#                     investigator = investigator,
+#                     month = month_statis,
+#                     from_group = group,
+#                     profit = percentage * monthly_total ,
+#                 )
 
     

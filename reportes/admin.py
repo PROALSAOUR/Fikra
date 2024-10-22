@@ -203,8 +203,9 @@ class InvestigatorProfitInline(admin.TabularInline):
     model = InvestigatorProfit
     extra = 0  
     max_num = 0
-    readonly_fields = ('month', 'profit', )  
-    fields = ('month', 'profit', "received")  
+    readonly_fields = ('month', 'from_group', 'profit', )  
+    fields = ('month', 'from_group', 'profit', "received")  
+    ordering = ('-month',)
     can_delete = False  
     show_change_link = False 
 
@@ -218,18 +219,26 @@ class InvestigatorAdmin(admin.ModelAdmin):
 class GroupMembersInline(admin.TabularInline):
     model = InvestmentGroupMember
     extra = 0  
-    fields = ('investigator', 'investment_value', "investment_percentage", 'profit_value', 'created_at', )  
-    readonly_fields = ('investment_percentage', 'profit_value', 'created_at', )  
+    fields = ('investigator', 'investment_value', "show_percentage", 'profit_value', 'created_at', )  
+    readonly_fields = ('show_percentage', 'profit_value', 'created_at', )  
     can_delete = True  
     show_change_link = True 
         
-    def get_readonly_fields(self, request, obj=None):
+    def show_percentage(self,  obj=None):
+        '''تضيف علامة النسبة المئوية بجانب نسبة العضو'''
+        if obj: 
+            return f"{obj.investment_percentage}%"
+        return "-"
+    show_percentage.short_description = "النسبة"
+
+        
+    def get_readonly_fields(self,request , obj=None):
         """منع اضافة اعضاء اذا كانت حالة المجموعة جاهزة او مكتملة"""
         if obj and obj.ready  :
             self.show_change_link=False 
             self.can_delete=False 
             self.max_num = 0
-            return self.readonly_fields + ('investigator', 'investment_value', "investment_percentage", 'profit_value', 'created_at', ) 
+            return self.readonly_fields + ('investigator', 'investment_value', "show_percentage", 'profit_value', 'created_at', ) 
         return self.readonly_fields
     
 #  دالة عرض المجموعات الستثمارية
@@ -309,7 +318,8 @@ class MonthlyTotalAdmin(admin.ModelAdmin):
     list_display = ('history', 'total_income', 'colored_total_profit' ,'sales_number')
     search_fields = ('history',)
     ordering = ('-month', '-year')
-    readonly_fields = ('colored_total_income', 'colored_additional_income', 'colored_total_costs', 'colored_total_packaging', 'colored_goods_price', 'colored_total_profit', 'sales_number',)
+    readonly_fields = ('history', 'colored_total_income', 'colored_additional_income', 'colored_total_costs', 'colored_total_packaging', 'colored_goods_price', 'colored_total_profit', 'sales_number',)
+    exclude = ('total_income', 'additional_income', 'total_costs', 'total_packaging', 'goods_price','total_profit', 'month', 'year')
     inlines = [CostInline, AdditionalInline, PackForMonthInline, MonthPartnersProfitInline, MonthlyInvestmentGroupInline]
 
     def colored_total_income(self, obj):

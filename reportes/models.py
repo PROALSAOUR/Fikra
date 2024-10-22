@@ -95,6 +95,7 @@ class Investigator(models.Model):
 # كلاس ربح المستثمر
 class InvestigatorProfit(models.Model):
     month = models.ForeignKey('MonthlyTotal', on_delete=models.CASCADE, verbose_name='الشهر', related_name='investigator_monthly_profits')
+    from_group =  models.ForeignKey('InvestmentGroup', on_delete=models.CASCADE, verbose_name='من المجموعة', related_name='investigator_group_profits' ,null=True)
     investigator = models.ForeignKey(Investigator, on_delete=models.CASCADE, verbose_name='المستثمر', related_name='investigator_profits')
     profit = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='الربح')
     received = models.BooleanField(default=False, verbose_name='تم التسليم؟')
@@ -164,7 +165,7 @@ class MonthlyInvestmentGroup(models.Model):
     class Meta:
         verbose_name = 'مجموعة استثمارية شهرية'
         verbose_name_plural = 'المجموعات الاستثمارية الشهرية'
-    
+
 # ======================== Total Profits & Costs ================================
 # كلاس احصائية لكل شهر
 class MonthlyTotal(models.Model):
@@ -179,7 +180,7 @@ class MonthlyTotal(models.Model):
     sales_number = models.IntegerField(null=True, verbose_name='المنتجات المباعة') # عدد الامنتجات المباع بالشهر
     
     def __str__(self) -> str:
-        return f"إحصائيات: {self.month}/{self.year}"
+        return f"{self.month}/{self.year}"
     
     class Meta:
         verbose_name = 'المجموع الشهري' 

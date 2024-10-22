@@ -48,6 +48,9 @@ INSTALLED_APPS = [
     'cards',
     'orders',
     'reportes',
+    
+    # مهام مجدولة
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -223,3 +226,22 @@ JAZZMIN_UI_TWEAKS = {
 
 # PARTNERS PERCENTAGE
 PARTNERS_PERCENTAGE = 0.1
+
+# جدولة المهام
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    # توزيع الارباح الشهرية على المستثمرين
+    'distribute-profits-every-3-days': {
+        'task': 'reportes.tasks.distribute_profits',
+        'schedule': crontab(hour=0, minute=0, day='*/5'),  # كل 5 أيام في منتصف الليل
+    },
+}
+
+# Broker URL لربط Celery مع Redis
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+
+# إعدادات Celery الأخرى
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
