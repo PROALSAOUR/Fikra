@@ -306,28 +306,68 @@ class MonthlyInvestmentGroupInline(admin.TabularInline):
     
 # دالة عرض الاحصائية الرئيسية
 class MonthlyTotalAdmin(admin.ModelAdmin):
-    list_display = ('history', 'total_income', 'show_total_profit' ,'sales_number')
+    list_display = ('history', 'total_income', 'colored_total_profit' ,'sales_number')
     search_fields = ('history',)
     ordering = ('-month', '-year')
-    readonly_fields = ('total_income', 'additional_income', 'total_costs', 'total_packaging', 'goods_price', 'total_profit', 'sales_number',)
+    readonly_fields = ('colored_total_income', 'colored_additional_income', 'colored_total_costs', 'colored_total_packaging', 'colored_goods_price', 'colored_total_profit', 'sales_number',)
     inlines = [CostInline, AdditionalInline, PackForMonthInline, MonthPartnersProfitInline, MonthlyInvestmentGroupInline]
 
-    def history(self, obj):
-        return f'{obj.year}/{obj.month}'
-    history.short_description = 'إحصائية شهر'
+    def colored_total_income(self, obj):
+        if obj.total_income:
+            if obj.total_income > 0:
+                return format_html('<span style="color:#28a745;">+{}</span>', obj.total_income)
+        else:
+            return '0'
+    colored_total_income.short_description = ' الدخل'
+    
+    def colored_additional_income(self, obj):
+        if obj.additional_income:
+            if obj.additional_income > 0:
+                return format_html('<span style="color:#28a745;">+{}</span>', obj.additional_income)
+        else:
+            return '0'
+    colored_additional_income.short_description = 'الإضافات'
 
-    def show_total_profit(self, obj):
+    def colored_total_costs(self, obj):
+        if obj.total_costs:
+            if obj.total_costs > 0:
+                return format_html('<span style="color:red;">-{}</span>', obj.total_costs)
+        else:
+            return '0'
+    colored_total_costs.short_description = 'المصاريف'
+
+    def colored_total_packaging(self, obj):
+        if obj.total_packaging:
+            if obj.total_packaging > 0:
+                return format_html('<span style="color:red;">-{}</span>', obj.total_packaging)
+        else:
+            return '0'
+    colored_total_packaging.short_description = 'التغليف'
+
+    def colored_goods_price(self, obj):
+        if obj.goods_price:
+            if obj.goods_price > 0:
+                return format_html('<span style="color:red;">-{}</span>', obj.goods_price)
+        else:
+            return '0'
+    colored_goods_price.short_description = 'سعر البضاعة'
+
+    def colored_total_profit(self, obj):
         if obj.total_profit:
             if obj.total_profit > 0:
-                return format_html('<span style="color:#28a745;">{}</span>', obj.total_profit)
+                return format_html('<span style="color:#28a745;">+{}</span>', obj.total_profit)
             elif obj.total_profit < 0:
                 return format_html('<span style="color: red;">{}</span>', obj.total_profit)
             else: # = 0
                 return format_html('<span style="color: #e1d221;">{}</span>', obj.total_profit)
         else:
             return '-'
-    show_total_profit.short_description = 'الأرباح'
+    colored_total_profit.short_description = 'الأرباح'
     
+    def history(self, obj):
+        return f'{obj.year}/{obj.month}'
+    history.short_description = 'إحصائية شهر'
+
     change_list_template = "admin/reportes/monthly-statis.html"  
     def changelist_view(self, request, extra_context=None):
         # جلب جميع البيانات الخاصة بالأرباح مرتبة حسب السنة والشهر

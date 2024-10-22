@@ -220,3 +220,6 @@ JAZZMIN_UI_TWEAKS = {
 }
 # ===================================================================
 
+
+# PARTNERS PERCENTAGE
+PARTNERS_PERCENTAGE = 0.1

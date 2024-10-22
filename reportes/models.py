@@ -112,7 +112,7 @@ class InvestmentGroup(models.Model):
     name = models.CharField(max_length=50, verbose_name='الاسم')
     value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='الحصة', null=True)
     remaining_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='المبلغ المتبقي', null=True)
-    refund_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="المبلغ المسترد", null=True)
+    refund_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="العوائد", null=True)
     ready = models.BooleanField(default=False , verbose_name="جاهزة؟") # هل المجموعة مكتملة الاعضاء وجاهزة لتوزيع الارباح
     completed = models.BooleanField(default=False , verbose_name="مكتملة؟") # هل المجموعة تم توزيع ارباحها بالكامل؟
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الإنشاء')
@@ -138,9 +138,9 @@ class InvestmentGroup(models.Model):
 class InvestmentGroupMember(models.Model):
     investigator = models.ForeignKey(Investigator, on_delete=models.CASCADE, verbose_name='المستثمر', related_name='members')  
     group = models.ForeignKey(InvestmentGroup, on_delete=models.CASCADE, verbose_name='المجموعة', related_name='members')  
-    investment_value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=" المبلغ الاستثماري")
+    investment_value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=" المبلغ المستثمر")
     investment_percentage = models.DecimalField(max_digits=10, decimal_places=2, null=True, default=0, verbose_name='النسبة')
-    profit_value = models.DecimalField(max_digits=10, decimal_places=2,  null=True, default=0, verbose_name='الربح')
+    profit_value = models.DecimalField(max_digits=10, decimal_places=2,  null=True, default=0, verbose_name='العائد')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الإنضمام')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')
     
@@ -170,13 +170,13 @@ class MonthlyInvestmentGroup(models.Model):
 class MonthlyTotal(models.Model):
     month = models.IntegerField(verbose_name='الشهر') # رقم الشهر
     year = models.IntegerField(verbose_name='السنة') # رقم السنة
-    total_income = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='إجمالي الدخل',  null=True)
-    additional_income =  models.DecimalField(max_digits=10, decimal_places=2, verbose_name='إجمالي الإضافات',  null=True)
-    total_costs = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='إجمالي التكلفة' , null=True)
+    total_income = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=' الدخل',  null=True)
+    additional_income =  models.DecimalField(max_digits=10, decimal_places=2, verbose_name=' الإضافات',  null=True)
+    total_costs = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=' التكاليف' , null=True)
     total_packaging = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='إجمالي التغليف', null=True)
     goods_price =  models.DecimalField(max_digits=10, decimal_places=2, verbose_name='سعر البضاعة', null=True)
-    total_profit = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='إجمال الربح', null=True)
-    sales_number = models.IntegerField(null=True, verbose_name='عدد المبيعات') # عدد الامنتجات المباع بالشهر
+    total_profit = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='إجمالي الربح', null=True)
+    sales_number = models.IntegerField(null=True, verbose_name='المنتجات المباعة') # عدد الامنتجات المباع بالشهر
     
     def __str__(self) -> str:
         return f"إحصائيات: {self.month}/{self.year}"
