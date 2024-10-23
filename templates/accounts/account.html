@@ -61,11 +61,11 @@
                             <i class="fa-solid fa-angles-left " ></i>
                         </a>
                     </li>
-                    <li>                        
-                         <a href="#" class="download-fikra-link" id="pwa-download">
+                    <li id="hide-after-download">                        
+                         <a href="#" class="download-fikra-link">
                             <div class="item">
                                 <i class="fa-solid fa-download"></i>
-                                <h5> تحميل فكرة على جهازي </h5>
+                                <button id="pwa-download">تحميل فكرة على جهازي </button>
                             </div>
                             <i class="fa-solid fa-angles-left "></i>
                         </a>
@@ -122,7 +122,6 @@
                 <img src="{% static "images/name logo.jpg" %}" alt="">
             </div>
             <p> لا يمكننا وصف سعادتنا لتحميلك تطبيقنا! من اعماق قلبنا شكراً لك</p>
-            <p style="color:var(--disaple-text-color); padding-bottom:20px">سوف يبدأ التحميل خلال ثواني </p>
         </div>
         <!-- End download-fikra Section -->
         <!-- Start Products Section -->
@@ -146,6 +145,6 @@
     </div>
       
       
-      
+    <script src=" {% static "/javascript/install-app.js" %}"></script>
 {% endblock content %}
     

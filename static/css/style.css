@@ -4014,6 +4014,15 @@ form.choose-to-replace {
   -ms-transition: all 0.2s ;
   -o-transition: all 0.2s ;
 }
+.account-menu .menu-items a .item button {
+  background: none;
+  border: none;
+  font-size: var(--tab-m-size);
+  color: var(--main-text-color);
+  font-weight: 700;
+  z-index: 100;
+  cursor: pointer;
+}
 /* Tab media */
 @media (max-width: 793px) {
   .account-menu .container {
@@ -4021,6 +4030,9 @@ form.choose-to-replace {
   }
   .account-menu .menu-items a {
     font-size: var(--tab-l-size);
+  }
+  .account-menu .menu-items a .item button  {
+    font-size: var(--tab-xs-size);
   }
 }
 /* mobile media */
@@ -4030,6 +4042,15 @@ form.choose-to-replace {
   }
   .account-menu .menu-items a {
     font-size: var(--mob-l-size);
+  }
+  .account-menu .menu-items a .item button {
+    font-size: var(--mob-m-size);
+  }
+}
+/* mobile media */
+@media (max-width: 397px) {
+  .account-menu .menu-items a .item button {
+    font-size: var(--mob-xs-size);
   }
 }
 .account-menu .menu-items a:hover {
@@ -4057,7 +4078,7 @@ form.choose-to-replace {
     font-size: var(--tab-m-size);
   }
 }
-.account-menu .menu-items a:hover .item h5{
+.account-menu .menu-items a:hover .item h5, .menu-items a:hover .item button{
   color: var(--main-color);
 }
 /* End Account Menu Section   */

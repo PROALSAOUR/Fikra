@@ -184,45 +184,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 // ===================================================================================================
-// الكود الخاص بعرض النافذة الخاصة بتحميل التطبيق
-document.addEventListener('DOMContentLoaded', function () {
-    const downloadMenu = document.querySelector('.download-fikra-page');
-    const downloadLink = document.querySelector('.download-fikra-link');
-
-    if (downloadMenu && downloadLink) { // تحقق من وجود العنصرين قبل إضافة الأحداث
-        function showDownloadMenu() {
-            downloadMenu.style.display = 'block'; // عرض القائمة
-            setTimeout(() => {
-                downloadMenu.style.visibility = 'visible';
-                downloadMenu.style.opacity = '1';
-                downloadMenu.style.transform = 'translate(-50%, -40%) scale(1)';
-            }, 10);
-        }
-
-        function hideDownloadMenu() {
-            downloadMenu.style.opacity = '0';
-            downloadMenu.style.transform = 'translate(-50%, -40%) scale(0.5)';
-            setTimeout(() => {
-                downloadMenu.style.visibility = 'hidden';
-                downloadMenu.style.display = 'none';
-            }, 300);
-        }
-
-        downloadLink.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (downloadMenu.style.visibility === 'hidden' || downloadMenu.style.visibility === '') {
-                showDownloadMenu();
-            }
-        });
-
-        document.addEventListener('click', function (e) {
-            if (downloadMenu.style.visibility === 'visible' && !downloadMenu.contains(e.target) && !downloadLink.contains(e.target)) {
-                hideDownloadMenu();
-            }
-        });
-    }
-});
-// ===================================================================================================
 // إظهار الفاتورة و النافذة الخاصة بإضافة كوبون الى الفاتورة
 document.addEventListener('DOMContentLoaded', function () {
 
