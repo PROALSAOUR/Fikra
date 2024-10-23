@@ -1,7 +1,7 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="ar">
+    {% load pwa %} 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,11 +18,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
-    <!-- import json -->
-    {% comment %} <link rel="manifest" href="{% static 'manifest.json' %}"> {% endcomment %}
+    <!-- import PWA  -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    {% progressive_web_app_meta %}
     <!-- website title & icon -->
     <title>Fikra</title>
-    <link rel="website icon" type="" href="{% static "/images/logo.jpg" %}">
+    <link rel="website icon" type="" href="{% static "/images/icons/small-logo.png" %}">
     
 </head>
 <body dir="rtl" class="" >
@@ -64,17 +65,6 @@
     <script src=" {% static "/javascript/fireworks.js" %}"></script>
     <script src=" {% static "/javascript/install-app.js" %}"></script>
 
-    {% comment %} <script>
-        if ('serviceWorker' in navigator) {
-          window.addEventListener('load', function() {
-            navigator.serviceWorker.register('{% static "/javascript/service-worker.js" %}').then(function(registration) {
-              console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            }, function(err) {
-              console.log('ServiceWorker registration failed: ', err);
-            });
-          });
-        }
-    </script> {% endcomment %}
 
 
     {% comment %} only in debugging remove later {% endcomment %}

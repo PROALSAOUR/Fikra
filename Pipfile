@@ -13,6 +13,7 @@ phonenumbers = "*"
 django-celery-beat = "*"
 celery = "*"
 redis = "*"
+django-pwa = "*"
 
 [dev-packages]
 

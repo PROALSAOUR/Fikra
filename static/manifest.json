@@ -1,34 +1,33 @@
-{
-    "name": "Fikra",
-    "short_name": "Fikra",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#232323",
-    "theme_color": "#292929",
-    "icons": [
-      {
-        "src": "/static/images/icons/logo.png",
-        "sizes": "192x192",
-        "type": "image/png"
-      },
-      {
-        "src": "/static/images/icons/logo2.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
-    ],
-    "screenshots": [
-    {
-      "src": "/static/images/screenshots/screenshot1.jpg",
-      "sizes": "687x1280",
-      "type": "image/jpg",
-      "form_factor": "wide"
-    },
-    {
-      "src": "/static/images/screenshots/screenshot1.jpg",
-      "sizes": "687x1280",
-      "type": "image/jpg",
-      "form_factor": "narrow"
-    }
-  ]
+{"name": "FIKRA",
+"short_name": "FIKRA",
+"description": "Fikra Clothing Store",
+"start_url": "/",
+"display": "standalone",
+"scope": "/",
+"orientation": "any",
+"background_color": "#232323",
+"theme_color": "#292929",
+"status_bar": "default",
+"icons": [
+  {
+    "src": "/static/images/icons/small-logo.png",
+    "sizes": "192x192"
   }
+],
+"dir": "auto",
+"lang": "en-US",
+"screenshots": [
+  {
+    "src": "/static/images/screenshots/screenshot1.jpg",
+    "sizes": "1080x1920",
+    "type": "image/jpeg",
+    "form_factor": "wide"
+  },
+  {
+    "src": "/static/images/screenshots/screenshot2.jpg",
+    "sizes": "720x1280",
+    "type": "image/png",
+    "form_factor": "narrow"
+  }
+],
+"shortcuts": []}

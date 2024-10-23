@@ -1,23 +1,21 @@
-// window.addEventListener('beforeinstallprompt', (e) => {
-//     e.preventDefault(); // منع العرض التلقائي
-//     deferredPrompt = e;
-//     console.log('beforeinstallprompt fired'); // سجل الرسالة
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // الآن يمكنك عرض زر لتثبيت التطبيق للمستخدم
+    const installBtn = document.getElementById('pwa-download');
 
-//     installBtn.style.display = 'block'; // إظهار الزر
-
-//     installBtn.addEventListener('click', () => {
-//         installBtn.style.display = 'none'; // إخفاء الزر بعد النقر عليه
-//         deferredPrompt.prompt(); // إظهار نافذة التثبيت
-//         deferredPrompt.userChoice.then((choiceResult) => {
-//             if (choiceResult.outcome === 'accepted') {
-//                 console.log('User accepted the install prompt');
-//             } else {
-//                 console.log('User dismissed the install prompt');
-//             }
-//             deferredPrompt = null; // إعادة تعيين deferredPrompt
-//         });
-//     });
-// });
-
-  
-  
+    if (installBtn) {
+        installBtn.addEventListener('click', () => {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the A2HS prompt');
+                } else {
+                    console.log('User dismissed the A2HS prompt');
+                }
+                deferredPrompt = null;
+            });
+        });
+    }
+});

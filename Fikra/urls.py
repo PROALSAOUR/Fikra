@@ -31,6 +31,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('cards/', include('cards.urls')),
     path('orders/', include('orders.urls')),
+    path('', include('pwa.urls')),# إضافة مسارات PWA
 ] + debug_toolbar_urls()
 
 urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)

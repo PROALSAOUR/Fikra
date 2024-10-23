@@ -51,6 +51,10 @@ INSTALLED_APPS = [
     
     # مهام مجدولة
     'django_celery_beat',
+    
+    # PWA
+    'django.contrib.sites',
+    'pwa',
 ]
 
 MIDDLEWARE = [
@@ -231,10 +235,9 @@ PARTNERS_PERCENTAGE = 0.1
 from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
-    # توزيع الارباح الشهرية على المستثمرين
-    'distribute-profits-every-3-days': {
+    'distribute-profits-every-5-days': {
         'task': 'reportes.tasks.distribute_profits',
-        'schedule': crontab(hour=0, minute=0, day='*/5'),  # كل 5 أيام في منتصف الليل
+        'schedule': crontab(day_of_month='7'),  # في اليوم السابع من كل شهر
     },
 }
 
@@ -245,3 +248,42 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+
+
+# PWA إعدادات 
+# حاليا ما عم تجي البيانات منهن عم تجي من الملف في static
+PWA_APP_NAME = "FIKRA"
+PWA_APP_DESCRIPTION = "Fikra Clothing Store"
+PWA_APP_THEME_COLOR = "#292929"
+PWA_APP_BACKGROUND_COLOR = "#232323"
+PWA_APP_DISPLAY = "standalone"
+PWA_APP_SCOPE = "/"
+PWA_APP_START_URL = "/"
+PWA_APP_ICONS = [
+    {
+        "src": "/static/images/icons/small-logo.png",
+        "sizes": "192x192"
+    }
+]
+PWA_APP_SCREENSHOTS = [
+    {
+        "src": "/static/images/screenshots/screenshot1.jpg",
+        "sizes": "1080x1920",
+        "type": "image/jpeg", 
+        "form_factor": "wide"
+    },
+    {
+        "src": "/static/images/screenshots/screenshot2.jpg",
+        "sizes": '720x1280',
+        "type": "image/jpg",  
+        "form_factor": "narrow"
+    }
+]
+PWA_APP_SPLASH_SCREEN = [
+    {
+        "src": "/static/images/screenshots/splach.jpg",
+        "sizes": '720x1280',
+        "type": "image/jpg"
+    }
+]
