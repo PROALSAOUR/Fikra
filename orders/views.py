@@ -8,6 +8,9 @@ from cards.models import GiftItem, CoponUsage
 from store.models import Cart
 from accounts.models import UserProfile
 from django.utils import timezone
+from accounts.send_messages import create_order_message, cancel_order_message, edit_order_message
+
+
 
 # دالة عرض الطلبات
 @login_required
@@ -92,6 +95,12 @@ def cancel_order(request):
                         
                     order.status = 'canceled'
                     order.save()
+                    # ارسال رسالة بعد إلغاء الطلب
+                    message = cancel_order_message(user_name=user.first_name, order=order.serial_number)
+                    inbox = user.profile.inbox
+                    inbox.messages.add(message)
+                    inbox.save()
+                    
                     return JsonResponse({'success': True, 'message': 'تمت عملية إلغاء الطلب بنجاح!'})
             
         except Order.DoesNotExist:
@@ -199,6 +208,11 @@ def edit_order(request):
                     
                     old_variation = item.order_item  # متغير المنتج القديم
                     new_variation = new_item.cart_item  # متغير المنتج الجديد
+                    # تخزين الكميتين كي يتم استعمالهم مع المخزون و المباع
+                    old_qty = item.qty # الكمية القديمة
+                    new_qty = new_item.qty # الكمية الجديدة
+                    
+                    
                     
                     if new_item.cart_item.stock <= 0:  # تحقق من توفر المنتج الجديد
                         return JsonResponse({'success': False, 'error': 'المنتج المستبدل غير متاح حاليا'})
@@ -247,8 +261,13 @@ def edit_order(request):
                         
                     # تخزين السعر الجديد للطلب بعد التعديل  لإستعماله في جلب الفارق بين المنتجين المعدلين
                     new_total =  order.total_price
-                    
                     order.save()
+
+                    #  ارسال رسالة الى المستخدم عند تعديل الطلب
+                    message = edit_order_message(user_name=user.first_name, order=order.serial_number)
+                    inbox = user.profile.inbox
+                    inbox.messages.add(message)
+                    inbox.save()
 
                     # تعديل النقاط إذا كان الطلب قد تم تسليمه بالفعل
                     if order.status == 'delivered':
@@ -256,22 +275,14 @@ def edit_order(request):
                         profile.points = order.total_points  # تعديل النقاط بناءً على الطلب المعدل
                         profile.save()
                         
-                    
-                    
-                    # **تحديث المخزون والمبيعات**
-                    if old_variation and old_variation.stock + item.qty <= old_variation.stock:
-                        old_variation.update_stock(item.qty)  # إضافة الكمية المبيعة للمنتج القديم إلى المخزون
-                        old_variation.sold -= item.qty  # خصم الكمية من المبيعات
-
-                    if new_variation and new_item.qty > 0:
-                        new_variation.sell(new_item.qty)  # إضافة الكمية الخاصة بالمنتج الجديد إلى المبيعات
-                        new_variation.update_stock(-new_item.qty)  # خصم الكمية من المخزون
-                    
-                    
-                        
-                    # انشاء معاملة لإخبار الموظفين انه هنالك عملية إلغاء منتجات حصلت
+                    # تحديث المخزون والمبيعات للمنتجات القديمة والجديدة
+                    old_variation.update_stock(old_qty)  # إعادة الكمية القديمة إلى المخزون
+                    old_variation.sold -= old_qty # تحديث الكمية المباعة
+                    old_variation.save()
+                    new_variation.sell(new_qty)  # تحديث المبيعات
+                                            
+                    # انشاء معاملة لإخبار الموظفين انه هنالك عملية استبدال منتجات حصلت
                     dealing, created = OrderDealing.objects.get_or_create(order=order)
-                
                     DealingItem.objects.create(
                         order_dealing= dealing,
                         old_item = old_variation,
@@ -280,10 +291,7 @@ def edit_order(request):
                         status = 'replace',
                         price_difference = new_total - old_total,
                     )
-                
-                    dealing.save()
-
-                        
+                    dealing.save()   
 
                     return JsonResponse({'success': True, 'message': 'تم تعديل المنتج بنجاح'})
 
@@ -390,7 +398,7 @@ def create_order(request):
             with_message=with_message,
             message=message,
         )
-
+        
         # إنشاء عناصر الطلب
         for item in available_items:
             OrderItem.objects.create(
@@ -402,6 +410,12 @@ def create_order(request):
             )
             item['product_variation'].sell(item['qty'])
 
+        # ارسال رسالة عند اتمام الطلب 
+        message = create_order_message(user_name=user.first_name, order=order.serial_number)
+        inbox = user.profile.inbox
+        inbox.messages.add(message)
+        inbox.save()
+        
         # إفراغ السلة عند نجاح الطلب
         cart.delete()
 

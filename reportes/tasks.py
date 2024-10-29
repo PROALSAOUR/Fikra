@@ -47,7 +47,9 @@ def distribute_profits():
                         )
                     
                     
-
+@shared_task
+def add():
+    return 9 * 9
 
 
 

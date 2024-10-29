@@ -1,6 +1,6 @@
 from cards.models import *
 from store.models import *
-from accounts.models import UserProfile, Message
+from accounts.models import UserProfile
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.http import JsonResponse
@@ -12,7 +12,7 @@ from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 import phonenumbers
 from django.utils import timezone
-
+from accounts.send_messages import buy_copon_done_message, send_gift_to_someone_not_in_fikra
 
 # ===================================================
 # مستودع البطاقات
@@ -178,18 +178,7 @@ def buy_copon(request, cid):
        
     
     # ارسال رسالة عند شراء كوبون
-    message = Message(
-        subject= f'تمت عملية شراء كوبون بنجاح',
-        content= 
-        f"""
-        مرحبا {user_copon.user.first_name}
-        لقد تمت عملية شراء الكوبون ({ user_copon.copon_code }) بنجاح يمكنك العثور عليه الأن داخل مخزونك واستعماله مع احد طلباتك القادمة ,
-        في حال كان لديك اي استفسار يرجى التواصل مع خدمة العملاء وسوف يتم الرد عليك بأسرع وقت ممكن.
-        """,
-        timestamp=timezone.now()
-    )
-            
-    message.save()
+    message = buy_copon_done_message(user_name=user_copon.user.first_name, copon_name=user_copon.copon_code)
     inbox.messages.add(message)
     
     # خصم النقاط وحفظ التحديثات
@@ -260,21 +249,9 @@ def buy_gift(request, gid):
                         message = message_content,
                     )
                     
-                     # رسالة الى المشتري تخبره ان المستلم ليس لديه حساب على فكرة وانه سيتم التواصل معه
-                    message = Message(
-                        subject= f'تمت عملية شراء الهدية بنجاح',
-                        content= 
-                        f"""
-                        مرحبا {user.first_name}
-                        لقد تمت عملية شراء الهدية ({ gift }) بنجاح, يبدو ان  ({recipient_name}[{recipient_phone}]) غير مسجل في قاعدة البيانات الخاصة بمتجرنا لكن لاتقلق سوف يتواصل معه احد موظفينا لإيصال هديتك اليه,
-                        في حال كان لديك اي استفسار يرجى التواصل مع خدمة العملاء وسوف يتم الرد عليك بأسرع وقت ممكن.
-                        """,
-                        timestamp=timezone.now()
-                    )
-                    
-                    message.save()
+                    # رسالة الى المشتري تخبره ان المستلم ليس لديه حساب على فكرة وانه سيتم التواصل معه
+                    message = send_gift_to_someone_not_in_fikra(gift=gift, user_name=user.first_name, recipient_name=recipient_name, recipient_phone=recipient_phone)
                     profile.inbox.messages.add(message)
-                    
                     profile.points -= gift.price
                     profile.save()
                     gift.sales_count += 1
@@ -370,20 +347,8 @@ def buy_gift2(request, gid):
                     )
                     
                     # رسالة الى المشتري تخبره ان المستلم ليس لديه حساب على فكرة وانه سيتم التواصل معه
-                    message = Message(
-                        subject= f'تمت عملية شراء الهدية بنجاح',
-                        content= 
-                        f"""
-                        مرحبا {user.first_name}
-                        لقد تمت عملية شراء الهدية ({ gift }) بنجاح, يبدو ان  ({recipient_name}[{recipient_phone}]) غير مسجل في قاعدة البيانات الخاصة بمتجرنا لكن لاتقلق سوف يتواصل معه احد موظفينا لإيصال هديتك اليه,
-                        في حال كان لديك اي استفسار يرجى التواصل مع خدمة العملاء وسوف يتم الرد عليك بأسرع وقت ممكن.
-                        """,
-                        timestamp=timezone.now()
-                    )
-            
-                    message.save()
+                    message = send_gift_to_someone_not_in_fikra(gift=gift, user_name=user.first_name, recipient_name=recipient_name, recipient_phone=recipient_phone)
                     profile.inbox.messages.add(message)
-                    
                     
                     profile.points -= gift.price
                     profile.save()

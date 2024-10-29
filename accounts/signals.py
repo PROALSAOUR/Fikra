@@ -1,6 +1,7 @@
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from accounts.models import *
+from accounts.send_messages import wellcome_new_user
 
 
 @receiver(post_save, sender=User)
@@ -11,23 +12,11 @@ def craete_user_profile_and_inbo(sender, instance, created, **kwargs):
         inbox = Inbox.objects.create(user=instance)
         # إنشاء بروفايل جديد مرتبط بالمستخدم وصندوق البريد
         UserProfile.objects.create(user=instance, inbox=inbox)
-        
-        
+            
         # إنشاء رسالة جديدة وإضافتها إلى صندوق الوارد
-        message = Message(
-            subject= f'اهلا بك في فكرة',
-            content= 
-            f"""
-            مرحبا {instance.first_name}
-            ,لا يسعنا وصف سعادتنا بإنضمامك الى عائلة فكرة , نرجو ان نكون عند حسن ظنك و ان نقدم لك تجربة تسوق استثنائية و مميزة,
-            في حال كان لديك اي استفسار لا تتردد بالتواصل معنا
-            """,
-            timestamp=timezone.now()
-            )
-        message.save()
+        message = wellcome_new_user(instance.first_name)
         inbox.messages.add(message)
         
-
 @receiver(pre_save, sender=UserProfile)
 def track_user_profile_points_change(sender, instance,  **kwargs):
     '''دالة تعمل عند اجراء اي تعديل على البروفايل

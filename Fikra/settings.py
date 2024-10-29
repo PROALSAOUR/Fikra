@@ -179,7 +179,7 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
     
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "images/logo.jpg",
+    "site_logo": "images/icons/small-logo.png",
 
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
     "login_logo": 'images/admin-logo.jpg',
@@ -227,17 +227,22 @@ JAZZMIN_UI_TWEAKS = {
 }
 # ===================================================================
 
-
 # PARTNERS PERCENTAGE
 PARTNERS_PERCENTAGE = 0.1
+
+# ===================================================================
 
 # جدولة المهام
 from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
-    'distribute-profits-every-5-days': {
+    'distribute-profits-every-7th-day-of-month': {
         'task': 'reportes.tasks.distribute_profits',
         'schedule': crontab(day_of_month='7'),  # في اليوم السابع من كل شهر
+    },
+    'check-copon-expire-every-day': {
+        'task': 'cards.tasks.check_expire',
+        'schedule': crontab(hour=0, minute=0), # كل يوم الساعة 12 صباحا
     },
 }
 
@@ -250,6 +255,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 
+# ===================================================================
 
 # PWA إعدادات 
 # حاليا ما عم تجي البيانات منهن عم تجي من الملف في static
@@ -287,3 +293,4 @@ PWA_APP_SPLASH_SCREEN = [
         "type": "image/jpg"
     }
 ]
+# ===================================================================

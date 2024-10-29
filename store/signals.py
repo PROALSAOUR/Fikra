@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import ProductVariation, Product
+from .models import ProductVariation
 
 @receiver(post_save, sender=ProductVariation)
 def update_product_sales_count(sender, instance, created, **kwargs):

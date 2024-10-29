@@ -58,6 +58,8 @@ class CoponUsage(models.Model):
                 return False
             else:
                 return True
+        else:
+            return False
     
     def use_copon(self):
         self.has_used = True

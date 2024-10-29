@@ -1,9 +1,9 @@
 from orders.models import Order
-from accounts.models import UserProfile, Message
+from accounts.models import UserProfile
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.utils import timezone
-
+from accounts.send_messages import add_order_points_message
 
 @receiver(pre_save, sender=Order)
 def update_user_points(sender, instance, **kwargs):
@@ -16,23 +16,13 @@ def update_user_points(sender, instance, **kwargs):
     user_profile = UserProfile.objects.get(user=instance.user)
     user_inbox = user_profile.inbox  # الحصول على صندوق الوارد الخاص بالمستخدم
 
-    # إذا تم تغيير الحالة إلى 'delivered'
     if previous_order.status != 'delivered' and instance.status == 'delivered':
         # إضافة النقاط إلى المستخدم
         user_profile.points += instance.total_points
         user_profile.save()
 
         # إنشاء رسالة جديدة وإضافتها إلى صندوق الوارد
-        message = Message(
-            subject= f'تم اضافة نقاط الطلب [{str(instance.serial_number).zfill(6)}] !',
-            content= 
-            f"""
-            مرحبا {instance.user} 
-            لقد تمت اضافة النقاط التابعة للطلب [{str(instance.serial_number).zfill(6)}] والتي قيمتها {instance.total_points} نقطة بنجاح الى حسابك, 
-            نرجو لك وقتا سعيداً.
-            """,
-            timestamp=timezone.now()
-            )
+        message = add_order_points_message(user_name=instance.user, points=instance.total_points, order_se=instance.serial_number)
         message.save()
         user_inbox.messages.add(message)
 
