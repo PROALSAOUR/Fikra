@@ -5,9 +5,13 @@ self.addEventListener('install', function(event) {
     caches.open(staticCacheName).then(function(cache) {
       return cache.addAll([
         '/',  // تأكد من أن المسار صحيح
-        '/static/css/styles.css',  // مثال لملف CSS
-        '/static/javascript/main.js',  // مثال لملف JS
-        '/static/images/icons/small-logo.png',  // مثال لأيقونة
+        '/offline/',
+        '/static/css/offline-style.css',
+        '/static/css/all.css',
+        '/static/css/all.min.css',
+        '/static/css/style.css', 
+        '/static/javascript/main.js',  
+        '/static/images/icons/small-logo.png',  
       ]);
     })
   );
@@ -15,8 +19,10 @@ self.addEventListener('install', function(event) {
 
 self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.match(event.request).then(function(response) {
-      return response || fetch(event.request);
-    })
+      caches.match(event.request).then(function(response) {
+          return response || fetch(event.request).catch(function() {
+              return caches.match('/offline/'); // إعادة الصفحة غير المتصلة إذا فشل التحميل
+          });
+      })
   );
 });

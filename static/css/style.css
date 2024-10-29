@@ -4020,7 +4020,7 @@ form.choose-to-replace {
   font-size: var(--tab-m-size);
   color: var(--main-text-color);
   font-weight: 700;
-  z-index: 100;
+  z-index: 2;
   cursor: pointer;
 }
 /* Tab media */

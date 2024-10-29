@@ -10,9 +10,9 @@
     
     <!-- import css files -->
     <link rel="stylesheet" href="{% static "/css/normalize.css" %}">                                 <!-- Render All Element Normally -->
-    <link rel="stylesheet" href="{% static "/css/all.css" %}">                                      <!-- Font Awesome Icons File     -->
+    <link rel="stylesheet" href="{% static "/css/all.css" %}">                                       <!-- Font Awesome Icons File     -->
     <link rel="stylesheet" href="{% static "/css/all.min.css" %}">                                   <!-- Font Awesome Icons File     -->
-    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" /> <!-- Slider Style CSS File       -->       
+    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />                <!-- Slider Style CSS File       -->       
     <link rel="stylesheet" href="{% static "/css/style.css" %}">                                     <!-- Main Template CSS File      -->
     <!-- import font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,7 +24,7 @@
     <!-- website title & icon -->
     <title>Fikra</title>
     <link rel="website icon" type="" href="{% static "/images/icons/small-logo.png" %}">
-    
+
 </head>
 <body dir="rtl" class="" >
     {% if request.path != '/accounts/sign/' %}
@@ -63,7 +63,6 @@
     <script src=" {% static "/javascript/main.js" %}"></script>
     <script src=" {% static "/javascript/live-search.js" %}"></script>
     <script src=" {% static "/javascript/fireworks.js" %}"></script>
-
 
 
     {% comment %} only in debugging remove later {% endcomment %}

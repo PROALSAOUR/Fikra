@@ -10,6 +10,17 @@ from django.utils import timezone
 import json
 from django.utils.html import format_html
 
+# ======================================================================================================================
+# ازالة  django_beat_celery من لوحة الادارة
+from django_celery_beat.models import PeriodicTask, IntervalSchedule, CrontabSchedule, SolarSchedule, ClockedSchedule
+# حاول إلغاء تسجيل كل نموذج على حدة إذا كان مسجلاً مسبقًا
+for model in [PeriodicTask, IntervalSchedule, CrontabSchedule, SolarSchedule, ClockedSchedule]:
+    try:
+        admin.site.unregister(model)
+    except admin.sites.NotRegistered:
+        pass
+# ======================================================================================================================
+
 
 # دالة عدد المستخدمين الاجمالي
 @admin.register(UserReports)
@@ -421,3 +432,5 @@ admin.site.register(Investigator, InvestigatorAdmin)
 admin.site.register(Packaging, PackagingAdmin)
 admin.site.register(MonthlyTotal, MonthlyTotalAdmin)    
 admin.site.register(InvestmentGroup, InvestmentGroupAdmin)
+
+

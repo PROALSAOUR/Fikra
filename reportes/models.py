@@ -12,6 +12,7 @@ class UserReports(models.Model):
 class OrdersCount(models.Model):
     class Meta:
         verbose_name_plural = 'عدد الطلبات'
+
 # ======================== Partners & investigators =============================
 # كلاس الشركاء 
 class Partners(models.Model):

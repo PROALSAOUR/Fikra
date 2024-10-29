@@ -23,10 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-1beap&sr&$u*8tst9amg9)4o6*^&3_rlo-l-==nnb$azpv6p5&'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', ]
 
 
 # Application definition
@@ -39,7 +36,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debug_toolbar',
+        
+    # مهام مجدولة
+    'django_celery_beat',
+    
+    # PWA
+    'pwa',
     
     # My Custom Apps 
     'store', 
@@ -48,13 +50,6 @@ INSTALLED_APPS = [
     'cards',
     'orders',
     'reportes',
-    
-    # مهام مجدولة
-    'django_celery_beat',
-    
-    # PWA
-    'django.contrib.sites',
-    'pwa',
 ]
 
 MIDDLEWARE = [
@@ -65,10 +60,23 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'Fikra.middleware.AdminLanguageMiddleware', # كود الخاص بترجمة صفحة الادمن
 ]
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True  # اجعل هذا False في بيئة الإنتاج
+
+if DEBUG:
+    INSTALLED_APPS += ['debug_toolbar']
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK':  lambda request: request.user.is_superuser,
+    }
+else:
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': lambda request: False,
+    }
 
 # for toolbar Remove later
 INTERNAL_IPS = [
@@ -253,7 +261,6 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
 
 # ===================================================================
 

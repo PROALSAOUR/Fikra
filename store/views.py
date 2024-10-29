@@ -9,9 +9,10 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.timezone import now 
 from django.core.cache import cache
 
-
-
-
+# صفحة الاوف لاين
+def offline(request):
+    return render(request, 'store/offline.html')
+# ===================================================
 # الصفحة الرئيسية
 def index(request):
     
