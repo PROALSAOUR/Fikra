@@ -1,26 +1,26 @@
 <!-- product-start -->
 <div class="swiper-slide product-box {% if product.offer %} offer {% endif %}"> <!-- اضف كلاس اوفر اذا كان هنالك تخفيض- -->
-    <a href="{% url "store:product_details" product.id %}">
+    <a href="{% url "store:product_details" product.id %}" aria-label="استعرض {{product.name}}">
         <div class="product-image">
             <div class="off-holder">
                 {% if product.get_total_stock > 0 %}
-                    <span>تخفيض </span>
+                    <span>{{product.get_offer_percentage|floatformat:0}}% </span>
                 {% endif %}
             </div>
             <img src="{{ product.thumbnail_img.url }}" alt="{{ product.name}}" loading="lazy">
         </div>
         <div class="product-info">
-            <h4 class="product-name"> {{ product.name|slice:":20" }}{% if product.name|length > 20 %}...{% endif %}</h4> <!-- اقصى طول 20 حرف -->
+            <div class="product-name"> {{ product.name|slice:":20" }}{% if product.name|length > 20 %}...{% endif %}</div> <!-- اقصى طول 20 حرف -->
                 <p class="product-description"> {{ product.description|slice:":50" }}{% if product.description|length > 50 %}...{% endif %}</p> <!-- اقل طول 42 حرف اقصى طول 50 حرف -->
 
             {% if product.get_total_stock > 0 %}
-                <h4 class="product-price">
+                <div class="product-price">
                     <div class="buy-by-money"><span class="old"> {{ product.price }} </span><span class="new"> | {{ product.new_price |floatformat:0 }} </span><span> دل </span></div>
-                </h4>
+                </div>
             {% else %}
-                <h4 class="product-price" style='color:#9D2121;text-wrap:nowrap;'>
+                <div class="product-price" style='color:#9D2121;text-wrap:nowrap;'>
                     نفذت الكمية 
-                </h4>
+                </div>
             {% endif %}
 
 
@@ -30,7 +30,7 @@
 {% comment %} الكود الخاص  بزر اضافة الى المفضلة {% endcomment %}
 {% if user.is_authenticated %}
     <span class="add-to-fav">
-            <a href="{% url 'store:add_to_favourites' product.id %}" class="add-to-fav-link" data-product-id="{{ product.id }}">
+            <a href="{% url 'store:add_to_favourites' product.id %}" aria-label="اذهب الى المفضلة" class="add-to-fav-link" data-product-id="{{ product.id }}">
                 {% if request.path == '/favourite/' %}
                         <i class="fa-regular fa-trash-can"></i>
                 {% else %}
@@ -55,7 +55,7 @@
     {% if product.get_total_stock > 0 %}
 
         <span class="add-to-cart">
-            <a href="{% url 'store:add_to_cart2' product.pid %}" class="add-to-cart-link">
+            <a href="{% url 'store:add_to_cart2' product.pid %}" class="add-to-cart-link" aria-label="اضف الى السلة">
                 <span> إضافة الى السلة </span><i class="fa-solid fa-cart-shopping"></i> 
             </a>
         </span>

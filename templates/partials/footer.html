@@ -3,17 +3,16 @@
 <div class="footer">
     <div class="links">
         <ul class="important-links"> 
-            {% if men_category %}<li><a href=" {% url "store:category" men_category.slug %}"><i class="fa-solid fa-angles-left"></i>المنتجات الرجالية</a></li>{% endif %}
-            {% if women_category %}<li><a href=" {% url "store:category" women_category.slug %}"><i class="fa-solid fa-angles-left"></i>المنتجات النسائية</a></li>{% endif %}
-            <li><a href="{% url "store:offer_page" %}"><i class="fa-solid fa-angles-left"></i>صفحة العروض</a></li>
-            <li><a href="{% url "orders:my-orders" %}"><i class="fa-solid fa-angles-left"></i> طلباتي السابقة</a></li>
+            {% if men_category %}<li><a href=" {% url "store:category" men_category.slug %}" aria-label='التصنيفات الرجالية'><i class="fa-solid fa-angles-left"></i>المنتجات الرجالية</a></li>{% endif %}
+            {% if women_category %}<li><a href=" {% url "store:category" women_category.slug %}" aria-label='التصنيفات النسائية'><i class="fa-solid fa-angles-left"></i>المنتجات النسائية</a></li>{% endif %}
+            <li><a href="{% url "store:offer_page" %}"  aria-label="صفحة العروض"><i class="fa-solid fa-angles-left"></i>صفحة العروض</a></li>
+            <li><a href="{% url "orders:my-orders" %}"  aria-label="صفحة الطلبات السابقة"><i class="fa-solid fa-angles-left"></i> طلباتي السابقة</a></li>
         </ul>
         <ul class="important-links">
-            <li><a href="{% url "cards:cards-store" %}"><i class="fa-solid fa-angles-left"></i>متجر البطاقات</a></li>
-            <li><a href="{% url "blog:blog" %}"><i class="fa-solid fa-angles-left"></i> المدونة</a></li>
-            <li><a href="{% url "blog:questions-page" %}"><i class="fa-solid fa-angles-left"></i> الاسئلة الشائعة</a></li>
-            <li><a href="#"><i class="fa-solid fa-angles-left"></i> تواصل معنا</a></li>
-           
+            <li><a href="{% url "cards:cards-store" %}"  aria-label="متجر البطاقات"><i class="fa-solid fa-angles-left"></i>متجر البطاقات</a></li>
+            <li><a href="{% url "blog:blog" %}"  aria-label="المدونة"><i class="fa-solid fa-angles-left"></i> المدونة</a></li>
+            <li><a href="{% url "blog:questions-page" %}"  aria-label="الاسئلة الشائعة"><i class="fa-solid fa-angles-left"></i> الاسئلة الشائعة</a></li>
+            <li><a href="#"><i class="fa-solid fa-angles-left"  aria-label="تواصل معنا"></i> تواصل معنا</a></li>
         </ul>
     </div>
     <div class="info">
@@ -32,9 +31,9 @@
     <div class="social">
         <div class="image"><img src="{% static "/images/icons/small-logo.png" %}" alt=""></div>    
         <ul class="social-icons">
-            <li class="facebook"><a href=""><i class="fa-brands fa-facebook facebook"></i></a></li>
-            <li class="instagram"><a href=""><i class="fa-brands fa-instagram instagram"></i></a></li>
-            <li class=" whatsapp"><a href=""><i class="fa-brands fa-whatsapp whatsapp"></i></a></li>
+            <li class="facebook"><a href="#" aria-label='تواصل على فيسبوك'><i class="fa-brands fa-facebook facebook"></i></a></li>
+            <li class="instagram"><a href="#" aria-label='تواصل على انستغرام'><i class="fa-brands fa-instagram instagram"></i></a></li>
+            <li class=" whatsapp"><a href="#" aria-label='تواصل على واتساب'><i class="fa-brands fa-whatsapp whatsapp"></i></a></li>
         </ul>
     </div>
 </div>

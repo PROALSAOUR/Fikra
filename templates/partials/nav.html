@@ -19,23 +19,23 @@
             {% endif %}
             <div class="nav">
                 <div class="nav-item {% if request.path == '/' %}active{% endif %}">
-                    <a href=" {% url 'store:home' %} " id="home" ><i class="fa-solid fa-store"></i></a>
+                    <a href=" {% url 'store:home' %}" aria-label="الرئيسية" id="home" ><i class="fa-solid fa-store"></i></a>
                     <label for="home">الرئيسية</label>
                 </div>
                 <div class="nav-item {% if request.path == '/cart/' %}active{% endif %}">
-                    <a href="{% url 'store:cart_page' %}" id="cart"><i class="fa-solid fa-bag-shopping"></i></a>
+                    <a href="{% url 'store:cart_page' %}" aria-label="السلة" id="cart"><i class="fa-solid fa-bag-shopping"></i></a>
                     <label for="cart">حقيبتي</label>
                 </div>
                 <div class="nav-item  {% if request.path == '/search/' %}active{% endif %}">
-                    <a href="{% url 'store:search_page' %}" id="search"><i class="fa-solid fa-magnifying-glass"></i></a>
+                    <a href="{% url 'store:search_page' %}" aria-label="البحث" id="search"><i class="fa-solid fa-magnifying-glass"></i></a>
                     <label for="search">البحث</label>
                 </div>
                 <div class="nav-item  {% if request.path == '/favourite/' %}active{% endif %}">
-                    <a href="{% url 'store:favourite_page' %}" id="fav"><i class="fa-solid fa-bookmark"></i></a>
+                    <a href="{% url 'store:favourite_page' %}" aria-label="المفضلة" id="fav"><i class="fa-solid fa-bookmark"></i></a>
                     <label for="fav">المفضلة</label>
                 </div>
                 <div class="nav-item  {% if request.path == '/accounts/' %}active{% endif %}">
-                    <a href="{% url 'accounts:account_page' %}" id="account"><i class="fa-solid fa-circle-user"></i></a>
+                    <a href="{% url 'accounts:account_page' %}" aria-label="حسابي" id="account"><i class="fa-solid fa-circle-user"></i></a>
                     <label for="account">حسابي</label>
                 </div>
             </div>

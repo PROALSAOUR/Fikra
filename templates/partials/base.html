@@ -9,11 +9,11 @@
     <meta name="csrf-token" content="{{ csrf_token }}">
     
     <!-- import css files -->
-    <link rel="stylesheet" href="{% static "/css/normalize.css" %}">                                 <!-- Render All Element Normally -->
-    <link rel="stylesheet" href="{% static "/css/all.css" %}">                                       <!-- Font Awesome Icons File     -->
-    <link rel="stylesheet" href="{% static "/css/all.min.css" %}">                                   <!-- Font Awesome Icons File     -->
-    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />                <!-- Slider Style CSS File       -->       
-    <link rel="stylesheet" href="{% static "/css/style.css" %}">                                     <!-- Main Template CSS File      -->
+    <link rel="stylesheet" href="{% static "/css/normalize.css" %}" onload="this.media='all'">   <!-- Render All Element Normally -->
+    <link rel="stylesheet" href="{% static "/css/all.css" %}" onload="this.media='all'">   <!-- Font Awesome Icons File     -->
+    <link rel="stylesheet" href="{% static "/css/all.min.css" %}" onload="this.media='all'">  <!-- Font Awesome Icons File     -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />   <!-- Slider Style CSS File       -->       
+    <link rel="stylesheet" href="{% static "/css/style.css" %}" onload="this.media='all'">   <!-- Main Template CSS File      -->
     <!-- import font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,13 +56,13 @@
     {% endif %}
     
     <!-- import Javascript files -->
-    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src=" {% static "/javascript/pop-pages.js" %}"></script>
-    <script src=" {% static "/javascript/main.js" %}"></script>
-    <script src=" {% static "/javascript/live-search.js" %}"></script>
-    <script src=" {% static "/javascript/fireworks.js" %}"></script>
+    <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"  onload="this.media='all'"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"  onload="this.media='all'"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"  onload="this.media='all'"></script>
+    <script src=" {% static "/javascript/pop-pages.js" %}"  onload="this.media='all'"></script>
+    <script src=" {% static "/javascript/main.js" %}" onload="this.media='all'"></script>
+    <script src=" {% static "/javascript/live-search.js" %}" onload="this.media='all'"></script>
+    <script src=" {% static "/javascript/fireworks.js" %}" onload="this.media='all'"></script>
 
 
     {% comment %} only in debugging remove later {% endcomment %}

@@ -81,7 +81,6 @@
                             <h4 class="product-price {% if product.offer %} offer {% endif %}">
                                 <span class="offer-percient">تخفيض <span>{{product.get_offer_percentage}}%</span></span>
                                 <div class="buy-by-money"><span class="old"> {{product.price}} </span><span class="new"> | {{product.new_price|floatformat:0}} </span><span> دل </span></div>
-                                <div class="buy-by-points">{{product.point_price}} <i class="fa-solid fa-gem"></i></div>            
                             </h4>
                         {% else %}
                             <h4 class="product-price" style='color:#9D2121;text-wrap:nowrap;'>

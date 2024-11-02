@@ -26,7 +26,7 @@
                                         <div class="specific">
                                             <div class="swiper-slide product-box {% if item.product.offer %} offer {% endif %}"> <!-- اضف كلاس اوفر اذا كان هنالك تخفيض- -->
                                                 
-                                                <a href="{% url "store:product_details" item.product.id  %}">
+                                                <a href="{% url "store:product_details" item.product.id  %}"  aria-label="استعرض {{item.product.name}}">
                                                     <div class="product-image">
                                                         <div class="off-holder">
                                                             {% if item.product.get_total_stock > 0 %}
@@ -36,19 +36,19 @@
                                                         <img src="{{ item.product_item.image.url }}" alt="{{ item.product.name }}">
                                                     </div>
                                                     <div class="product-info">
-                                                        <h4 class="product-name"> {{ item.product.name|slice:":20" }}{% if item.product.name|length > 20 %}...{% endif %}</h4><!-- اقصى طول 20 حرف -->
+                                                        <div class="product-name"> {{ item.product.name|slice:":20" }}{% if item.product.name|length > 20 %}...{% endif %}</div><!-- اقصى طول 20 حرف -->
                                                         
-                                                        <h4 class="product-size ">المقاس: <span>{{ item.size }}</span></h4>
-                                                        <h4 class="product-color ">اللون: <span>{{ item.color }}</span></h4>
+                                                        <div class="product-size ">المقاس: <span>{{ item.size }}</span></div>
+                                                        <div class="product-color ">اللون: <span>{{ item.color }}</span></div>
 
                                                         {% if item.product.get_total_stock > 0 %}
-                                                            <h4 class="product-price">
+                                                            <div class="product-price">
                                                                 <div class="buy-by-money"><span class="old">{{ item.product.price }}</span><span class="new"> | {{ item.product.new_price|floatformat:0 }}</span><span class='currency'>دل</span></div>
-                                                            </h4>
+                                                            </div>
                                                         {% else %}
-                                                            <h4 class="product-price" style='color:#9D2121;text-wrap:nowrap;'>
+                                                            <div class="product-price" style='color:#9D2121;text-wrap:nowrap;'>
                                                                 نفذت الكمية 
-                                                            </h4>
+                                                            </div>
                                                         {% endif %}
 
                                                     </div>
@@ -57,7 +57,7 @@
                                                 {% comment %} الكود الخاص  بزر ازالة من السلة {% endcomment %}
                                                 
                                                 <span class="add-to-trash add-to-fav">
-                                                    <a href="{% url 'store:remove_from_cart' item.cart_item.id %}" data-cart-item-id="{{ item.cart_item.id }}">
+                                                    <a href="{% url 'store:remove_from_cart' item.cart_item.id %}" aria-label="ازل من المفضلة" data-cart-item-id="{{ item.cart_item.id }}">
                                                         <i class="fa-regular fa-trash-can"></i>
                                                     </a>
                                                 </span>
@@ -65,7 +65,7 @@
 
                                                 {% comment %} الكود الخاص  بزر اضافة الى المفضلة {% endcomment %}
                                                 <span class="add-to-fav">
-                                                    <a href="{% url 'store:add_to_favourites'  item.product.id %}" class="add-to-fav-link" data-product-id="{{  item.cart_item.product_item.product.id }}">
+                                                    <a href="{% url 'store:add_to_favourites'  item.product.id %}" aria-label="اضف الى المفضلة" class="add-to-fav-link" data-product-id="{{  item.cart_item.product_item.product.id }}">
 
                                                         {% if  item.product.id in favourite_products %}
                                                             <i class="fa-solid fa-heart"></i>
@@ -84,11 +84,12 @@
                                                             متبقي (<span class="stock-quantity">{{ item.cart_item.get_stock_quantity }}</span>) في المخزن
                                                         </div>
                                                     </div>
-                                                    <button type="button" class="minus">
+                                                    <button type="button" class="minus" title="انقاص">
                                                         <i class="fa-regular fa-square-minus"></i>
                                                     </button>
-                                                    <input type="number" name="qty" class="quantity-value" value="{{ item.qty }}" min="1" />
-                                                    <button type="button" class="plus-cart">
+                                                    <label for="forlabel{{ item.cart_item.id }}" style="visibility: hidden;position: absolute;left: 100vw;top: 100vw;">الكمية الحالية</label>
+                                                    <input type="number" id="forlabel{{ item.cart_item.id }}" name="qty" class="quantity-value" value="{{ item.qty }}" min="1" />
+                                                    <button type="button" class="plus-cart" title="زيادة">
                                                         <i class="fa-regular fa-square-plus"></i>
                                                     </button>
                                                 </span>
@@ -114,7 +115,7 @@
                                         <div class="specific">
                                             <div class="swiper-slide product-box" > <!-- اضف كلاس اوفر اذا كان هنالك تخفيض- -->
                                                 
-                                                <a href="{% url "store:product_details" item.product.id  %}" style='opacity: 0.6;'>
+                                                <a href="{% url "store:product_details" item.product.id  %}" aria-label="استعرض {{item.product.name}}" style='opacity: 0.6;'>
                                                     <div class="product-image">
                                                         <div class="off-holder">
                                                                 <span>تخفيض</span>
@@ -122,27 +123,27 @@
                                                         <img src="{{ item.product_item.image.url }}" alt="{{ item.product.name }}"  style='opacity: 0.5;'>
                                                     </div>
                                                     <div class="product-info">
-                                                        <h4 class="product-name"> {{ item.product.name|slice:":20" }}{% if item.product.name|length > 20 %}...{% endif %}</h4><!-- اقصى طول 20 حرف -->
+                                                        <div class="product-name"> {{ item.product.name|slice:":20" }}{% if item.product.name|length > 20 %}...{% endif %}</div><!-- اقصى طول 20 حرف -->
                                                         
-                                                        <h4 class="product-size ">المقاس: <span>{{ item.size }}</span></h4>
-                                                        <h4 class="product-color ">اللون: <span>{{ item.color }}</span></h4>
-                                                        <h4 class="product-price" style='color:#9D2121;text-wrap:nowrap;'>
+                                                        <div class="product-size ">المقاس: <span>{{ item.size }}</span></div>
+                                                        <div class="product-color ">اللون: <span>{{ item.color }}</span></div>
+                                                        <div class="product-price" style='color:#9D2121;text-wrap:nowrap;'>
                                                             نفذت الكمية 
-                                                        </h4>
+                                                        </div>
 
                                                     </div>
                                                 </a> 
 
                                                 {% comment %} الكود الخاص  بزر ازالة من السلة {% endcomment %}
                                                 <span class="add-to-trash add-to-fav"  style='opacity: 0.8;'>
-                                                    <a href="{% url 'store:remove_from_cart' item.cart_item.id %}" data-cart-item-id="{{ item.cart_item.id }}">
+                                                    <a href="{% url 'store:remove_from_cart' item.cart_item.id %}" aria-label="ازالة من السلة" data-cart-item-id="{{ item.cart_item.id }}">
                                                         <i class="fa-regular fa-trash-can"></i>
                                                     </a>
                                                 </span>
 
                                                 {% comment %} الكود الخاص  بزر اضافة الى المفضلة {% endcomment %}
                                                 <span class="add-to-fav" style='opacity: 0.8;'>
-                                                    <a href="{% url 'store:add_to_favourites'  item.product.id %}" class="add-to-fav-link" data-product-id="{{  item.cart_item.product_item.product.id }}">
+                                                    <a href="{% url 'store:add_to_favourites'  item.product.id %}" aria-label="اضافة الى المفضلة" class="add-to-fav-link" data-product-id="{{  item.cart_item.product_item.product.id }}">
 
                                                         {% if  item.product.id in favourite_products %}
                                                             <i class="fa-solid fa-heart"></i>
@@ -176,7 +177,7 @@
 
                                 <form action="" class="discount">
                                 
-                                    <p  class="add-copon-link">هل لديك لديك كوبون خصم؟</p>
+                                    <p class="add-copon-link">هل لديك لديك كوبون خصم؟</p>
     
                                     {% comment %} في حال كان هنالك كود مختار بالفعل  {% endcomment %}
 
@@ -215,7 +216,7 @@
             </div>
             <p> طلبك في طريقه إليك</p>
             <i class="fa-solid fa-boxes-packing"></i>
-            <p class="confirm-order-message"><a href="{% url "orders:my-orders" %}" > الذهاب إلى صفحة الطلبات <i class="fa-solid fa-arrow-up-right-from-square"></i></a></p>
+            <p class="confirm-order-message"><a href="{% url "orders:my-orders" %}" aria-label="الذهاب إلى صفحة الطلبات "> الذهاب إلى صفحة الطلبات <i class="fa-solid fa-arrow-up-right-from-square"></i></a></p>
         </div>
         <!-- End add-cart-pop-page Section -->
 

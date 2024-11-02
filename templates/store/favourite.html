@@ -14,7 +14,7 @@
                             {% endif %}
                             <input type="search" class="search-input" id="search-query" name="q" placeholder="ما الذي تبحث عنه؟" value="{{ request.GET.q }}">                   
                             
-                            <button id="clear-favourites-btn" type="button" class="empty">
+                            <button id="clear-favourites-btn" type="button" class="empty"  title="إفراغ المفضلة">
                                 <span class="delete">إفراغ</span>
                                 <span class="items-count">({{ products_count }})</span>
                                 <i class="fa-regular fa-trash-can"></i>

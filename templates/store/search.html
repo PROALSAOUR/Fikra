@@ -9,11 +9,11 @@
         <div class="container">
             <form id="filter-form" method="get" action="{% url 'store:search_page' %}" class="search">
                 {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.category or request.GET.brand %}
-                    <button class='clear-search' OnClick="resetFilters();"><i class="fa-solid fa-xmark"></i><p>إلغاء الفلترة</p></button>
+                    <button title="إزالة الفلترة" class='clear-search' OnClick="resetFilters();"><i class="fa-solid fa-xmark"></i><p>إلغاء الفلترة</p></button>
                 {% endif %}
                 <input type="search" class="search-input" id="search-query" name="q" placeholder="ما الذي تبحث عنه؟" value="{{ request.GET.q }}">
                 <div class="filter-container">
-                    <button type="button" class="filter-toggle">
+                    <button type="button" class="filter-toggle" title="الفلاتر">
                         <i class="fa-solid fa-sliders"></i>
                     </button>
                     <div class="filter-options">
@@ -22,9 +22,9 @@
                             <button type="button" class="close-filter">&times;</button>
                         </div>
                         <div class="filter-tabs">
-                            <button type="button" class="filter-tab" data-target="price">السعر</button>
-                            <button type="button" class="filter-tab" data-target="category">التصنيف</button>
-                            <button type="button" class="filter-tab" data-target="brand">العلامة التجارية</button>
+                            <button type="button" title="الفلتر" class="filter-tab" data-target="price">السعر</button>
+                            <button type="button" title="الفلتر" class="filter-tab" data-target="category">التصنيف</button>
+                            <button type="button" title="الفلتر" class="filter-tab" data-target="brand">العلامة التجارية</button>
                         </div>
                         <div class="filter-content">
                             <!-- الفلاتر المخفية هنا -->
@@ -56,7 +56,7 @@
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" class="apply-filters">تطبيق الفلاتر</button>
+                        <button type="submit"  title="تطبيق الفلاتر" class="apply-filters">تطبيق الفلاتر</button>
                     </div>
                 </div>
             </form>

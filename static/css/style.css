@@ -963,6 +963,7 @@ select option::selection {
   -moz-border-radius: var(--main-border-radius);
   -ms-border-radius: var(--main-border-radius);
   -o-border-radius: var(--main-border-radius);
+  aspect-ratio: 4 / 1; 
 }
 .header .upper-part .points a{
   font-size:  var(--lab-l-size);

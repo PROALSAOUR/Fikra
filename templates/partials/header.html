@@ -15,8 +15,8 @@
                             <div class="toggle">
                                 <input type="checkbox" name="" id="them">
                                 <label for="them">
-                                    <img src="{% static 'images/dark_mode_30dp_B18E4B_FILL0_wght400_GRAD0_opsz24.svg' %}" class="moon icon" alt="">
-                                    <img src="{% static 'images/wb_sunny_30dp_B18E4B_FILL0_wght400_GRAD0_opsz24.svg' %}" class="sun icon" alt="">
+                                    <img src="{% static 'images/dark_mode_30dp_B18E4B_FILL0_wght400_GRAD0_opsz24.svg' %}" class="moon icon" alt="الوضع المظلم">
+                                    <img src="{% static 'images/wb_sunny_30dp_B18E4B_FILL0_wght400_GRAD0_opsz24.svg' %}" class="sun icon" alt="الوضع الفاتح">
                                 </label>    
                             </div>
                         </div>
@@ -26,7 +26,7 @@
                             </div>
                             <ul class="links">
                                 {% for category in men_categories %}
-                                    <li><a href="{% url 'store:category' category.slug %}"><i class="fa-solid fa-angles-left"></i> {{ category.name|slice:":-6"  }}</a></li>
+                                    <li><a href="{% url 'store:category' category.slug %}" aria-label="اذهب الى {{ category.name }}"><i class="fa-solid fa-angles-left"></i> {{ category.name|slice:":-6"  }}</a></li>
                                 {% endfor %}
                             </ul>
                         </div>
@@ -36,7 +36,7 @@
                             </div>
                             <ul class="links">
                                 {% for category in women_categories %}
-                                    <li><a href="{% url 'store:category' category.slug %}"><i class="fa-solid fa-angles-left"></i> {{ category.name|slice:":-6"  }}</a></li>
+                                    <li><a href="{% url 'store:category' category.slug %}" aria-label="اذهب الى {{ category.name }}"><i class="fa-solid fa-angles-left"></i> {{ category.name|slice:":-6"  }}</a></li>
                                 {% endfor %}
                             </ul>
                         </div>
@@ -45,35 +45,35 @@
                                 <h1>تواصل معنا</h1>
                             </div>
                             <ul class="links">
-                                <li><a href=""><i class="fa-brands fa-facebook"></i>فيسبوك</a></li>
-                                <li><a href=""><i class="fa-brands fa-instagram"></i>انستغرام</a></li>
-                                <li><a href=""><i class="fa-brands fa-whatsapp"></i>واتساب</a></li>
-                                <li><a href=""><i class="fa-regular fa-envelope"></i>ايميل</a></li>
-                                <li><a href=""><i class="fa-solid fa-phone-volume"></i>اتصل بنا</a></li>
+                                <li><a href="#" aria-label="اذهب الى فيسبوك" ><i class="fa-brands fa-facebook"></i>فيسبوك</a></li>
+                                <li><a href="#" aria-label="اذهب الى انستغرام" ><i class="fa-brands fa-instagram"></i>انستغرام</a></li>
+                                <li><a href="#" aria-label="اذهب الى واتساب" ><i class="fa-brands fa-whatsapp"></i>واتساب</a></li>
+                                <li><a href="#" aria-label="اذهب الى ايميل" ><i class="fa-regular fa-envelope"></i>ايميل</a></li>
+                                <li><a href="#" aria-label="تواصل معنا" ><i class="fa-solid fa-phone-volume"></i>اتصل بنا</a></li>
                             </ul>
                         </div>  
                         <div class="secondary-nav">
                             <ul>
                                 <li class="li contact-us"><i class="fa-solid fa-headset"></i></li>
-                                <li class="li"><a href="{% url "cards:cards-repo" %}"><i class="fa-solid fa-gifts"></i></a></li>
-                                <li class="li"><a href="{% url "orders:my-orders" %}"><i class="fa-solid fa-list-check"></i></a></li>
-                                <li class="li"><a href="{% url 'blog:blog' %}"><i class="fa-regular fa-circle-question"></i></a></li>
+                                <li class="li"><a href="{% url "cards:cards-repo" %}" aria-label="مخزون البطاقات"><i class="fa-solid fa-gifts"></i></a></li>
+                                <li class="li"><a href="{% url "orders:my-orders" %}" aria-label="طلباتي السابقة"><i class="fa-solid fa-list-check"></i></a></li>
+                                <li class="li"><a href="{% url 'blog:blog' %}" aria-label="المدونة"><i class="fa-regular fa-circle-question"></i></a></li>
                             </ul>
                         </div>      
                     </div>  
                     <!-- end mega-menu  -->
-                    <a href="{% url "accounts:account_info" %}#go_to_notfications" style="position: relative;">
+                    <a href="{% url "accounts:account_info" %}#go_to_notfications" aria-label="الاشعارات" style="position: relative;">
                         <i class="fa-regular fa-bell bell"></i>
                         {% if unread_messages_count > 0 %}  <!-- اذا كان هنالك رسائل جديدة اظهر السبان والا اخفيه  -->
                             <span class="has-new-notif"></span>
                         {% endif %}
                     </a>
                 </div>
-                <div class="logo">
-                    <img src="{% static 'images/name logo.jpg' %}" alt="Fikra Store Name">
+                <div class="logo"  width='1200' height="1200">
+                    <img src="{% static 'images/name logo.jpg' %}" alt="Fikra Store Name" >
                 </div>
                 <div class="points">
-                    <a href="{% url "accounts:account_page" %}">
+                    <a href="{% url "accounts:account_page" %}" aria-label="حسابي">
                         <span>{{ user_points }}</span>
                         <i class="fa-solid fa-gem"></i>                
                     </a>
@@ -81,11 +81,9 @@
             </div>
             <div class="lower-part">
                 <div class="categories">
-                    <a class="category" href="{% url "store:offer_page" %}">عروض</a>
-                    {% if men_category %}<a class="category" href=" {% url "store:category" men_category.slug %}"> رجالي</a>{% endif %}
-                    {% if women_category %}<a class="category" href=" {% url "store:category" women_category.slug %}"> نسائي</a>{% endif %} 
-                    {% comment %} <a class="category" href="{% url "store:points_page" %}">هدايا</a>     {% endcomment %}
-
+                    <a class="category" href="{% url "store:offer_page" %}" aria-label="العروض">عروض</a>
+                    {% if men_category %}<a class="category" href=" {% url "store:category" men_category.slug %}" aria-label="الملابس الرجالية"> رجالي</a>{% endif %}
+                    {% if women_category %}<a class="category" href=" {% url "store:category" women_category.slug %}" aria-label="الملابس النسائية"> نسائي</a>{% endif %} 
                 </div>
             </div>
         </div>
