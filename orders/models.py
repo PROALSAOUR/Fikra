@@ -69,6 +69,12 @@ class Order(models.Model):
         verbose_name_plural = 'الطلبات'
 
 class OrderItem(models.Model):
+    ORDERITEM_STATUS =  [
+        ('confirmed', 'مؤكد'),
+        ('replaced', 'مُستبدل'),
+    ]
+    
+    status = models.CharField(choices=ORDERITEM_STATUS, max_length=15, default='confirmed')
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items', verbose_name='الطلب')
     order_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='order_items' , verbose_name='المنتج')
     qty = models.PositiveIntegerField(default=1, verbose_name='الكمية')
@@ -154,5 +160,4 @@ class DealingItem(models.Model):
 
     def __str__(self) -> str:
         return f'{self.order_dealing.order.user} => {self.order_dealing.order.serial_number}'
-    
     

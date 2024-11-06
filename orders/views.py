@@ -9,8 +9,7 @@ from settings.models import Settings
 from store.models import Cart
 from accounts.models import UserProfile
 from django.utils import timezone
-from accounts.send_messages import create_order_message, cancel_order_message, edit_order_message
-
+from accounts.send_messages import create_order_message, cancel_order_message, edit_order_message, return_order_item_message
 
 
 # دالة عرض الطلبات
@@ -123,54 +122,61 @@ def remove_order_item(request):
             if not remove_id or not order_id :
                 return JsonResponse({'success': False, 'error': 'المعذرة يبدو انه هنالك بيانات ناقصة يرجى المحاولة لاحقا.'})
             
+            # تحقق من حالة الطلب
             order = Order.objects.get(id=order_id, user=user)
-            
             if order.status == 'canceled':
-                return JsonResponse({'success': False, 'error': ' نعتذر, هذا الطلب تم إلغاؤه مسبقا لذالك لايمكن تعديله'}) 
-            elif order.status == 'delivered':
-                return JsonResponse({'success': False, 'error': "نعتذر, لا يمكن إلغاء منتج من طلب تم تسليمه بالفعل"}) 
-            elif order.status == 'shipped':
-                return JsonResponse({'success': False, 'error': "المعذرة لكن هذا الطلب تم شحنه اليك بالفعل اذا اردت إلغائه عليك التواصل مع خدمة العملاء"}) 
-            else:
-                order_item = order.order_items.get(id=remove_id)
-                order_item.delete()
+                return JsonResponse({'success': False, 'error': "نعتذر. لا يمكن تعديل الطلبات التي تم إلغاؤها"})
+            if order.status == 'delivered' and order.deliverey_date:
+                # احسب الفرق بين التاريخ الحالي وتاريخ التسليم
+                days_since_delivery = (timezone.now() - order.deliverey_date).days
+                # تحقق مما إذا كانت المدة أكبر من عدد أيام الاستبدال القصوى
                 
-                product_variant = order_item.order_item 
-                product_variant.update_stock(order_item.qty)  # زيادة المخزون بناءً على الكمية
-                product_variant.sold -= order_item.qty  # انقاص الكمية المباعة بناءً على الكمية
-                product_variant.save()
+                max_replace_days = Settings.objects.values_list('max_return_days', flat=True).first()
+
+                if max_replace_days is None:
+                    max_replace_days = 3  # ثلاث أيام كقيمة افتراضية
                 
-                 
-                # التحقق من عدد العناصر المتبقية في الطلب
-                if not order.order_items.exists():  # إذا لم يكن هناك أي عناصر متبقية
-                    order.status = 'canceled'
-                else:     
-                    # تجديد بيانات الطلب بعد حذف المنتج  
-                    order.old_total -= order_item.price * order_item.qty
-                    order.total_price = order.old_total + order.dlivery_price - order.discount_amount
-                    order.total_points -= order_item.points * order_item.qty
-                  
-                order.save()  
+                if days_since_delivery > max_replace_days:
+                    return JsonResponse({'success': False, 'error': "نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإرجاع"})
                 
+            
+            order_item = order.order_items.get(id=remove_id)
+            order_item.delete()
+            
+            product_variant = order_item.order_item 
+            product_variant.update_stock(order_item.qty)  # زيادة المخزون بناءً على الكمية
+            product_variant.sold -= order_item.qty  # انقاص الكمية المباعة بناءً على الكمية
+            product_variant.save()
+                
+            # التحقق من عدد العناصر المتبقية في الطلب
+            if not order.order_items.exists():  # إذا لم يكن هناك أي عناصر متبقية
+                order.status = 'canceled'
+            else:     
+                # تجديد بيانات الطلب بعد حذف المنتج  
+                order.old_total -= order_item.price * order_item.qty
+                order.total_price = order.old_total + order.dlivery_price - order.discount_amount
+                order.total_points -= order_item.points * order_item.qty
+            order.save()  
+            
+            # انشاء معاملة فقط ان لم تكن حالة الطلب  جاري المعالجة
+            if order.status != 'pending' :      
                 # انشاء معاملة لإخبار الموظفين انه هنالك عملية إلغاء منتجات حصلت
                 dealing, created = OrderDealing.objects.get_or_create(order=order)
-                
                 DealingItem.objects.create(
                     order_dealing= dealing,
                     old_item = product_variant,
                     status = 'return',
                     price_difference = 0,
-                    )
+                )
+                dealing.save()               
+                #  ارسال رسالة الى المستخدم عند ارجاع منتج من الطلب
+                message = return_order_item_message(user_name=user.first_name, order=order.serial_number)
+                inbox = user.profile.inbox
+                inbox.messages.add(message)
+                inbox.save() 
                 
-                dealing.save()
-                
-                
-              
-                
-                
-                return JsonResponse({'success': True, 'message':'تمت ازالة المنتج من الطلب بنجاح' })
+            return JsonResponse({'success': True, 'message':'تمت ازالة المنتج من الطلب بنجاح' })
                   
-        
         except OrderItem.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'العنصر المطلوب غير موجود'})
         except Exception as e:
@@ -197,7 +203,7 @@ def edit_order(request):
                     days_since_delivery = (timezone.now() - order.deliverey_date).days
                     # تحقق مما إذا كانت المدة أكبر من عدد أيام الاستبدال القصوى
                     
-                    max_replace_days = Settings.objects.values_list('partners_percentage', flat=True).first()
+                    max_replace_days = Settings.objects.values_list('max_replace_days', flat=True).first()
                     if max_replace_days is None:
                         max_replace_days = 3  # ثلاث أيام كقيمة افتراضية
                     
@@ -229,6 +235,7 @@ def edit_order(request):
                         item.qty = new_item.qty
                         item.price = new_item.cart_item.product_item.product.get_price()  # تحديث السعر بناءً على المتغير الجديد
                         item.points = new_item.cart_item.product_item.product.bonus
+                        item.status = 'replaced'
                         item.save()
 
                     else:
@@ -240,6 +247,7 @@ def edit_order(request):
                             existing_order_item.qty += new_item.qty
                             existing_order_item.price = new_item.cart_item.product_item.product.get_price()  # تحديث السعر بناءً على الكمية الجديدة
                             existing_order_item.points = new_item.cart_item.product_item.product.bonus
+                            existing_order_item.status = 'replaced'
                             existing_order_item.save()
 
                             # إزالة العنصر القديم
@@ -251,6 +259,7 @@ def edit_order(request):
                             item.qty = new_item.qty
                             item.price = new_item.cart_item.product_item.product.get_price()
                             item.points = new_item.cart_item.product_item.product.bonus
+                            item.status = 'replaced'
                             item.save()
 
                     # تخزين السعر القديم للطلب قبل التعديل  لإستعماله في جلب الفارق بين المنتجين المعدلين
@@ -436,6 +445,4 @@ def create_order(request):
         return JsonResponse({'success': True, 'message': 'تمت عملية الطلب بنجاح!'})
 
     return JsonResponse({'success': False, 'error': 'طلب غير صالح'})
-
-
 

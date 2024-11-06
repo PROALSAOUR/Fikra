@@ -189,6 +189,22 @@ def edit_order_message(user_name, order):
     message.save()
     return message
     
+def return_order_item_message(user_name, order):
+    """الرسالة التي ترسل عند ارجاع منتج من طلب """
+    message = Message(
+        subject= f'تم إنشاء طلب إرجاع بنجاح!',
+        content= 
+        f"""
+        مرحبا {user_name} 
+        لقد تم انشاء طلب إرجاع لأحد المنتجات التابعة  للطلب ({str(order).zfill(6)}) الخاص بك بنجاح سوق يتواصل معك مندوب التوصيل الخاص بنا قريبا, شاكرين لك حسن تفهمك.\n 
+        في حال كان لديك اي استفسار يرجى التواصل مع خدمة العملاء وسوف يتم الرد عليك بأسرع وقت ممكن\n
+        نرجو لك وقتا سعيداً.
+        """,
+        timestamp=timezone.now()
+    )
+    message.save()
+    return message
+    
 
 
 
