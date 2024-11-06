@@ -5,11 +5,20 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 import decimal
 
+# ترتيب عمل الاشارات الخاصة بالاحصائيات
+# 1 update_monthly_totals 
+# 2 calc_groups_incomes
+# 3 update_partners_profit
+
+# ========================== FUNCTIONS =======================
+
 def get_partners_percentage():
     """دالة تجلب نسبة الشركاء من الربح من ملف الاعدادات"""
     percentage = Settings.objects.values_list('partners_percentage', flat=True).first()
     print(f'persentage is {percentage}++++++++++++++++++++++++++++++++++++++++++')
     return decimal.Decimal(percentage) if percentage else decimal.Decimal(0)
+
+# ========================== SIGNALS =========================
 
 @receiver(post_save, sender=Order)
 def update_monthly_totals(sender, created, instance, **kwargs):
@@ -154,6 +163,80 @@ def calc_groups_incomes(sender, created, instance, **kwargs):
                 group.refund_amount += group_month.total_amount 
                 group.save() 
 
+@receiver(post_save, sender=AdditionalIncome)
+def handle_additional_income(sender, created, instance, **kwargs):
+    """
+    تعمل عند انشاء دخل او تعديله وظيفتها تعديل قيم الاحصائية
+    """
+    #  الحصول على احصائية للشهر المطلوب
+    monthly_statis = instance.month
+    
+    # ========= الحصول على المدخلات ============
+    
+    additional_income = sum(income.value for income in monthly_statis.incomes.all()) if monthly_statis.incomes.exists() else 0
+                                
+    # ================= حساب اجمالي الربح ==============
+    
+    total_profit = (monthly_statis.total_income + additional_income) - ( monthly_statis.total_costs + monthly_statis.total_packaging + monthly_statis.goods_price )
+
+    # ================= تحدييث بيانات الإحصائية الشهرية ==============
+    
+    monthly_statis.additional_income = additional_income
+    monthly_statis.total_profit = total_profit    
+    monthly_statis.save()
+    
+@receiver(post_save, sender=Cost)
+def handle_total_costs(sender, created, instance, **kwargs):
+    """
+    تعمل عند انشاء تكلفة او تعديلها وظيفتها تعديل قيم الاحصائية
+    """
+    #  الحصول على احصائية للشهر المطلوب
+    monthly_statis = instance.month
+    
+    # ========= الحصول على التكاليف ============
+    
+    total_costs = sum(cost.value for cost in monthly_statis.costs.all()) if monthly_statis.costs.exists() else 0
+                                
+    # ================= حساب اجمالي الربح ==============
+    
+    total_profit = (monthly_statis.total_income + monthly_statis.additional_income) - ( total_costs + monthly_statis.total_packaging + monthly_statis.goods_price )
+
+    # ================= تحدييث بيانات الإحصائية الشهرية ==============
+    
+    monthly_statis.total_costs = total_costs
+    monthly_statis.total_profit = total_profit    
+    monthly_statis.save()
+
+@receiver(post_save, sender=PackForMonth)
+def handle_total_packaging(sender, created, instance, **kwargs):
+    """
+    تعمل عند تعديل تكلفة التغليف التابعة للشهر و تعدل قيم الاحصائية
+    """
+    #  الحصول على احصائية للشهر المطلوب
+    monthly_statis = instance.for_month
+    
+    # ========= الحصول على جميع الطلبات المسلمة بنفس الشهر ============
+        
+    all_orders = Order.objects.filter(
+        deliverey_date__month=monthly_statis.month, 
+        deliverey_date__year=monthly_statis.year, 
+        status='delivered'
+    ).prefetch_related('order_items__order_item__product_item__product')   
+    all_orders_count = all_orders.count() 
+    
+    # الحصول على تكلفة تغلييف جميع الطلبات
+    total_packaging = all_orders_count * instance.one_order_packing_cost
+                                
+    # ================= حساب اجمالي الربح ==============
+    
+    total_profit = (monthly_statis.total_income + monthly_statis.additional_income) - ( monthly_statis.total_costs + total_packaging + monthly_statis.goods_price )
+
+    # ================= تحدييث بيانات الإحصائية الشهرية ==============
+    
+    monthly_statis.total_packaging = total_packaging
+    monthly_statis.total_profit = total_profit    
+    monthly_statis.save()
+
 @receiver(post_save, sender=InvestmentGroupMember)
 def update_investment_Group(sender, created, instance, **kwargs):
     """
@@ -242,5 +325,3 @@ def prevent_received_false(sender, instance, **kwargs):
         except InvestigatorProfit.DoesNotExist:
             pass 
 
-
-# 

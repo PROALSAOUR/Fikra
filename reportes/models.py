@@ -217,7 +217,7 @@ class PackForMonth(models.Model):
         verbose_name_plural = 'تكلفة التغليف'
 # كلاس للمصاريف
 class Cost(models.Model):
-    month = models.ForeignKey(MonthlyTotal, on_delete=models.CASCADE, related_name='costs'  , verbose_name='شهر')
+    month = models.ForeignKey(MonthlyTotal, on_delete=models.CASCADE, related_name='costs' , verbose_name='شهر')
     title = models.CharField(verbose_name='الاسم')
     value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='التكلفة')
     description = models.TextField(verbose_name='الوصف' , null=True, blank=True)
