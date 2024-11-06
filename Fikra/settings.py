@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'cards',
     'orders',
     'reportes',
+    'settings',
+    
 ]
 
 MIDDLEWARE = [
@@ -233,11 +235,6 @@ JAZZMIN_UI_TWEAKS = {
         "success": "btn-success"
     }
 }
-# ===================================================================
-
-# PARTNERS PERCENTAGE
-PARTNERS_PERCENTAGE = 0.1
-
 # ===================================================================
 
 # جدولة المهام

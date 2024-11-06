@@ -45,12 +45,4 @@ def distribute_profits():
                             from_group = group,
                             profit = percentage * monthly_total ,
                         )
-                    
-                    
-@shared_task
-def add():
-    return 9 * 9
-
-
-
-
+                                        

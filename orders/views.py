@@ -5,6 +5,7 @@ from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from orders.models import *
 from cards.models import GiftItem, CoponUsage
+from settings.models import Settings
 from store.models import Cart
 from accounts.models import UserProfile
 from django.utils import timezone
@@ -194,9 +195,14 @@ def edit_order(request):
                 if order.status == 'delivered' and order.deliverey_date:
                     # احسب الفرق بين التاريخ الحالي وتاريخ التسليم
                     days_since_delivery = (timezone.now() - order.deliverey_date).days
-                    # تحقق مما إذا كانت المدة أكبر من 3 أيام
-                    if days_since_delivery > 3:
-                        return JsonResponse({'success': False, 'error': "نعتذر. أقصى مدة لاستبدال المنتجات هي بعد تاريخ التسليم بثلاثة أيام"})
+                    # تحقق مما إذا كانت المدة أكبر من عدد أيام الاستبدال القصوى
+                    
+                    max_replace_days = Settings.objects.values_list('partners_percentage', flat=True).first()
+                    if max_replace_days is None:
+                        max_replace_days = 3  # ثلاث أيام كقيمة افتراضية
+                    
+                    if days_since_delivery > max_replace_days:
+                        return JsonResponse({'success': False, 'error': "نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإستبدال"})
                
                 try:
                     # الحصول على عنصر الطلب المراد استبداله
@@ -263,12 +269,6 @@ def edit_order(request):
                     new_total =  order.total_price
                     order.save()
 
-                    #  ارسال رسالة الى المستخدم عند تعديل الطلب
-                    message = edit_order_message(user_name=user.first_name, order=order.serial_number)
-                    inbox = user.profile.inbox
-                    inbox.messages.add(message)
-                    inbox.save()
-
                     # تعديل النقاط إذا كان الطلب قد تم تسليمه بالفعل
                     if order.status == 'delivered':
                         profile = UserProfile.objects.get(user=user)
@@ -280,18 +280,25 @@ def edit_order(request):
                     old_variation.sold -= old_qty # تحديث الكمية المباعة
                     old_variation.save()
                     new_variation.sell(new_qty)  # تحديث المبيعات
-                                            
-                    # انشاء معاملة لإخبار الموظفين انه هنالك عملية استبدال منتجات حصلت
-                    dealing, created = OrderDealing.objects.get_or_create(order=order)
-                    DealingItem.objects.create(
-                        order_dealing= dealing,
-                        old_item = old_variation,
-                        new_item = new_variation,
-                        new_qty = item.qty,
-                        status = 'replace',
-                        price_difference = new_total - old_total,
-                    )
-                    dealing.save()   
+                        
+                    # انشاء معاملة فقط ان لم تكن حالة الطلب  جاري المعالجة
+                    if order.status != 'pending' :                     
+                        # انشاء معاملة لإخبار الموظفين انه هنالك عملية استبدال منتجات حصلت
+                        dealing, created = OrderDealing.objects.get_or_create(order=order)
+                        DealingItem.objects.create(
+                            order_dealing= dealing,
+                            old_item = old_variation,
+                            new_item = new_variation,
+                            new_qty = item.qty,
+                            status = 'replace',
+                            price_difference = new_total - old_total,
+                        )
+                        dealing.save()  
+                        #  ارسال رسالة الى المستخدم عند تعديل الطلب
+                        message = edit_order_message(user_name=user.first_name, order=order.serial_number)
+                        inbox = user.profile.inbox
+                        inbox.messages.add(message)
+                        inbox.save() 
 
                     return JsonResponse({'success': True, 'message': 'تم تعديل المنتج بنجاح'})
 

@@ -172,13 +172,13 @@ class MonthlyInvestmentGroup(models.Model):
 class MonthlyTotal(models.Model):
     month = models.IntegerField(verbose_name='الشهر') # رقم الشهر
     year = models.IntegerField(verbose_name='السنة') # رقم السنة
-    total_income = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=' الدخل',  null=True)
-    additional_income =  models.DecimalField(max_digits=10, decimal_places=2, verbose_name=' الإضافات',  null=True)
-    total_costs = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=' التكاليف' , null=True)
-    total_packaging = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='إجمالي التغليف', null=True)
-    goods_price =  models.DecimalField(max_digits=10, decimal_places=2, verbose_name='سعر البضاعة', null=True)
-    total_profit = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='إجمالي الربح', null=True)
-    sales_number = models.IntegerField(null=True, verbose_name='المنتجات المباعة') # عدد الامنتجات المباع بالشهر
+    total_income = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=' الدخل',  null=True, default=0)
+    additional_income =  models.DecimalField(max_digits=10, decimal_places=2, verbose_name=' الإضافات',  null=True, default=0)
+    total_costs = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=' المصاريف' , null=True, default=0)
+    total_packaging = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='إجمالي التغليف', null=True, default=0)
+    goods_price =  models.DecimalField(max_digits=10, decimal_places=2, verbose_name='سعر البضاعة', null=True, default=0)
+    total_profit = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='إجمالي الربح', null=True, default=0)
+    sales_number = models.IntegerField(null=True, verbose_name='المنتجات المباعة', default=0) # عدد الامنتجات المباع بالشهر
     
     def __str__(self) -> str:
         return f"{self.month}/{self.year}"
@@ -215,7 +215,7 @@ class PackForMonth(models.Model):
     
     class Meta:
         verbose_name_plural = 'تكلفة التغليف'
-# كلاس للتكاليف
+# كلاس للمصاريف
 class Cost(models.Model):
     month = models.ForeignKey(MonthlyTotal, on_delete=models.CASCADE, related_name='costs'  , verbose_name='شهر')
     title = models.CharField(verbose_name='الاسم')
@@ -226,8 +226,8 @@ class Cost(models.Model):
         return f'{self.title} => {self.value}'
     
     class Meta:
-        verbose_name = 'تكلفة'
-        verbose_name_plural = 'التكاليف'
+        verbose_name = 'مصروف'
+        verbose_name_plural = 'المصاريف'
 # كلاس للدخل الإضافي
 class AdditionalIncome(models.Model):
     month = models.ForeignKey(MonthlyTotal, on_delete=models.CASCADE, related_name='incomes'  , verbose_name='شهر')
@@ -240,7 +240,7 @@ class AdditionalIncome(models.Model):
     
     class Meta:
         verbose_name = 'دخل'
-        verbose_name_plural = 'المدخلات'
+        verbose_name_plural = 'الإضافات'
 
 # ===============================================
 

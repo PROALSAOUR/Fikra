@@ -1,10 +1,15 @@
 from reportes.models import *
 from orders.models import Order
+from settings.models import Settings
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 import decimal
-from Fikra.settings import PARTNERS_PERCENTAGE
-from datetime import datetime
+
+def get_partners_percentage():
+    """دالة تجلب نسبة الشركاء من الربح من ملف الاعدادات"""
+    percentage = Settings.objects.values_list('partners_percentage', flat=True).first()
+    print(f'persentage is {percentage}++++++++++++++++++++++++++++++++++++++++++')
+    return decimal.Decimal(percentage) if percentage else decimal.Decimal(0)
 
 @receiver(post_save, sender=Order)
 def update_monthly_totals(sender, created, instance, **kwargs):
@@ -90,9 +95,11 @@ def calc_groups_incomes(sender, created, instance, **kwargs):
     """
     
     # جلب احصائيات الشهر
-    total_goods_amount = instance.goods_price
-    total_profits = instance.total_profit - (instance.total_profit * decimal.Decimal(PARTNERS_PERCENTAGE)) # ايجاد اجمالي الربح بعد خصم نسبة الشركاء
-        
+    total_goods_amount = instance.goods_price or decimal.Decimal(0)  # تعيين قيمة افتراضية
+    partners_percentage = get_partners_percentage()  # استدعاء الدالة للحصول على النسبة
+    total_profit = decimal.Decimal(instance.total_profit or 0)  # تعيين قيمة افتراضية إذا كان None
+    total_profits = total_profit - (total_profit * partners_percentage)  # اجمالي الربح بعد خصم نسبة الشركاء من الربح
+
     if created: # اذا تم انشاء احصائية قم بإنشاء روابط مجموعات استثمارية
         all_groups = InvestmentGroup.objects.filter(ready=True, completed=False, remaining_amount__gt=0) # جلب جميع المجموعات
     
@@ -133,8 +140,9 @@ def calc_groups_incomes(sender, created, instance, **kwargs):
         # جلب المجموعة الخاصة بكل رابط واعادة حساب بياناتها
         for group_monthly in all_groups_monthly:
             # اولا جلب البيانالت الجديدة بعد تعديل الاحصائية
-            group_monthly.goods_amount = group_monthly.monthly_percentage *  instance.goods_price
-            group_monthly.profit_amount = group_monthly.monthly_percentage *  instance.total_profit
+            group_monthly.goods_amount = group_monthly.monthly_percentage *  total_goods_amount
+            group_monthly.profit_amount = group_monthly.monthly_percentage * total_profits
+            group_monthly.total_amount = group_monthly.goods_amount + group_monthly.profit_amount
             group_monthly.save()
             
             group = group_monthly.investment_group # جلب المجموعة
@@ -200,8 +208,9 @@ def update_partners_profit(sender, created, instance, **kwargs):
         partners = Partners.objects.all() # جلب جميع الشركاء
 
         if partners.exists():  # تحقق من وجود الشركاء
-            total_profit = instance.total_profit
-            total_partners_profit = total_profit * decimal.Decimal(PARTNERS_PERCENTAGE)  # جلب نسبة الشركاء الإجمالية من الربح
+            total_profit = decimal.Decimal(instance.total_profit or 0)
+            partners_percentage = get_partners_percentage()  # استدعاء الدالة للحصول على النسبة
+            total_partners_profit = total_profit * partners_percentage  # جلب نسبة الشركاء الإجمالية من الربح
 
             for partner in partners:
                 partner_profit, created = PartnersProfit.objects.get_or_create(
@@ -232,32 +241,6 @@ def prevent_received_false(sender, instance, **kwargs):
                 instance.received = True  # استعادة القيمة الأصلية
         except InvestigatorProfit.DoesNotExist:
             pass 
-    
-# @receiver(post_save, sender=MonthlyTotal)
-# def temprary(sender, created, instance, **kwargs):
-#     "دالة مؤقتة تزال لاحقا وظيفتها توزيع ارباح الشهور على المستثمرين"
-#     year = 2024
-#     month = 9
 
-#     month_statis = MonthlyTotal.objects.get(month=month, year=year)
-#     if month_statis:
-#         # جيب جميع روابط المجموعات و الاحصائية
-#         all_monthly_groups = MonthlyInvestmentGroup.objects.filter(monthly_total=month_statis).prefetch_related('investment_group')
 
-#         for monthly_group in all_monthly_groups:
-#             # جيب اجمالي كل مجموعة بالشهر
-#             monthly_total = monthly_group.total_amount # ربح المجموعة الاجمالي بالشهر
-#             group = monthly_group.investment_group # جلب المجموعة من الروابط
-#             all_members = group.members.all() # جيب كل اعضاء المجموعة      
-#             for member in all_members: 
-#                 investigator = member.investigator # جلب المستثمر
-#                 percentage = decimal.Decimal(member.investment_percentage / 100 ) # احسب النسبة
-#                 # انشئ ربح مستثمر مرتبط بالشهر 
-#                 InvestigatorProfit.objects.create(
-#                     investigator = investigator,
-#                     month = month_statis,
-#                     from_group = group,
-#                     profit = percentage * monthly_total ,
-#                 )
-
-    
+# 
