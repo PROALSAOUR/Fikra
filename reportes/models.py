@@ -184,6 +184,7 @@ class MonthlyTotal(models.Model):
         return f"{self.month}/{self.year}"
     
     class Meta:
+        ordering = ['-year', '-month']  # ترتيب حسب السنة ثم الشهر
         verbose_name = 'المجموع الشهري' 
         verbose_name_plural = 'الإحصائيات الشهرية'         
 # كلاس للتغليف

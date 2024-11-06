@@ -21,7 +21,6 @@ for model in [PeriodicTask, IntervalSchedule, CrontabSchedule, SolarSchedule, Cl
         pass
 # ======================================================================================================================
 
-
 # دالة عدد المستخدمين الاجمالي
 @admin.register(UserReports)
 class UserReportsAdmin(admin.ModelAdmin):
@@ -182,7 +181,8 @@ class PartnersProfitInline(admin.TabularInline):
     extra = 0  
     max_num = 0
     readonly_fields = ('month', 'profit', )  
-    fields = ('month', 'profit', "received")  
+    fields = ('month', 'profit', "received") 
+    ordering = ('month',) 
     can_delete = False  
     show_change_link = False 
         
@@ -216,10 +216,10 @@ class InvestigatorProfitInline(admin.TabularInline):
     max_num = 0
     readonly_fields = ('month', 'from_group', 'profit', )  
     fields = ('month', 'from_group', 'profit', "received")  
-    ordering = ('-month',)
+    ordering = ('month',)
     can_delete = False  
     show_change_link = False 
-
+    
 # دالة عرض المستثمرين
 class InvestigatorAdmin(admin.ModelAdmin):
     list_display = ('name', 'phone_number', )
@@ -288,7 +288,16 @@ class CostInline(admin.TabularInline):
     fields = ('title', 'value', 'description')  # تحديد ترتيب الحقول
     can_delete = True  
     show_change_link = True  
+    
+    def is_latest(self, obj):
+        latest = MonthlyTotal.objects.order_by('-year', '-month').first()
+        return obj == latest
 
+    def get_readonly_fields(self, request, obj=None):
+        readonly = super().get_readonly_fields(request, obj)
+        if obj and not self.is_latest(obj):
+            readonly += ('title', 'value', 'description')
+        return readonly
 # قيمة الاضافات داخل الاحصائية 
 class AdditionalInline(admin.TabularInline):
     model = AdditionalIncome
@@ -296,6 +305,17 @@ class AdditionalInline(admin.TabularInline):
     fields = ('title', 'value', 'description')  # تحديد ترتيب الحقول
     can_delete = True  
     show_change_link = True  
+    
+    # لمنع التعديل ان كانت هذه احصائية قديمة
+    def is_latest(self, obj):
+        latest = MonthlyTotal.objects.order_by('-year', '-month').first()
+        return obj == latest
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly = super().get_readonly_fields(request, obj)
+        if obj and not self.is_latest(obj):
+            readonly += ('title', 'value', 'description')
+        return readonly
 # سعر تغليف الطلب الواحد داخل الاحصائية
 class PackForMonthInline(admin.TabularInline):
     model = PackForMonth
@@ -304,7 +324,18 @@ class PackForMonthInline(admin.TabularInline):
     can_delete = False  
     max_num = 0
     show_change_link = False  
+    
+    
+    # لمنع التعديل ان كانت هذه احصائية قديمة
+    def is_latest(self, obj):
+        latest = MonthlyTotal.objects.order_by('-year', '-month').first()
+        return obj == latest
 
+    def get_readonly_fields(self, request, obj=None):
+        readonly = super().get_readonly_fields(request, obj)
+        if obj and not self.is_latest(obj):
+            readonly +=  ('one_order_packing_cost', )  
+        return readonly
 # ارباح الشركاء داخل الاحصائية الشهرية
 class MonthPartnersProfitInline(admin.TabularInline):
     model = PartnersProfit
@@ -313,7 +344,6 @@ class MonthPartnersProfitInline(admin.TabularInline):
     readonly_fields = ('partner', 'profit', "received")    
     can_delete = False  
     show_change_link = False 
-
 # دالة ربح المجموعات دالة الاحصائية
 class MonthlyInvestmentGroupInline(admin.TabularInline):
     model = MonthlyInvestmentGroup
@@ -323,7 +353,6 @@ class MonthlyInvestmentGroupInline(admin.TabularInline):
     can_delete = False  
     show_change_link = False 
     verbose_name_plural = 'الاستثمارات'
-    
 # دالة عرض الاحصائية الرئيسية
 class MonthlyTotalAdmin(admin.ModelAdmin):
     list_display = ('history', 'total_income', 'colored_total_profit' ,'sales_number')
@@ -389,6 +418,17 @@ class MonthlyTotalAdmin(admin.ModelAdmin):
         return f'{obj.year}/{obj.month}'
     history.short_description = 'إحصائية شهر'
 
+    def is_latest(self, obj):
+        latest = MonthlyTotal.objects.order_by('-year', '-month').first()
+        return obj == latest
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly = super().get_readonly_fields(request, obj)
+        if obj and not self.is_latest(obj):
+            readonly += ('total_income', 'additional_income', 'total_costs', 'total_packaging', 'goods_price', 'total_profit')
+        return readonly
+    
+
     change_list_template = "admin/reportes/monthly-statis.html"  
     def changelist_view(self, request, extra_context=None):
         # جلب جميع البيانات الخاصة بالأرباح مرتبة حسب السنة والشهر
@@ -426,11 +466,8 @@ class MonthlyTotalAdmin(admin.ModelAdmin):
 
         return super().changelist_view(request, extra_context=extra_context)
 
-
 admin.site.register(Partners, PartnersAdmin)
 admin.site.register(Investigator, InvestigatorAdmin)
 admin.site.register(Packaging, PackagingAdmin)
 admin.site.register(MonthlyTotal, MonthlyTotalAdmin)    
 admin.site.register(InvestmentGroup, InvestmentGroupAdmin)
-
-
