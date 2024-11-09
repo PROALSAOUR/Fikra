@@ -29,11 +29,15 @@
                 </div>
                 <div class="my-info-details" id='go_to_notfications'>
                     <div class="details-item">
-                        <div class="title"><p>اسم المستخدم</p><a href="{% url "accounts:edit-account" %}"><i class="fa-solid fa-pen"></i></a></div>
+                        <div class="title"><p>اسم المستخدم</p><a href="{% url "accounts:edit-name" %}"><i class="fa-solid fa-pen"></i></a></div>
                         <div class="content">{{ user_name }}</div>
                     </div>
                     <div class="details-item">
-                        <div class="title"><p>رقم الهاتف</p><a href="{% url "accounts:edit-account" %}"><i class="fa-solid fa-pen"></i></a></div>
+                        <div class="title"><p>كلمة المرور</p><a href="{% url "accounts:edit-password" %}"><i class="fa-solid fa-pen"></i></a></div>
+                        <div class="content">********</div>
+                    </div>
+                    <div class="details-item">
+                        <div class="title"><p>رقم الهاتف</p><a href="#"><i class="fa-solid fa-pen"></i></a></div>
                         <div class="content">{{ phone_number }}</div>
                     </div>
                     

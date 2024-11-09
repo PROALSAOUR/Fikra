@@ -137,7 +137,7 @@ def remove_order_item(request):
                     max_replace_days = 3  # ثلاث أيام كقيمة افتراضية
                 
                 if days_since_delivery > max_replace_days:
-                    return JsonResponse({'success': False, 'error': "نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإرجاع"})
+                    return JsonResponse({'success': False, 'error': F"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإرجاع و هي {max_replace_days}"})
                 
             
             order_item = order.order_items.get(id=remove_id)
@@ -208,7 +208,7 @@ def edit_order(request):
                         max_replace_days = 3  # ثلاث أيام كقيمة افتراضية
                     
                     if days_since_delivery > max_replace_days:
-                        return JsonResponse({'success': False, 'error': "نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإستبدال"})
+                        return JsonResponse({'success': False, 'error': f"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإستبدال و هي {max_replace_days}"})
                
                 try:
                     # الحصول على عنصر الطلب المراد استبداله

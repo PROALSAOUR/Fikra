@@ -955,6 +955,7 @@ select option::selection {
     width: 7px;
     height: 7px;
   }
+  
 }
 .header .upper-part .logo img{
   height: var(--lab-xl-size);
@@ -7376,22 +7377,21 @@ input[type="radio"]:checked + .custom-radio::after {
 .edit-card .edit-exit {
   position: absolute;
   left: 0%;
-  top: 12%;
+  top: 18%;
 }
 @media (max-width: 890px) {
   .edit-card .edit-exit {
-    top: 11%;
+    top: 15%;
   }
 }
 @media (max-width: 716px) {
   .edit-card .edit-exit {
     left: 1%;
-    top: 10%;
   }
 }
 @media (max-width: 598px) {
   .edit-card .edit-exit {
-    top: 16%;
+    top: 24%;
   }
 }
 @media (max-width: 228px) {
@@ -7460,7 +7460,7 @@ input[type="radio"]:checked + .custom-radio::after {
   margin-right: 20px;
 }
 .edit-card form .edit-items input::placeholder {
-  font-size: 13px;
+  font-size: 12px;
   padding-right: 10px;
 }
 .edit-card form button {
@@ -7535,6 +7535,9 @@ input[type="radio"]:checked + .custom-radio::after {
   .edit-card form button {
     width: 100px;
   }
+  .edit-card form .edit-items input::placeholder {
+    font-size: 10px;
+  }
 }
 @media (max-width: 532px) {
   .edit-card h1{
@@ -7577,8 +7580,11 @@ input[type="radio"]:checked + .custom-radio::after {
     width: 120px;
   }
 }
-@media (max-width: 412px) {
 
+@media (max-width: 492px) {
+  .edit-card {
+    max-width: 80%;
+  }
   .edit-card form .image {
     display: none;
   }
@@ -7586,11 +7592,11 @@ input[type="radio"]:checked + .custom-radio::after {
     width: 100%;
   }
   .edit-card form .edit-items {
-    width: 90%;
+    width: 95%;
     margin: 0 auto;
   }
   .edit-card form .edit-items input {
-    width: 80%;
+    width: 85%;
     margin-right: 10px;
   }
   .edit-card form button {
@@ -7598,4 +7604,5 @@ input[type="radio"]:checked + .custom-radio::after {
     padding: 5px 10px;
   }
 }
+
 /* End Edit account */

@@ -3,7 +3,7 @@
 
 {% block content %}
 
-<div class="sign-page" style="position: relative;">
+<div class="sign-page" style="position: relative; padding-top:20px;">
     <div class="edit-card">
         <h1>تعديل بينات حسابي <i class="fa-solid fa-pen"></i></h1>
 
@@ -36,18 +36,6 @@
                         <label for="last-name">الإسم الاخير</label>
                         <input type="text" name="last-name" id="last-name" value="{{last_name}}"  >
                     </div>                           
-                    <div>
-                        <label for="oldpassword">كلمة المرور القديمة</label>
-                        <input type="text" name="old-password" id="oldpassword" required>
-                    </div>
-                    <div>
-                        <label for="password1">كلمة المرور الجديدة</label>
-                        <input type="password" name="password1" id="password1" placeholder="(اتركه فارغا ان اردت تغيير الاسم فقط)">
-                    </div>
-                    <div>
-                        <label for="password2">تأكيد كلمة المرور</label>
-                        <input type="password" name="password2" id="password2" placeholder="(اتركه فارغا ان اردت تغيير الاسم فقط)">
-                    </div>
                     <button type="submit">تعديل</button>
                 </div>
             </div>

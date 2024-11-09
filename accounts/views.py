@@ -107,32 +107,16 @@ def delete_account(request):
         user.delete()  # حذف المستخدم
         logout(request)  # تسجيل خروج المستخدم بعد الحذف
     return redirect('store:home')  # إعادة توجيه إلى الصفحة الرئيسية
-#  دالة تعديل حساب
+#  دالة تعديل كلمة المرور
 @login_required
 def edit_account(request):
-    context = {}
-
     if request.method == 'POST':
         # الحصول على البيانات من الفورم
-        first_name = request.POST.get('first-name')
-        last_name = request.POST.get('last-name')
         old_password = request.POST.get('old-password')
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
-
-        # تحقق إن كان المستخدم يرغب بتغيير الاسم فقط
-        if first_name and last_name and old_password and not password1 and not password2:
-            if check_password(old_password, request.user.password):
-                request.user.first_name = first_name
-                request.user.last_name = last_name
-                request.user.save()
-                messages.success(request, 'تم تحديث الأسماء بنجاح.')
-                return redirect('accounts:account_info')
-            else:
-                messages.error(request, 'كلمة المرور القديمة غير صحيحة.')
-
-        # تحقق إن كان المستخدم يرغب بتغيير كلمة المرور فقط
-        elif old_password and password1 and password2 and not first_name and not last_name:
+        # تحقق إن كان المستخدم  ادخل جميع البيانات المطلوبة 
+        if old_password and password1 and password2 :
             if check_password(old_password, request.user.password):
                 if password1 == password2:
                     if len(password1) >= 8 and ' ' not in password1 and not password1.isdigit() and password1.isascii():
@@ -147,26 +131,30 @@ def edit_account(request):
                     messages.error(request, 'كلمتا المرور الجديدة غير متطابقتين.')
             else:
                 messages.error(request, 'كلمة المرور القديمة غير صحيحة.')
+        else:
+            messages.error(request, 'يرجى إدخال البيانات المطلوبة.')
 
-        # تحقق إن كان المستخدم يرغب بتغيير الأسماء وكلمة المرور معًا
-        elif first_name and last_name and old_password and password1 and password2:
-            if check_password(old_password, request.user.password):
-                if password1 == password2:
-                    if len(password1) >= 8 and ' ' not in password1 and not password1.isdigit() and password1.isascii():
-                        request.user.first_name = first_name
-                        request.user.last_name = last_name
-                        request.user.set_password(password1)
-                        update_session_auth_hash(request, request.user)  # الحفاظ على الجلسة
-                        request.user.save()
-                        messages.success(request, 'تم تحديث الأسماء وكلمة المرور بنجاح.')
-                        return redirect('accounts:account_info')
-                    else:
-                        messages.error(request, 'كلمة المرور يجب أن تكون 8 أحرف على الأقل، ولا تحتوي على فراغات، ولا تكون عبارة عن أرقام فقط.')
-                else:
-                    messages.error(request, 'كلمتا المرور الجديدة غير متطابقتين.')
+    return render(request, 'accounts/edit-password.html')
+# دالة تعديل اسم المستخدم
+@login_required
+def edit_name(request):
+    context = {}
+    if request.method == 'POST':
+        # الحصول على البيانات من الفورم
+        first_name = request.POST.get('first-name')
+        last_name = request.POST.get('last-name')
+
+        if first_name and last_name :
+            # تحقق انه لم يقم بإدخال نفس الاسم القديم
+            if request.user.first_name!= first_name or request.user.last_name!= last_name:
+                request.user.first_name = first_name
+                request.user.last_name = last_name
+                request.user.save()
+                messages.success(request, 'تم تحديث الأسماء بنجاح.')
+                return redirect('accounts:account_info')    
             else:
-                messages.error(request, 'كلمة المرور القديمة غير صحيحة.')
-
+                messages.error(request, 'الأسماء الحالية مطابقة للأسماء القديمة!.')
+            
         else:
             messages.error(request, 'يرجى إدخال البيانات المطلوبة.')
 
@@ -177,7 +165,8 @@ def edit_account(request):
             'last_name': request.user.last_name,
         }
 
-    return render(request, 'accounts/edit.html', context)
+    return render(request, 'accounts/edit-name.html', context)
+
 
 # =============================================================
 
