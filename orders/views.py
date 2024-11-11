@@ -141,6 +141,11 @@ def remove_order_item(request):
                 
             
             order_item = order.order_items.get(id=remove_id)
+            
+            old_qty = order_item.qty
+            old_item_price = product_variant.product_item.product.get_price()
+            price_difference = 0 - (old_qty * old_item_price)
+
             order_item.delete()
             
             product_variant = order_item.order_item 
@@ -148,25 +153,23 @@ def remove_order_item(request):
             product_variant.sold -= order_item.qty  # انقاص الكمية المباعة بناءً على الكمية
             product_variant.save()
                 
-            # التحقق من عدد العناصر المتبقية في الطلب
-            if not order.order_items.exists():  # إذا لم يكن هناك أي عناصر متبقية
-                order.status = 'canceled'
-            else:     
-                # تجديد بيانات الطلب بعد حذف المنتج  
-                order.old_total -= order_item.price * order_item.qty
-                order.total_price = order.old_total + order.dlivery_price - order.discount_amount
-                order.total_points -= order_item.points * order_item.qty
+            # تجديد بيانات الطلب بعد حذف المنتج  
+            order.old_total -= order_item.price * order_item.qty
+            order.total_price = order.old_total + order.dlivery_price - order.discount_amount
+            order.total_points -= order_item.points * order_item.qty
             order.save()  
             
             # انشاء معاملة فقط ان لم تكن حالة الطلب  جاري المعالجة
-            if order.status != 'pending' :      
+            if order.status != 'pending' :     
+                                 
                 # انشاء معاملة لإخبار الموظفين انه هنالك عملية إلغاء منتجات حصلت
                 dealing, created = OrderDealing.objects.get_or_create(order=order)
                 DealingItem.objects.create(
                     order_dealing= dealing,
                     old_item = product_variant,
+                    old_qty = old_qty,
                     status = 'return',
-                    price_difference = 0,
+                    price_difference = price_difference ,
                 )
                 dealing.save()               
                 #  ارسال رسالة الى المستخدم عند ارجاع منتج من الطلب
@@ -298,6 +301,7 @@ def edit_order(request):
                             order_dealing= dealing,
                             old_item = old_variation,
                             new_item = new_variation,
+                            old_qty = old_qty,
                             new_qty = item.qty,
                             status = 'replace',
                             price_difference = new_total - old_total,
@@ -445,4 +449,40 @@ def create_order(request):
         return JsonResponse({'success': True, 'message': 'تمت عملية الطلب بنجاح!'})
 
     return JsonResponse({'success': False, 'error': 'طلب غير صالح'})
+# دالة عرض طلبات الاستبدال والاسترجاع
+@login_required
+def orders_dealing(request):
+    
+    all_dealing = OrderDealing.objects.filter(is_dealt=False).prefetch_related('order__user')
+    order_dealing = []
+    
+    for deal in all_dealing:
+        if deal.order.user == request.user and deal.order.status != 'canceled':
+            order_dealing.append(deal)
+    
+    context = {
+    'order_dealing':order_dealing,
+    }
+    
+    return render(request, 'orders/orders-dealing.html', context)
+# دالة عرض عناصر طلبات الاستبدال والاسترجاع
+@login_required
+def dealing_items(request, did):
+    order_dealing = get_object_or_404(OrderDealing, id=did)
+    serial_number = order_dealing.order.serial_number
+    
+    if request.user == order_dealing.order.user:
+        all_dealing = DealingItem.objects.filter(order_dealing=did).prefetch_related('order_dealing__order__user', 'old_item__product_item', 'new_item__product_item').order_by('is_dealt', 'created_at')
+        user_dealing = [ deal for deal in all_dealing if deal.order_dealing.order.user == request.user]    
+    else:
+        return redirect('orders/orders_dealing')   
+            
+    context = {
+        'user_dealing':user_dealing,
+        'serial_number':serial_number,
+    }
+    
+    return render(request, 'orders/dealing-items.html', context)
+
+
 

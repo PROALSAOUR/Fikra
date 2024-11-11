@@ -10,7 +10,8 @@ urlpatterns = [
     path("edit-order/", edit_order, name="edit-order"),
     path("cancel-order/", cancel_order, name="cancel-order"),
     path("remove-order-item/", remove_order_item, name="remove-order-item"),
-    
+    path("orders_dealing/", orders_dealing, name="orders-dealing"),
+    path("dealing-items/<did>", dealing_items, name="dealing-items"),    
    
     
 

@@ -1,0 +1,58 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="order" style="position: relative;">
+    
+    <!-- Start Order Details -->
+        <div class="Order">
+            <div class="container">
+                <div class="order-info">
+                    <div class="order-id-status">
+                        <h3>الطلب رقم {{ serial_number|stringformat:"06d" }}<span></span></h3>                     
+                        <a class='edit-exit' href="javascript:void(0);" onclick="goBack()">
+                            <span class="exit-button"><i class="fa-solid fa-arrow-left"></i></span>
+                        </a>
+                    </div>
+                </div>
+                <div class="order-products">
+                    <table class="products-table">
+                        {% if user_dealing %}
+                            <thead>
+                                <tr>
+                                    <th>الحالة</th>
+                                    <th>المنتج القديم</th>
+                                    <th>المنتج الجديد</th>
+                                    <th>الكمية القديمة</th>
+                                    <th>الكمية الجديدة</th>
+                                    <th>فرق السعر</th>
+                                    <th>مُسلمة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for deal in user_dealing %}
+                                    <tr>
+                                        <td>{{ deal.get_status_display }}</td>
+                                        <td><img src="{{ deal.old_item.product_item.image.url }}"></td>
+                                        <td><img src="{{ deal.new_item.product_item.image.url }}"></td>
+                                        <td>{% if deal.old_qty %}{{ deal.old_qty }}{% else %}0{% endif %}</td>
+                                        <td>{% if deal.new_qty %}{{ deal.new_qty }}{% else %}-{% endif %}</td>
+                                        <td>{{deal.price_difference}}</td>
+                                        <td>{% if deal.is_dealt %}✅{% else %}❌{% endif %}</td>
+                                    </tr> 
+                                {% endfor %}
+                            </tbody>
+                        {% else %}
+                            {% include "common/no-result.html" %}
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    <!-- End Order Details -->
+</div>
+
+{% include "pop-pages/edit-order.html" %}
+
+{% endblock content %}

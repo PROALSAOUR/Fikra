@@ -136,6 +136,7 @@ class DealingItem(models.Model):
     order_dealing = models.ForeignKey(OrderDealing, on_delete=models.CASCADE, related_name='deals' , verbose_name='طلب المعالجة')
     old_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='old_deals' , verbose_name='المنتج القديم')
     new_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='new_deals', null=True, blank=True , verbose_name='المنتج الجديد')
+    old_qty = models.IntegerField(null=True, blank=True , verbose_name='الكمية القديمة')
     new_qty = models.IntegerField(null=True, blank=True , verbose_name='الكمية الجديدة')
     price_difference = models.IntegerField(null=True, blank=True , verbose_name='فرق السعر')  
     is_dealt = models.BooleanField(default=False , verbose_name='المعالجة') # هل تم تنفيذ عملية التعديل  

@@ -243,7 +243,7 @@ class ProductVariation(models.Model):
     updated_at = models.DateTimeField(auto_now=True , verbose_name='تاريخ التعديل')
 
     def __str__(self):
-        return f"{self.product_item} - {self.product_item.product.name} - {self.product_item.color} - {self.size}"
+        return f"{self.product_item} - {self.product_item.color} - {self.size}"
 
     def update_stock(self, quantity_change):
         """

@@ -63,8 +63,8 @@ class MyOrdersAdmin(admin.ModelAdmin):
 class DealingInline(admin.TabularInline):
     model = DealingItem
     extra = 0  # عدم إظهار حقول إضافية
-    readonly_fields = ('old_item', 'new_item', 'new_qty', 'price_difference', 'status', ) 
-    fields = ('old_item', 'new_item', 'new_qty', 'price_difference', 'is_dealt', 'status' )  # تحديد ترتيب الحقول
+    readonly_fields = ('old_item', 'new_item', 'old_qty', 'new_qty', 'price_difference', 'status', ) 
+    fields = ('old_item', 'new_item', 'old_qty', 'new_qty', 'price_difference', 'is_dealt', 'status' )  # تحديد ترتيب الحقول
     can_delete = False  # منع حذف العناصر
     max_num = 0  # منع إضافة عناصر جديدة
     show_change_link = True  
@@ -73,7 +73,7 @@ class DealingAdmin(admin.ModelAdmin):
     list_display = ('order__user', 'order', 'status', 'get_modifications', 'is_dealt', 'created_at', )    
     search_fields = ('order__user__phone_number', )
     list_filter = ('order', 'is_dealt',)
-    ordering = ('-updated_at', '-created_at',)
+    ordering = ('is_dealt', '-updated_at', '-created_at',)
     readonly_fields = ( 'order', 'total_price_difference', 'created_at', 'updated_at',)
     inlines = [DealingInline] 
     

@@ -7379,6 +7379,13 @@ input[type="radio"]:checked + .custom-radio::after {
   left: 0%;
   top: 18%;
 }
+.exit-button.see-dealing {
+  right: 0 !important;
+  font-size: 12px !important;
+  padding: 5px !important;
+  left: 80%  !important;
+  top:18px !important;
+}
 @media (max-width: 890px) {
   .edit-card .edit-exit {
     top: 15%;
@@ -7388,13 +7395,27 @@ input[type="radio"]:checked + .custom-radio::after {
   .edit-card .edit-exit {
     left: 1%;
   }
+  .exit-button.see-dealing {
+    font-size: 10px !important;
+  }
 }
 @media (max-width: 598px) {
   .edit-card .edit-exit {
     top: 24%;
   }
+  .exit-button.see-dealing {
+    font-size: 8px !important;
+  }
 }
-@media (max-width: 228px) {
+@media (max-width: 498px) {
+  .exit-button.see-dealing {
+    padding: 2px 0 !important;
+    left: 85%  !important;
+    top:5px !important;
+    right: -15px !important;
+  }
+}
+@media (max-width: 328px) {
   .edit-card .edit-exit {
     left: 0%;
     top: 16%;
