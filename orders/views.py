@@ -31,6 +31,12 @@ def order_details(request, oid):
     order = get_object_or_404(Order, pk=oid , user=user)
     items = order.order_items.prefetch_related('order_item__product_item__product')
     
+    try: # هل يوجد عمليات استبدال او استرجاع تابعة للطلب؟
+        order_dealing = OrderDealing.objects.get(order=order)      
+    except OrderDealing.DoesNotExist:
+        order_dealing = None
+    
+    
     # إضافة حقل السعر الإجمالي لكل عنصر
     for item in items:
         item.total_price = item.qty * item.price
@@ -58,10 +64,13 @@ def order_details(request, oid):
         except Exception:
             available_items = None    
     
+    
+    
     context = {
         'order':order,
         'items':items,
         'available_items':available_items,
+        'order_dealing':order_dealing,
     }
     
     return render(request, 'orders/order-details.html', context)   
@@ -449,40 +458,31 @@ def create_order(request):
         return JsonResponse({'success': True, 'message': 'تمت عملية الطلب بنجاح!'})
 
     return JsonResponse({'success': False, 'error': 'طلب غير صالح'})
-# دالة عرض طلبات الاستبدال والاسترجاع
-@login_required
-def orders_dealing(request):
-    
-    all_dealing = OrderDealing.objects.filter(is_dealt=False).prefetch_related('order__user')
-    order_dealing = []
-    
-    for deal in all_dealing:
-        if deal.order.user == request.user and deal.order.status != 'canceled':
-            order_dealing.append(deal)
-    
-    context = {
-    'order_dealing':order_dealing,
-    }
-    
-    return render(request, 'orders/orders-dealing.html', context)
 # دالة عرض عناصر طلبات الاستبدال والاسترجاع
 @login_required
-def dealing_items(request, did):
-    order_dealing = get_object_or_404(OrderDealing, id=did)
-    serial_number = order_dealing.order.serial_number
-    
-    if request.user == order_dealing.order.user:
-        all_dealing = DealingItem.objects.filter(order_dealing=did).prefetch_related('order_dealing__order__user', 'old_item__product_item', 'new_item__product_item').order_by('is_dealt', 'created_at')
-        user_dealing = [ deal for deal in all_dealing if deal.order_dealing.order.user == request.user]    
-    else:
-        return redirect('orders/orders_dealing')   
-            
+def order_dealing(request, oid):
+    order = get_object_or_404(Order, id=oid)
     context = {
-        'user_dealing':user_dealing,
-        'serial_number':serial_number,
+        'serial_number': order.serial_number,
     }
     
+    if request.user == order.user:
+        try:
+            order_dealing = OrderDealing.objects.get(order=order)
+            
+        except OrderDealing.DoesNotExist:
+            order_dealing = None
+        
+        if order_dealing:
+            dealing_items = order_dealing.deals.prefetch_related(
+                'order_dealing__order__user', 
+                'old_item__product_item', 
+                'new_item__product_item'
+            ).order_by('is_dealt', 'created_at')
+            
+            context.update({
+                'order_dealing': order_dealing,
+                'dealing_items': dealing_items,
+            })
+    
     return render(request, 'orders/dealing-items.html', context)
-
-
-

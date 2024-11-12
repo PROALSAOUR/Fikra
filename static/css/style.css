@@ -7380,11 +7380,21 @@ input[type="radio"]:checked + .custom-radio::after {
   top: 18%;
 }
 .exit-button.see-dealing {
+  position: relative;
   right: 0 !important;
   font-size: 12px !important;
-  padding: 5px !important;
+  padding: 10px 5px !important;
   left: 80%  !important;
   top:18px !important;
+}
+.exit-button.see-dealing i {
+  margin-right: 5px;
+  font-size: 10px ;
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg);
+  -ms-transform: rotateY(180deg);
+  -o-transform: rotateY(180deg);
 }
 @media (max-width: 890px) {
   .edit-card .edit-exit {
@@ -7395,24 +7405,15 @@ input[type="radio"]:checked + .custom-radio::after {
   .edit-card .edit-exit {
     left: 1%;
   }
-  .exit-button.see-dealing {
-    font-size: 10px !important;
-  }
 }
 @media (max-width: 598px) {
   .edit-card .edit-exit {
     top: 24%;
   }
-  .exit-button.see-dealing {
-    font-size: 8px !important;
-  }
 }
 @media (max-width: 498px) {
   .exit-button.see-dealing {
-    padding: 2px 0 !important;
-    left: 85%  !important;
-    top:5px !important;
-    right: -15px !important;
+    font-size: 8px !important;
   }
 }
 @media (max-width: 328px) {

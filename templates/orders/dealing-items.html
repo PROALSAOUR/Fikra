@@ -8,17 +8,25 @@
     <!-- Start Order Details -->
         <div class="Order">
             <div class="container">
-                <div class="order-info">
-                    <div class="order-id-status">
-                        <h3>الطلب رقم {{ serial_number|stringformat:"06d" }}<span></span></h3>                     
-                        <a class='edit-exit' href="javascript:void(0);" onclick="goBack()">
-                            <span class="exit-button"><i class="fa-solid fa-arrow-left"></i></span>
-                        </a>
+                {% if dealing_items %}
+                    <div class="order-info">
+                        <div class="order-id-status">
+                            <h3>الطلب رقم <span>{{ serial_number|stringformat:"06d" }}</span></h3>                     
+                            <h3>فرق السعر <span> {% if order_dealing.total_price_difference %}{{order_dealing.total_price_difference}}{% else %}0{% endif %} </span></h3>   
+                            <h3>متبقي الدفع<span> يضاف لاحقا </span></h3>   
+                            
+                            <a class='edit-exit' href="javascript:void(0);" onclick="goBack()">
+                                <span class="exit-button"><i class="fa-solid fa-arrow-left"></i></span>
+                            </a>
+                        </div>
+                        <div class="order-date">
+                            <span>{{ order_dealing.updated_at|date:" Y/m/d" }}</span>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
                 <div class="order-products">
                     <table class="products-table">
-                        {% if user_dealing %}
+                        {% if dealing_items %}
                             <thead>
                                 <tr>
                                     <th>الحالة</th>
@@ -31,7 +39,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for deal in user_dealing %}
+                                {% for deal in dealing_items %}
                                     <tr>
                                         <td>{{ deal.get_status_display }}</td>
                                         <td><img src="{{ deal.old_item.product_item.image.url }}"></td>
