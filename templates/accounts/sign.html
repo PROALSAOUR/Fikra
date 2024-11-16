@@ -47,7 +47,7 @@
                     <img src="{% static "images/name logo.jpg" %}" alt="محل ملابس بطبرق">
                 </div>
                 <h1>إنشاء حساب</h1>
-                <form method='POST'>
+                <form method='POST' autocomplete="on">
                     {% csrf_token %}
                     <input type='hidden' name='form-type' value='sign'>
                     {% if sign_up_form.errors %}

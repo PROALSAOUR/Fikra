@@ -11,10 +11,16 @@
                 {% if dealing_items %}
                     <div class="order-info">
                         <div class="order-id-status">
-                            <h3>الطلب رقم <span>{{ serial_number|stringformat:"06d" }}</span></h3>                     
-                            <h3>فرق السعر <span> {% if order_dealing.total_price_difference %}{{order_dealing.total_price_difference}}{% else %}0{% endif %} </span></h3>   
-                            <h3>متبقي الدفع<span> يضاف لاحقا </span></h3>   
-                            
+                            <h3>الطلب رقم <span>{{ serial_number|stringformat:"06d" }}</span></h3>
+                            {% comment %}  اذا كان الرقم سالب اعطي المستخدم اذا كان موجب المستخدم يعطينا {% endcomment %} 
+                            <h3> متبقي الدفع 
+                                <span style="color: {% if remaining_label == 'لك' %} #27bc27{% else %}#cf2222{% endif %};">
+                                    {{ remaining }}
+
+                                    {{ remaining_label }}
+                                </span>
+                            </h3>   
+            
                             <a class='edit-exit' href="javascript:void(0);" onclick="goBack()">
                                 <span class="exit-button"><i class="fa-solid fa-arrow-left"></i></span>
                             </a>

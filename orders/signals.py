@@ -1,6 +1,6 @@
-from orders.models import Order
+from orders.models import Order, OrderDealing
 from accounts.models import UserProfile
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from accounts.send_messages import add_order_points_message
@@ -31,3 +31,9 @@ def update_user_points(sender, instance, **kwargs):
 
 
     user_inbox.save()  # حفظ تحديثات صندوق الوارد
+    
+@receiver(post_save, sender=OrderDealing)
+def calc_remaining(sender, instance, **kwargs):
+    """عند حفظ طلب تعديل تعمل هذه الدالة لحساب متبقي الدفع"""
+    instance.calc_remaining()  # تقوم بحساب المتبقي وحفظه
+    

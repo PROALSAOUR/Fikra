@@ -74,7 +74,7 @@ class DealingAdmin(admin.ModelAdmin):
     search_fields = ('order__user__phone_number', )
     list_filter = ('order', 'is_dealt',)
     ordering = ('is_dealt', '-updated_at', '-created_at',)
-    readonly_fields = ( 'order', 'total_price_difference', 'created_at', 'updated_at',)
+    readonly_fields = ( 'order', 'remaining', 'created_at', 'updated_at',)
     inlines = [DealingInline] 
     
     def get_modifications(self, obj):

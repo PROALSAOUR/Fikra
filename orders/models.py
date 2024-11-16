@@ -87,20 +87,26 @@ class OrderItem(models.Model):
 class OrderDealing(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE , verbose_name='الطلب')
     is_dealt = models.BooleanField(default=False, verbose_name='الاستجابة')
-    total_price_difference = models.IntegerField(default=0, null=True , verbose_name='فرق السعر')
+    remaining = models.IntegerField(verbose_name='المتبقي',  default=0)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الإنشاء')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')
     
-    def update_total_price_difference_and_is_dealt(self):
-        # لأنو اذا ما كان مستلم لسا مافي داعي نعمل تغيير بالسعر لأنو اصلا مادفع
-        if self.order.status == 'delivered' :  
-            # حساب مجموع price_difference لجميع DealingItem المرتبطة
-            total_price_diff = sum(
-                deal.price_difference for deal in self.deals.all() 
-                if deal.price_difference is not None and not deal.is_dealt
-            )
-            self.total_price_difference = total_price_diff
-                   
+    def modifications_numbers(self):
+        # حساب عدد DealingItem المرتبطة بـ OrderDealing
+        return self.deals.count()
+
+    def calc_remaining(self):
+        # حساب المتبقي للطلب
+        remaining = 0
+        deals = self.deals.filter(is_dealt=False)
+        for deal in deals:
+            remaining += deal.price_difference if deal.price_difference else 0
+            
+        # تحديث الحقل بدون استدعاء save() لتجنب حدوث حلقة لانهائية بسبب الاشارات
+        OrderDealing.objects.filter(pk=self.pk).update(remaining=remaining)
+    
+    def update_order_dealing_dealt(self):
+           
         # تحقق من حالة is_dealt لجميع DealingItem المرتبطة
         if all(deal.is_dealt for deal in self.deals.all()):
             self.is_dealt = True
@@ -109,15 +115,6 @@ class OrderDealing(models.Model):
 
         # حفظ التحديثات
         self.save()
-
-    def modifications_numbers(self):
-        # حساب عدد DealingItem المرتبطة بـ OrderDealing
-        return self.deals.count()
-    
-    def save(self, *args, **kwargs):
-        if self.order.status != 'delivered':
-            self.total_price_difference = None
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"ملخص تعديلات الطلب {self.order.serial_number} "
@@ -157,7 +154,7 @@ class DealingItem(models.Model):
         super().save(*args, **kwargs)
         
         # تحديث total_price_difference و is_dealt في OrderDealing
-        self.order_dealing.update_total_price_difference_and_is_dealt()
+        self.order_dealing.update_order_dealing_dealt()
 
     def __str__(self) -> str:
         return f'{self.order_dealing.order.user} => {self.order_dealing.order.serial_number}'

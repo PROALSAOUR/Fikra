@@ -152,16 +152,15 @@ def remove_order_item(request):
             order_item = order.order_items.get(id=remove_id)
             
             old_qty = order_item.qty
-            old_item_price = product_variant.product_item.product.get_price()
+            old_item_price = order_item.order_item.product_item.product.get_price() 
             price_difference = 0 - (old_qty * old_item_price)
-
+            
             order_item.delete()
             
             product_variant = order_item.order_item 
             product_variant.update_stock(order_item.qty)  # زيادة المخزون بناءً على الكمية
             product_variant.sold -= order_item.qty  # انقاص الكمية المباعة بناءً على الكمية
             product_variant.save()
-                
             # تجديد بيانات الطلب بعد حذف المنتج  
             order.old_total -= order_item.price * order_item.qty
             order.total_price = order.old_total + order.dlivery_price - order.discount_amount
@@ -178,7 +177,7 @@ def remove_order_item(request):
                     old_item = product_variant,
                     old_qty = old_qty,
                     status = 'return',
-                    price_difference = price_difference ,
+                    price_difference = price_difference if order.status == 'delivered' else 0, # اذا لم يكن الطلب مسلما لاداعي لإنشاء فارق سعر 
                 )
                 dealing.save()               
                 #  ارسال رسالة الى المستخدم عند ارجاع منتج من الطلب
@@ -313,9 +312,9 @@ def edit_order(request):
                             old_qty = old_qty,
                             new_qty = item.qty,
                             status = 'replace',
-                            price_difference = new_total - old_total,
+                            price_difference = new_total - old_total if order.status == 'delivered' else 0, # اذا لم يكن الطلب مسلما لاداعي لإنشاء فارق سعر 
                         )
-                        dealing.save()  
+                        dealing.save()
                         #  ارسال رسالة الى المستخدم عند تعديل الطلب
                         message = edit_order_message(user_name=user.first_name, order=order.serial_number)
                         inbox = user.profile.inbox
@@ -480,9 +479,19 @@ def order_dealing(request, oid):
                 'new_item__product_item'
             ).order_by('is_dealt', 'created_at')
             
+            remaining = order_dealing.remaining
+            # تحديد ما إذا كانت القيمة المتبقية لك أو عليك بناءً على علامة القيمة
+            if remaining < 0:
+                remaining_label = "لك"
+                remaining = abs(remaining)  # تحويل القيمة إلى موجبة
+            else:
+                remaining_label = "عليك"
+                
             context.update({
                 'order_dealing': order_dealing,
                 'dealing_items': dealing_items,
+                'remaining': remaining,
+                'remaining_label': remaining_label,
             })
     
     return render(request, 'orders/dealing-items.html', context)
