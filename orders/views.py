@@ -158,9 +158,7 @@ def remove_order_item(request):
             order_item.delete()
             
             product_variant = order_item.order_item 
-            product_variant.update_stock(order_item.qty)  # زيادة المخزون بناءً على الكمية
-            product_variant.sold -= order_item.qty  # انقاص الكمية المباعة بناءً على الكمية
-            product_variant.save()
+            
             # تجديد بيانات الطلب بعد حذف المنتج  
             order.old_total -= order_item.price * order_item.qty
             order.total_price = order.old_total + order.dlivery_price - order.discount_amount
@@ -184,7 +182,10 @@ def remove_order_item(request):
                 message = return_order_item_message(user_name=user.first_name, order=order.serial_number)
                 inbox = user.profile.inbox
                 inbox.messages.add(message)
-                inbox.save() 
+                inbox.save()
+            else: # اذا كانت حالة الطلب معالجة لن يتم انشاء طلب ارجاع لذا سيتم تعديل الكميات مباشرة
+                # تحديث المخزون والمبيعات للمنتجات القديمة والجديدة
+                product_variant.return_product(old_qty)  # إعادة الكمية القديمة إلى المخزون
                 
             return JsonResponse({'success': True, 'message':'تمت ازالة المنتج من الطلب بنجاح' })
                   
@@ -294,15 +295,9 @@ def edit_order(request):
                         profile = UserProfile.objects.get(user=user)
                         profile.points = order.total_points  # تعديل النقاط بناءً على الطلب المعدل
                         profile.save()
-                        
-                    # تحديث المخزون والمبيعات للمنتجات القديمة والجديدة
-                    old_variation.update_stock(old_qty)  # إعادة الكمية القديمة إلى المخزون
-                    old_variation.sold -= old_qty # تحديث الكمية المباعة
-                    old_variation.save()
-                    new_variation.sell(new_qty)  # تحديث المبيعات
-                        
+                    
                     # انشاء معاملة فقط ان لم تكن حالة الطلب  جاري المعالجة
-                    if order.status != 'pending' :                     
+                    if order.status != 'pending' :   
                         # انشاء معاملة لإخبار الموظفين انه هنالك عملية استبدال منتجات حصلت
                         dealing, created = OrderDealing.objects.get_or_create(order=order)
                         DealingItem.objects.create(
@@ -320,7 +315,13 @@ def edit_order(request):
                         inbox = user.profile.inbox
                         inbox.messages.add(message)
                         inbox.save() 
-
+                        
+                    else: # اذا كانت حالة الطلب معالجة لن يتم انشاء طلب تعديل لذا سيتم تعديل الكميات مباشرة
+                        # تحديث المخزون والمبيعات للمنتجات القديمة والجديدة
+                        old_variation.return_product(old_qty)  # إعادة الكمية القديمة إلى المخزون
+                        new_variation.sell(new_qty)  # تحديث المبيعات
+                            
+                        
                     return JsonResponse({'success': True, 'message': 'تم تعديل المنتج بنجاح'})
 
                 except OrderItem.DoesNotExist:
@@ -484,8 +485,10 @@ def order_dealing(request, oid):
             if remaining < 0:
                 remaining_label = "لك"
                 remaining = abs(remaining)  # تحويل القيمة إلى موجبة
-            else:
+            elif remaining >0:
                 remaining_label = "عليك"
+            else: # remaining = 0
+                remaining_label = "لا يوجد"
                 
             context.update({
                 'order_dealing': order_dealing,

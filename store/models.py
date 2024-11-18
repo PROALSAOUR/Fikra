@@ -260,6 +260,12 @@ class ProductVariation(models.Model):
        self.sold += quantity
        self.save()
     
+    def return_product(self, quantity):
+        """دالة ارجاع كميات المنتج المستبدل او المرجع الى المخزون """
+        self.update_stock(quantity)  # إعادة الكمية القديمة إلى المخزون
+        self.sold -= quantity # تحديث الكمية المباعة
+        self.save()
+                
     @property
     def item_thumbnail(self):
         return self.product_item.item_image # استرجع صورة المصغرة من المنتج

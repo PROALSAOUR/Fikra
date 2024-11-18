@@ -1,4 +1,4 @@
-from orders.models import Order, OrderDealing
+from orders.models import Order, OrderDealing, DealingItem
 from accounts.models import UserProfile
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
@@ -34,6 +34,50 @@ def update_user_points(sender, instance, **kwargs):
     
 @receiver(post_save, sender=OrderDealing)
 def calc_remaining(sender, instance, **kwargs):
-    """عند حفظ طلب تعديل تعمل هذه الدالة لحساب متبقي الدفع"""
+    """عند حفظ طلب التعديل تعمل هذه الدالة لحساب متبقي الدفع"""
     instance.calc_remaining()  # تقوم بحساب المتبقي وحفظه
     
+@receiver(pre_save, sender=DealingItem)
+def update_sold_and_stock(sender, instance, **kwargs):
+    """
+    دالة تعمل على تحديث كميات المخزون والمباع الخاصة بالمنتج المستبدل او المرجع عندما يسلم الى المستخدم 
+    """
+    try:
+        previous_dealing_item = DealingItem.objects.get(pk=instance.pk)
+    except DealingItem.DoesNotExist:
+        # إذا كان الطلب جديدًا، لا يوجد حالة سابقة، فنخرج من الدالة
+        return
+    
+    # الدالة تعمل فقط عند تعديل حالة المعالجة الى تمت المعالجة
+    if not previous_dealing_item.is_dealt and instance.is_dealt :
+    
+        # جلب الكميات والمنتجات (متوافق مع الاستبدال والاسترجاع)
+        old_item = instance.old_item
+        old_qty = instance.old_qty
+        
+        old_item.return_product(old_qty)  # إعادة الكمية القديمة إلى المخزون
+        
+        if instance.status == 'replace': # اذا كانت العملية عملية استبدال قم بتحديث كميات المنتج المستبدل به
+            
+            new_item = instance.new_item
+            new_qty = instance.new_qty
+            new_item.sell(new_qty)  # تحديث المبيعات
+            
+    elif  previous_dealing_item.is_dealt and not instance.is_dealt :
+        # في حالة قام احدهم بالخطأ بجعل حالة المعالجة صحيحة دون ان تتم المعالجة فعليا
+        # ثم اعاد تغير حالة المعالجة الى غير معالجة يتم عكس العملية السابقة تلقائيا هنا
+        
+        
+        # جلب الكميات والمنتجات (متوافق مع الاستبدال والاسترجاع)
+        old_item = instance.old_item
+        old_qty = instance.old_qty
+        
+        old_item.sell(old_qty)  # إعادة الكمية القديمة إلى المخزون
+        
+        if instance.status == 'replace': # اذا كانت العملية عملية استبدال قم بتحديث كميات المنتج المستبدل به
+            
+            new_item = instance.new_item
+            new_qty = instance.new_qty
+            new_item.return_product(new_qty)  # تحديث المبيعات
+            
+            

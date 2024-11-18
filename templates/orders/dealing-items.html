@@ -14,11 +14,15 @@
                             <h3>الطلب رقم <span>{{ serial_number|stringformat:"06d" }}</span></h3>
                             {% comment %}  اذا كان الرقم سالب اعطي المستخدم اذا كان موجب المستخدم يعطينا {% endcomment %} 
                             <h3> متبقي الدفع 
-                                <span style="color: {% if remaining_label == 'لك' %} #27bc27{% else %}#cf2222{% endif %};">
-                                    {{ remaining }}
-
-                                    {{ remaining_label }}
-                                </span>
+                                {% if remaining %} {% comment %} يوجد متبقي سواء لك او عليك {% endcomment %}
+                                    <span style="color: {% if remaining_label == 'لك' %} #27bc27{% else %}#cf2222{% endif %};">
+                                        {{ remaining }} {{ remaining_label }}
+                                    </span>
+                                {% else %}
+                                    <span>                                        
+                                        {{ remaining_label }}
+                                    </span>
+                                {% endif %}
                             </h3>   
             
                             <a class='edit-exit' href="javascript:void(0);" onclick="goBack()">
