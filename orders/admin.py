@@ -2,13 +2,6 @@ from django.contrib import admin
 from django.utils.html import format_html
 from orders.models import *
 
-class DliveryPriceAdmin(admin.ModelAdmin):
-    list_display = ('price',)
-        
-    def has_add_permission(self, request, obj=None):
-        # السماح بالإضافة فقط إذا لم يكن هناك أي صفحة اسئلة موجودة
-        return not DliveryPrice.objects.exists()
-
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0  # عدم إظهار حقول إضافية
@@ -36,7 +29,7 @@ class MyOrdersAdmin(admin.ModelAdmin):
     search_fields = ('serial_number', 'user__phone_number',)
     list_filter = ('status', 'with_message', 'user__phone_number',)
     ordering = ('-order_date', '-updated_at',)
-    readonly_fields = ( 'user', 'serial_number', 'old_total', 'discount_amount', 'dlivery_price', 'total_price', 'total_points',  'order_date', 'deliverey_date', 'message',)
+    readonly_fields = ( 'user', 'serial_number', 'old_total', 'discount_amount', 'total_price', 'total_points', 'free_delivery', 'order_date', 'deliverey_date', 'message',)
     exclude = ('with_message',)
     inlines = [OrderItemInline] 
     
@@ -97,5 +90,4 @@ class DealingAdmin(admin.ModelAdmin):
     status.short_description = 'حالة الطلب'   
 
 admin.site.register(Order, MyOrdersAdmin)
-admin.site.register(DliveryPrice, DliveryPriceAdmin)
 admin.site.register(OrderDealing, DealingAdmin)

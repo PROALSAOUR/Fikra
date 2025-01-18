@@ -3,16 +3,6 @@ from django.utils.html import mark_safe
 from store.models import ProductVariation
 from django.core.exceptions import ValidationError
 from accounts.models import User
-       
-class DliveryPrice(models.Model):
-    price = models.IntegerField(default=0 , verbose_name='سعر التوصيل')     
-    
-    def __str__(self):
-        return f"سعر التوصيل {self.price}"
-    
-    class Meta:
-        verbose_name = 'سعر التوصيل '
-        verbose_name_plural = 'سعر التوصيل'
         
 class Order(models.Model):
     
@@ -31,7 +21,7 @@ class Order(models.Model):
     total_price = models.PositiveIntegerField(verbose_name='الإجمالي')
     total_points = models.PositiveIntegerField(null=True, verbose_name='المكافأة')
     discount_amount = models.IntegerField(default=0, verbose_name='قيمة الخصم')
-    dlivery_price = models.IntegerField(default=0, verbose_name='سعر التوصيل')
+    free_delivery =  models.BooleanField(default=False, verbose_name='توصيل مجاني؟' )
     order_date = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الطلب')
     deliverey_date = models.DateTimeField(null=True, blank=True, verbose_name='تاريخ التسليم')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')

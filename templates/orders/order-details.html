@@ -69,33 +69,24 @@
                                 {% endfor %}
                             </tbody>
                             <tfoot>
-                                {% if order.dlivery_price or order.discount_amount %}
-                                    <tr>
-                                        <td colspan="6">المجموع :</td>
-                                        <td>{{ order.old_total }} دل </td>
-                                        <td colspan="2"></td>
-                                    </tr>
-                                {% endif %}
-                                {% if order.discount_amount %}
-                                    <tr>
-                                        <td colspan="6">  قيمة الخصم:</td>
-                                        <td>-{{ order.discount_amount }} دل </td>
-                                        <td colspan="2"></td>
-                                    </tr>
-                                {% endif %}
-                                {% if order.dlivery_price %}
-                                    <tr>
-                                        <td colspan="6">تكلفة الشحن:</td>
-                                        <td>+{{ order.dlivery_price }} دل </td>
-                                        <td colspan="2"></td>
-                                    </tr>
-                                {% endif %}
                                 {% if order.total_points %}
                                     <tr>
                                         <td colspan="6"> النقاط المكتسبة:</td>
                                         <td>+{{ order.total_points }} <i class="fa-solid fa-gem"> </td>
                                         <td colspan="2"></td>
                                     </tr>  
+                                {% endif %}
+                                <tr>
+                                    <td colspan="6">المجموع :</td>
+                                    <td>{{ order.old_total }} دل </td>
+                                    <td colspan="2"></td>
+                                </tr>
+                                {% if order.discount_amount %}
+                                    <tr>
+                                        <td colspan="6">  قيمة الخصم:</td>
+                                        <td>-{{ order.discount_amount }} دل </td>
+                                        <td colspan="2"></td>
+                                    </tr>
                                 {% endif %}
                                 <tr>
                                     <td colspan="6"> المجموع النهائي:</td>

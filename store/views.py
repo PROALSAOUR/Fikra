@@ -1,6 +1,6 @@
 from store.models import *
 from cards.models import GiftItem, CoponUsage
-from orders.models import DliveryPrice
+from settings.models import Settings
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -463,13 +463,12 @@ def clear_favourites(request):
 def cart_page(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
     cart_items = cart.items.prefetch_related('cart_item__product_item__variations__size').select_related('cart_item__product_item__product').all()  
-    delivery_price = DliveryPrice.objects.first()
     
     available_items = []
     unavailable_items = []
     
     total_qty = 0  # عدد المنتجات الاجمالي
-    total_price = delivery_price.price  # (متضمن سعر التوصيل)حساب السعر الاجمالي 
+    total_price = 0  # (متضمن سعر التوصيل)حساب السعر الاجمالي 
     total_bonus = 0  # حساب  الـبونس الاجمالي
 
     for item in cart_items:
@@ -512,6 +511,11 @@ def cart_page(request):
     user_copons = CoponUsage.objects.filter(user=user, has_used=False ,expire__gte=now().date(), copon_code__min_bill_price__lte=total_price).prefetch_related('copon_code').order_by('copon_code__value')
     user_gifts = GiftItem.objects.filter(has_used=False, recipient=user).prefetch_related('gift').order_by('sell_value')
     
+    # ========  الاستعلام عما ان كان التوصيل مجاني ==========
+    
+    settings =  Settings.get_settings()
+    delivery = settings.free_delivery
+    
     context = {
         'cart_items': cart_items,
         'available_items': available_items,
@@ -521,7 +525,7 @@ def cart_page(request):
         'total_qty': total_qty,
         'total_price': total_price,
         'total_bonus': total_bonus,
-        'delivery': delivery_price.price,
+        'delivery': delivery,
         'user_copons': user_copons,
         'user_gifts': user_gifts,
     }

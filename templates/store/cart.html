@@ -191,7 +191,8 @@
     
                                     <input type="submit" value="إتمام الطلب" class="confirm ordered-done-link">
                                 </form>
-                                <span class='cart-delivery'> سعر التوصيل: {% if delivery > 0 %}{{ delivery }} دل {% else %}مجاني{% endif %} </span>
+                                {% comment %} اذا كانت قيمة delivery غير صحيح يعني التوصيل ليس مجاني {% endcomment %}
+                                <span class='cart-delivery'>{% if not delivery %}(التوصيل غير مضمن بالفاتورة){% else %}التوصيل مجاني{% endif %} </span>
                             </div>
                             
                             <script type="text/javascript">

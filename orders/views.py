@@ -376,12 +376,6 @@ def create_order(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-        dlivery_price = 0  # قيمة التوصيل الافتراضية
-        try:
-            dlivery = DliveryPrice.objects.first()
-            dlivery_price = dlivery.price if dlivery else 0
-        except Exception:
-            dlivery_price = 0
 
         # Check if user wants to use discount
         if use_this and card_type:
@@ -416,14 +410,19 @@ def create_order(request):
                 except CoponUsage.DoesNotExist:
                     return JsonResponse({'success': False, 'error': 'كود الكوبون الذي ادخلته غير موجود في مخزونك!'})
 
+        # ========  الاستعلام عما ان كان التوصيل مجاني ==========
+        
+        settings =  Settings.get_settings()
+        delivery = settings.free_delivery
+
         # إنشاء الطلب
         order = Order.objects.create(
             user=user,
             old_total=total_price,
-            total_price=total_price - discount_amount + dlivery_price, 
+            total_price=total_price - discount_amount , 
             total_points=total_bonus,
-            dlivery_price=dlivery_price,
             discount_amount=discount_amount,
+            free_delivery = delivery,
             with_message=with_message,
             message=message,
         )
