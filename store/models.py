@@ -127,6 +127,16 @@ class Category(models.Model):
         verbose_name = 'تصنيف'
         verbose_name_plural = 'التصنيفات'
 
+class Repository(models.Model):
+    name = models.CharField(max_length=100 , verbose_name='المستودع')
+        
+    def __str__(self) -> str:
+        return self.name
+        
+    class Meta:
+        verbose_name = 'مستودع'
+        verbose_name_plural = 'المستودعات'
+
 class Tag(models.Model):
     name = models.CharField(max_length=20, blank=True , verbose_name='الإسم')
     
@@ -146,6 +156,7 @@ class Product(models.Model):
     description = models.TextField(verbose_name='الوصف')
     brand = models.ForeignKey(Brand, related_name='products', on_delete=models.CASCADE , verbose_name='البراند')
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE , verbose_name='التصنيف')
+    repository =  models.ForeignKey(Repository, related_name='products', on_delete=models.CASCADE , verbose_name='المستودع',)
     tag = models.ManyToManyField(Tag, related_name='products' , verbose_name='الهاشتاج')
     thumbnail_img = models.ImageField(upload_to='store/Products/thumbnails' , verbose_name='صورة العرض')
     featured = models.BooleanField(default=False , verbose_name='مميز؟')

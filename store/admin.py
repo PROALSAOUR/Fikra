@@ -33,6 +33,11 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('featured', 'status', 'size_category', 'parent_category',)
 
+class RepositoryAdmin(admin.ModelAdmin):
+    list_display = ('name', )
+    search_fields = ('name',)
+    list_filter = ('name',)
+
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name', 'tag_count')
     search_fields = ('name',)
@@ -73,6 +78,7 @@ admin.site.register(AdsSlider, AdsSliderAdmin)
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(SizeCategory, SizeCategoryAdmin)
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(Repository, RepositoryAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductItem, ProductItemAdmin)
