@@ -12,7 +12,7 @@
             <li><a href="{% url "cards:cards-store" %}"  aria-label="متجر البطاقات"><i class="fa-solid fa-angles-left"></i>متجر البطاقات</a></li>
             <li><a href="{% url "blog:blog" %}"  aria-label="المدونة"><i class="fa-solid fa-angles-left"></i> المدونة</a></li>
             <li><a href="{% url "blog:questions-page" %}"  aria-label="الاسئلة الشائعة"><i class="fa-solid fa-angles-left"></i> الاسئلة الشائعة</a></li>
-            <li><a href="#"><i class="fa-solid fa-angles-left"  aria-label="تواصل معنا"></i> تواصل معنا</a></li>
+            <li><a href="mailto:{{ email }}?subject=استفسار&body=ارغب بالاستفسار عن "><i class="fa-solid fa-angles-left"  aria-label="تواصل معنا"></i> تواصل معنا</a></li>
         </ul>
     </div>
     <div class="info">
@@ -20,8 +20,8 @@
         <p> الوجهة المثالية لعشاق الأناقة، نقدم ملابس عصرية للشباب والبنات بتصاميم فريدة وجودة عالية. استمتعوا بتجربة تسوق ممتعة لتجديد إطلالتكم بأحدث صيحات الموضة.</p>
         <div class="contact-us">
             <h3>تواصل معنا </h3>
-            <span>0926295838</span>
-            <span>096657418 </span>
+            <span>{{phone_number1}}</span>
+            <span>{{phone_number2}} </span>
         </div>
         <div class="location">
             <h3> الموقع </h3>
@@ -29,11 +29,11 @@
         </div>
     </div>
     <div class="social">
-        <div class="image"><img src="{% static "/images/icons/small-logo.png" %}" alt=""></div>    
+        <div class="image"><img src="{% static "/images/icons/small-logo.png" %}" alt="ايقونة الموقع"></div>    
         <ul class="social-icons">
-            <li class="facebook"><a href="#" aria-label='تواصل على فيسبوك'><i class="fa-brands fa-facebook facebook"></i></a></li>
-            <li class="instagram"><a href="#" aria-label='تواصل على انستغرام'><i class="fa-brands fa-instagram instagram"></i></a></li>
-            <li class=" whatsapp"><a href="#" aria-label='تواصل على واتساب'><i class="fa-brands fa-whatsapp whatsapp"></i></a></li>
+            <li class="facebook"><a href="{{facebook_link}}" aria-label='تواصل على فيسبوك'><i class="fa-brands fa-facebook facebook"></i></a></li>
+            <li class="instagram"><a href="{{instagram_link}}" aria-label='تواصل على انستغرام'><i class="fa-brands fa-instagram instagram"></i></a></li>
+            <li class=" whatsapp"><a href="https://wa.me/{{whatsapp_link}}" aria-label='تواصل على واتساب'><i class="fa-brands fa-whatsapp whatsapp"></i></a></li>
         </ul>
     </div>
 </div>

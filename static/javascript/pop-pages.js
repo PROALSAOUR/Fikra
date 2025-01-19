@@ -44,22 +44,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 // ===================================================================================================
-// الكود الخاص بتواصل معنا 
-document.addEventListener('DOMContentLoaded', function () {
-    const contactUsLinks = document.querySelectorAll('.contact-us');
-  
-    if (contactUsLinks.length > 0) {  // التحقق من وجود العناصر
-        contactUsLinks.forEach(function (link) {
-            link.addEventListener('click', function (e) {
-                e.preventDefault(); // منع الانتقال الافتراضي للرابط
-                const phoneNumber = '0926295838';
-                const whatsappUrl = `https://wa.me/${phoneNumber}`;
-                window.location.href = whatsappUrl; // توجيه المستخدم إلى رابط واتساب
-            });
-        });
-    }
-});
-// ====================================================================================================
 // الكود الخاص بإظهار صفحة حذف الحساب
 document.addEventListener('DOMContentLoaded', function () {
     const deleteMenu = document.querySelector('.delete-account');

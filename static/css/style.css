@@ -3596,7 +3596,7 @@ hr.sep {
   .cart .receipt {
     display: none;
     position: fixed;
-    z-index: 20;
+    z-index: 2000;
     width: 300px;
     left: 50%;
     top: 50%;

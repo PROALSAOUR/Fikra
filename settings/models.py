@@ -21,3 +21,16 @@ class Settings(models.Model):
     class Meta:
         verbose_name = "الإعدادات"
         verbose_name_plural = "الإعدادات"
+            
+class Social(models.Model):
+    facebook = models.URLField(verbose_name='فيسبوك', blank=True)
+    instagram = models.URLField(verbose_name='انستا', blank=True)
+    whatsapp = models.CharField(verbose_name='رقم الواتساب', blank=True, max_length=20)
+    phone_number1 = models.CharField(verbose_name='رقم الهاتف الاساسي', null=True, max_length=20)
+    phone_number2 = models.CharField(verbose_name='رقم الهاتف الثانوي', null=True, max_length=20)
+    email = models.EmailField(verbose_name='ايميل', blank=True)
+    
+    class Meta:
+        verbose_name = "حسابات الموقع"
+        verbose_name_plural = "حسابات الموقع"
+    

@@ -45,16 +45,16 @@
                                 <h1>تواصل معنا</h1>
                             </div>
                             <ul class="links">
-                                <li><a href="#" aria-label="اذهب الى فيسبوك" ><i class="fa-brands fa-facebook"></i>فيسبوك</a></li>
-                                <li><a href="#" aria-label="اذهب الى انستغرام" ><i class="fa-brands fa-instagram"></i>انستغرام</a></li>
-                                <li><a href="#" aria-label="اذهب الى واتساب" ><i class="fa-brands fa-whatsapp"></i>واتساب</a></li>
-                                <li><a href="#" aria-label="اذهب الى ايميل" ><i class="fa-regular fa-envelope"></i>ايميل</a></li>
-                                <li><a href="#" aria-label="تواصل معنا" ><i class="fa-solid fa-phone-volume"></i>اتصل بنا</a></li>
+                                <li><a href="{{ facebook_link }}" aria-label="اذهب الى فيسبوك" ><i class="fa-brands fa-facebook"></i>فيسبوك</a></li>
+                                <li><a href="{{ instagram_link }}" aria-label="اذهب الى انستغرام" ><i class="fa-brands fa-instagram"></i>انستغرام</a></li>
+                                <li><a href="https://wa.me/{{whatsapp_link}}" aria-label="اذهب الى واتساب" ><i class="fa-brands fa-whatsapp"></i>واتساب</a></li>
+                                <li><a href="mailto:{{ email }}?subject=استفسار&body=ارغب بالاستفسار عن  " aria-label="اذهب الى ايميل" ><i class="fa-regular fa-envelope"></i>ايميل</a></li>
+                                <li><a href="tel:{{ phone_number1 }}" aria-label="تواصل معنا" ><i class="fa-solid fa-phone-volume"></i>اتصل بنا</a></li>
                             </ul>
                         </div>  
                         <div class="secondary-nav">
                             <ul>
-                                <li class="li contact-us"><i class="fa-solid fa-headset"></i></li>
+                                <li class="li contact-us"><a href="https://wa.me/{{whatsapp_link}}" aria-label="اذهب الى واتساب" ><i class="fa-solid fa-headset"></i></a></li>
                                 <li class="li"><a href="{% url "cards:cards-repo" %}" aria-label="مخزون البطاقات"><i class="fa-solid fa-gifts"></i></a></li>
                                 <li class="li"><a href="{% url "orders:my-orders" %}" aria-label="طلباتي السابقة"><i class="fa-solid fa-list-check"></i></a></li>
                                 <li class="li"><a href="{% url 'blog:blog' %}" aria-label="المدونة"><i class="fa-regular fa-circle-question"></i></a></li>

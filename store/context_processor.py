@@ -3,6 +3,35 @@ from django.core.cache import cache
 from store.models import *
 from accounts.models import  UserProfile, Inbox
 from cards.models import GiftItem
+from settings.models import Social
+
+def social_data(request):
+    
+    # جلب حسابات الموقع من الكاش أو قاعدة البيانات
+    social = cache.get('social')
+    if not social:
+        social = Social.objects.first()
+        if social:
+            cache.set('social', social, 60 * 60)
+        else:
+            return {
+                'facebook_link': "#",
+                'instagram_link': "#",
+                'whatsapp_link':"#",
+                'phone_number1': "#",
+                'phone_number2': "#",
+                'email': "#",
+            }
+        
+    return {
+        'facebook_link': social.facebook,
+        'instagram_link': social.instagram,
+        'whatsapp_link': social.whatsapp,
+        'phone_number1': social.phone_number1,
+        'phone_number2': social.phone_number2,
+        'email': social.email,
+    }
+    
 
 def globals(request):
     
