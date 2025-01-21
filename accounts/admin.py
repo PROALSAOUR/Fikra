@@ -2,7 +2,6 @@ from django.contrib import admin
 from accounts.models import *
 from django.utils.html import format_html
 
-
 class UserAdmin(admin.ModelAdmin):
     list_display = ('get_full_name', 'get_phone_number')
     search_fields = ('first_name', 'last_name', 'phone_number')
@@ -32,9 +31,14 @@ class InboxAdmin(admin.ModelAdmin):
         return obj.messages.count()  # إرجاع عدد الرسائل المرتبطة بصندوق البريد
     messages_count.short_description = 'عدد الرسائل'  # عنوان العمود في الواجهة
 
-class SendMessageAdmin(admin.ModelAdmin):
-    list_display = ['subject', 'timestamp', 'is_read']
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ['subject', 'timestamp', 'is_read']    
     exclude = ['timestamp', 'is_read']
+    
+    def get_queryset(self, request):
+        """عرض الرسائل المرسلة للجميع فقط"""
+        qs = super().get_queryset(request)
+        return qs.filter(sent_to_all=True)
     
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'points')
@@ -65,6 +69,6 @@ class PointsUsageAdmin(admin.ModelAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(UserProfile, ProfileAdmin)
-admin.site.register(Message, SendMessageAdmin)
+admin.site.register(Message, MessageAdmin)
 admin.site.register(Inbox, InboxAdmin)
 admin.site.register(PointsUsage, PointsUsageAdmin)

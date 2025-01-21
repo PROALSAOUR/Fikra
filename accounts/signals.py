@@ -15,7 +15,7 @@ def craete_user_profile_and_inbo(sender, instance, created, **kwargs):
             
         # إنشاء رسالة جديدة وإضافتها إلى صندوق الوارد
         message = wellcome_new_user(instance.first_name)
-        inbox.messages.add(message)
+        inbox.add_message(message)
         
 @receiver(pre_save, sender=UserProfile)
 def track_user_profile_points_change(sender, instance,  **kwargs):

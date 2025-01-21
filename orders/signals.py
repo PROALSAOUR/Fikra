@@ -24,7 +24,7 @@ def update_user_points(sender, instance, **kwargs):
         # إنشاء رسالة جديدة وإضافتها إلى صندوق الوارد
         message = add_order_points_message(user_name=instance.user, points=instance.total_points, order_se=instance.serial_number)
         message.save()
-        user_inbox.messages.add(message)
+        user_inbox.add_message(message)
 
         # إضافة تاريخ التسليم إلى الطلب
         instance.deliverey_date = timezone.now()

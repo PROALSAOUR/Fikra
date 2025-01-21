@@ -51,7 +51,21 @@ class Message(models.Model):
     content = models.TextField( verbose_name='المحتوى')
     is_read = models.BooleanField(default=False , verbose_name='مقروئة؟')
     timestamp = models.DateTimeField(default=timezone.now , verbose_name='التاريخ') 
+    sent_to_all = models.BooleanField(default=False, verbose_name='مرسلة للجميع؟')
 
+    @staticmethod
+    def send_to_all(subject, content):
+        message = Message.objects.create(subject=subject, content=content, sent_to_all=True)
+        for inbox in Inbox.objects.all():
+            inbox.add_message(message)
+
+    def save(self, *args, **kwargs):
+        """إرسال الرسالة تلقائيًا عند الحفظ إذا كانت مخصصة للجميع"""
+        super().save(*args, **kwargs)  # حفظ الرسالة أولًا
+        if self.sent_to_all:  # إرسالها فقط إذا كانت مرسلة للجميع
+            for inbox in Inbox.objects.all():
+                inbox.messages.add(self)
+    
     
     def __str__(self):
         return self.subject
@@ -63,6 +77,16 @@ class Message(models.Model):
 class Inbox(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='inbox', verbose_name='المستخدم')
     messages = models.ManyToManyField(Message, related_name='inboxes', verbose_name='الرسائل')
+
+    MAX_MESSAGES = 20  # الحد الأقصى لعدد الرسائل
+
+    def add_message(self, message):
+        """إضافة رسالة جديدة مع إزالة الأقدم عند تجاوز الحد."""
+        if self.messages.count() >= self.MAX_MESSAGES:
+            oldest_message = self.messages.order_by('timestamp').first()  # أقدم رسالة
+            self.messages.remove(oldest_message)  # حذفها لتوفير مساحة
+        self.messages.add(message)  # إضافة الرسالة الجديدة
+
 
     def __str__(self):
         return f"Inbox for {self.user}"

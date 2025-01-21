@@ -11,7 +11,6 @@ import json
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 import phonenumbers
-from django.utils import timezone
 from accounts.send_messages import buy_copon_done_message, send_gift_to_someone_not_in_fikra
 
 # ===================================================
@@ -179,7 +178,7 @@ def buy_copon(request, cid):
     
     # ارسال رسالة عند شراء كوبون
     message = buy_copon_done_message(user_name=user_copon.user.first_name, copon_name=user_copon.copon_code)
-    inbox.messages.add(message)
+    inbox.add_message(message)
     
     # خصم النقاط وحفظ التحديثات
     points -= copon.price
@@ -251,7 +250,7 @@ def buy_gift(request, gid):
                     
                     # رسالة الى المشتري تخبره ان المستلم ليس لديه حساب على فكرة وانه سيتم التواصل معه
                     message = send_gift_to_someone_not_in_fikra(gift=gift, user_name=user.first_name, recipient_name=recipient_name, recipient_phone=recipient_phone)
-                    profile.inbox.messages.add(message)
+                    profile.inbox.add_message(message)
                     profile.points -= gift.price
                     profile.save()
                     gift.sales_count += 1
@@ -348,7 +347,7 @@ def buy_gift2(request, gid):
                     
                     # رسالة الى المشتري تخبره ان المستلم ليس لديه حساب على فكرة وانه سيتم التواصل معه
                     message = send_gift_to_someone_not_in_fikra(gift=gift, user_name=user.first_name, recipient_name=recipient_name, recipient_phone=recipient_phone)
-                    profile.inbox.messages.add(message)
+                    profile.inbox.add_message(message)
                     
                     profile.points -= gift.price
                     profile.save()

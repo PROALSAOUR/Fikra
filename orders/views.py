@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 import json
 from decimal import Decimal
 from django.contrib.auth.decorators import login_required
@@ -107,7 +107,7 @@ def cancel_order(request):
                     # ارسال رسالة بعد إلغاء الطلب
                     message = cancel_order_message(user_name=user.first_name, order=order.serial_number)
                     inbox = user.profile.inbox
-                    inbox.messages.add(message)
+                    inbox.add_message(message)
                     inbox.save()
                     
                     return JsonResponse({'success': True, 'message': 'تمت عملية إلغاء الطلب بنجاح!'})
@@ -161,7 +161,7 @@ def remove_order_item(request):
             
             # تجديد بيانات الطلب بعد حذف المنتج  
             order.old_total -= order_item.price * order_item.qty
-            order.total_price = order.old_total + order.dlivery_price - order.discount_amount
+            order.total_price = order.old_total - order.discount_amount
             order.total_points -= order_item.points * order_item.qty
             order.save()  
             
@@ -181,7 +181,7 @@ def remove_order_item(request):
                 #  ارسال رسالة الى المستخدم عند ارجاع منتج من الطلب
                 message = return_order_item_message(user_name=user.first_name, order=order.serial_number)
                 inbox = user.profile.inbox
-                inbox.messages.add(message)
+                inbox.add_message(message)
                 inbox.save()
             else: # اذا كانت حالة الطلب معالجة لن يتم انشاء طلب ارجاع لذا سيتم تعديل الكميات مباشرة
                 # تحديث المخزون والمبيعات للمنتجات القديمة والجديدة
@@ -279,7 +279,7 @@ def edit_order(request):
                         
                     # تحديث إجمالي الطلب
                     order.old_total = sum([i.price * i.qty for i in order.order_items.all()])
-                    order.total_price = order.old_total + order.dlivery_price - order.discount_amount
+                    order.total_price = order.old_total - order.discount_amount
                     order.total_points = sum([i.points * i.qty for i in order.order_items.all()])
                     
                     # التحقق من أن السعر الإجمالي لا يمكن أن يكون أقل من الصفر
@@ -313,7 +313,7 @@ def edit_order(request):
                         #  ارسال رسالة الى المستخدم عند تعديل الطلب
                         message = edit_order_message(user_name=user.first_name, order=order.serial_number)
                         inbox = user.profile.inbox
-                        inbox.messages.add(message)
+                        inbox.add_message(message)
                         inbox.save() 
                         
                     else: # اذا كانت حالة الطلب معالجة لن يتم انشاء طلب تعديل لذا سيتم تعديل الكميات مباشرة
@@ -441,7 +441,7 @@ def create_order(request):
         # ارسال رسالة عند اتمام الطلب 
         message = create_order_message(user_name=user.first_name, order=order.serial_number)
         inbox = user.profile.inbox
-        inbox.messages.add(message)
+        inbox.add_message(message)
         inbox.save()
         
         # إفراغ السلة عند نجاح الطلب
