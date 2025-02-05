@@ -14,6 +14,7 @@ django-celery-beat = "*"
 celery = "*"
 redis = "*"
 django-pwa = "*"
+twilio = "*"
 
 [dev-packages]
 

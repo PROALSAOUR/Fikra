@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils import timezone
+import random
+from django.utils.timezone import now
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, phone_number, password=None, **extra_fields):
@@ -45,6 +47,19 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'مستخدم'
         verbose_name_plural = 'مستخدمين'
+
+class OTPVerification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="otp_codes", null=True)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(default=now)
+    attempts = models.IntegerField(default=0)
+
+    def is_valid(self):
+        return (now() - self.created_at).seconds < 300 and self.attempts < 3  # صلاحية 5 دقائق و3 محاولات فقط
+
+    @staticmethod
+    def generate_code():
+        return str(random.randint(100000, 999999))
     
 class Message(models.Model):
     subject = models.CharField(max_length=250 , verbose_name='العنوان')

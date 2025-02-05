@@ -299,3 +299,10 @@ PWA_APP_SPLASH_SCREEN = [
     }
 ]
 # ===================================================================
+# الية ارسال رسائل التحقق 
+
+TWILIO_ACCOUNT_SID = "AC94270af676cdd6ff11e65657828c7cb4"
+TWILIO_AUTH_TOKEN = "f4232d996d7ac6d7e5ebe83123f01691"
+TWILIO_WHATSAPP_NUMBER = "whatsapp:+14155238886" # الرقم المقدم من Twilio
+
+

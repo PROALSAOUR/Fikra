@@ -27,11 +27,12 @@
 
 </head>
 <body dir="rtl" class="" >
-    {% if request.path != '/accounts/sign/' %}
+    {% comment %} لايوجد هيدر او ناف او فوتر بصفحة التسجيل والتحقق {% endcomment %}
+    {% if request.path != '/accounts/sign/' and  request.path != '/accounts/verify-otp/' %} 
         {% include "partials/header.html" %}
     {% endif %}
     
-    {% if request.path != '/accounts/sign/' %}
+    {% if request.path != '/accounts/sign/' and  request.path != '/accounts/verify-otp/' %}
         {% include "partials/nav.html" %}
     {% endif %}
 
@@ -43,7 +44,7 @@
     {% include "pop-pages/added-to-cart.html" %}
     {% include "pop-pages/buy-card.html" %}
     
-    {% if request.path != '/accounts/sign/' %}
+    {% if request.path != '/accounts/sign/' and  request.path != '/accounts/verify-otp/' %}
         {% include "partials/footer.html" %}
     {% endif %}   
 

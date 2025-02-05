@@ -12,10 +12,15 @@ class UserSignUpForm(UserCreationForm):
     phone_number = forms.CharField(widget=forms.TextInput(attrs={'id':'user-phone'}))
     password1 = forms.CharField(widget=forms.PasswordInput(attrs={'id':'passoword1'}))
     password2 = forms.CharField(widget=forms.PasswordInput(attrs={'id':'passoword2'}))
+    otp_code = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'id': 'otp-code'}),
+        help_text="سيتم إرسال رمز التحقق إلى رقم واتساب الخاص بك."
+    )
     
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'phone_number']
+        fields = ['first_name', 'last_name', 'phone_number', 'otp_code']
         
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')
@@ -26,6 +31,9 @@ class UserSignUpForm(UserCreationForm):
                 raise ValidationError("رقم الهاتف غير صالح.")
         except phonenumbers.NumberParseException:
             raise ValidationError("يرجى إدخال رقم هاتف صحيح.")
+        # التحقق مما إذا كان الرقم مسجلاً مسبقًا
+        if User.objects.filter(phone_number=phone_number).exists():
+            raise ValidationError("رقم الهاتف مستخدم بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.")
         return phone_number
     
 class UserLogInForm(forms.Form):
