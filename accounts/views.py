@@ -43,7 +43,6 @@ def sign(request):
     # إعداد النماذج الافتراضية
     sign_up_form = UserSignUpForm
     login_form = UserLogInForm
-        
     if request.method == 'POST':  
         
         form_type = request.POST.get('form-type')
@@ -79,7 +78,7 @@ def sign(request):
 
                 # تخزين OTP في قاعدة البيانات
                 otp_instance = OTPVerification.objects.create(
-                    user=None,  # سيتم ربطه لاحقًا بعد التحقق
+                    phone_number=phone_number ,
                     code=otp_code
                 )
 
@@ -111,7 +110,7 @@ def verify_otp(request):
             messages.error(request, "حدث خطأ، يرجى إعادة التسجيل.")
             return redirect("accounts:sign")
 
-        otp_instance = OTPVerification.objects.filter(id=otp_id).first()
+        otp_instance = OTPVerification.objects.filter(id=otp_id, phone_number=phone_number).first()
 
         if otp_instance :
             if  otp_instance.is_valid():
@@ -119,6 +118,8 @@ def verify_otp(request):
                     # إنشاء الحساب بعد التحقق
                     new_user = User.objects.create_user(phone_number=phone_number, first_name=first_name , last_name=last_name)
                     login(request, new_user)
+                    otp_instance.delete()# حذف الكود من قاعدة البيانات
+                    del request.session['otp_id']  # حذف الكود من الجلسة
                     messages.success(request, "تم التحقق بنجاح!")
                     return redirect("store:home")
                 else:
@@ -134,6 +135,10 @@ def verify_otp(request):
                 del request.session['otp_id']  # حذف الـ OTP المخزن بالجلسة
                 messages.error(request, "رمز التحقق انتهت صلاحيته. حاول من جديد.")
                 return redirect("accounts:sign")
+        else:
+            messages.error(request, "المعذرة يبدو انه قد حصل خطأ اثناء توليد رمز التحقق الخاص بك , حاول مرة اخرى لاحقا")
+            time.sleep(1)
+            return redirect("accounts:sign")
 
     return render(request, "accounts/verify_otp.html")
 # دالة عرض معلومات الحساب 
@@ -169,7 +174,7 @@ def delete_account(request):
     return redirect('store:home')  # إعادة توجيه إلى الصفحة الرئيسية
 #  دالة تعديل كلمة المرور
 @login_required
-def edit_account(request):
+def edit_account(request):    
     if request.method == 'POST':
         # الحصول على البيانات من الفورم
         old_password = request.POST.get('old-password')
@@ -196,6 +201,7 @@ def edit_account(request):
 
     return render(request, 'accounts/edit-password.html')
 # ================================
+#  دوال تعديل كلمة المرور المنسية
 def forget_password(request):
     context = {}
     # ان كان المستخدم مسجل دخوله خذ رقمه المسجل وارسل رسالة عليه
@@ -221,10 +227,11 @@ def forget_password(request):
             send_otp_via_whatsapp(formatted_phone, otp_code)  # إرسال OTP للرقم الصحيح
         else:
             messages.error(request, "رقم الهاتف الخاص بك غير صالح ")  # إرجاع رسالة خطأ
+            return redirect('accounts:edit-password')
 
         # تخزين OTP في قاعدة البيانات
         otp_instance = OTPVerification.objects.create(
-            user=None,  # سيتم ربطه لاحقًا بعد التحقق
+            phone_number=phone_number, 
             code=otp_code
         )
         request.session['otp_id'] = otp_instance.id  # تخزين الـ OTP ID في الجلسة
@@ -235,16 +242,19 @@ def verify_forget_password(request):
     if request.method == "POST":
         otp_code = request.POST.get("otp_code")
         otp_id = request.session.get("otp_id")
+        phone_number = request.session.get("phone_number")
 
-        if not otp_id:
+        if not otp_id or not phone_number:
             messages.error(request, "حدث خطأ، يرجى إعادة المحاولة لاحقاً.")
             return redirect("accounts:edit-password")
 
-        otp_instance = OTPVerification.objects.filter(id=otp_id).first()
+        otp_instance = OTPVerification.objects.filter(id=otp_id, phone_number=phone_number).first()
 
         if otp_instance :
             if  otp_instance.is_valid():
                 if otp_instance.code == otp_code:
+                    otp_instance.delete()# حذف الكود من قاعدة البيانات
+                    del request.session['otp_id']  # حذف الكود من الجلسة
                     return redirect("accounts:reset_password") # تحويل لصفحة تغيير كلمة السر
                 else:
                     otp_instance.attempts += 1
@@ -261,6 +271,10 @@ def verify_forget_password(request):
                 messages.error(request, "رمز التحقق انتهت صلاحيته. حاول من جديد.")
                 time.sleep(1)
                 return redirect("accounts:edit-password")
+        else:
+            messages.error(request, "المعذرة يبدو انه قد حصل خطأ اثناء توليد رمز التحقق الخاص بك , حاول مرة اخرى لاحقا")
+            time.sleep(1)
+            return redirect("accounts:edit-password")
 
     return render(request, 'accounts/verify_forget_password.html')
 def phone_number_of_forgeted_password(request):
@@ -323,16 +337,10 @@ def reset_password(request):
             return redirect('accounts:reset_password')
         
     return render(request, 'accounts/reset_password.html')
-
-
-
-
-
-
 # ================================
 # دالة تعديل اسم المستخدم
 @login_required
-def edit_name(request):
+def edit_name(request):    
     context = {}
     if request.method == 'POST':
         # الحصول على البيانات من الفورم
@@ -361,8 +369,6 @@ def edit_name(request):
         }
 
     return render(request, 'accounts/edit-name.html', context)
-
-
 # =============================================================
 
 

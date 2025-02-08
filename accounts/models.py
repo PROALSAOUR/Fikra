@@ -49,7 +49,7 @@ class User(AbstractUser):
         verbose_name_plural = 'مستخدمين'
 
 class OTPVerification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="otp_codes", null=True)
+    phone_number = models.CharField(max_length=20)
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(default=now)
     attempts = models.IntegerField(default=0)

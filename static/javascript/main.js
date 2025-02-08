@@ -1937,7 +1937,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 // =============================================================================================
-
+// دوال تعديل الطلب من قائمة الطلبات السابقة
 document.addEventListener('DOMContentLoaded', function () {
   const deleteMenu = document.querySelector('.replace-menu');
   const deleteLinks = document.querySelectorAll('.replace-clicable'); // الحصول على جميع العناصر التي تحتوي على الكلاس
@@ -1952,7 +1952,6 @@ document.addEventListener('DOMContentLoaded', function () {
       deleteMenu.style.transform = 'translate(-50%, -50%) scale(1)';
     }, 10);
   }
-
   // دالة لإخفاء النافذة المنبثقة
   function hideDeleteMenu() {
     deleteMenu.style.opacity = '0';
@@ -2041,8 +2040,25 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 });
-
-
-
-
-
+// =============================================================================================
+// إخفاء رسائل الخطأ أو النجاح بعد تحميل الصفحة في صفحات الحساب
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+      const errorMessages = document.querySelectorAll('.error-messages');
+      // إخفاء الرسائل الإضافية إذا كانت أكثر من 2
+      if (errorMessages.length > 2) {
+          errorMessages.forEach(function(message, index) {
+              if (index >= 2) {
+                  message.style.display = 'none';
+              }
+          });
+      }
+      // إخفاء الرسائل بعد 4 ثوانٍ
+      setTimeout(function() {
+          errorMessages.forEach(function(message) {
+              message.style.display = 'none';
+          });
+      }, 4000);
+  });
+});
+// =============================================================================================
