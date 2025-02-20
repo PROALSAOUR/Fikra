@@ -2,7 +2,6 @@ from django.db.models import Count
 from django.core.cache import cache
 from store.models import *
 from accounts.models import  UserProfile, Inbox
-from cards.models import GiftItem
 from settings.models import Social
 
 def social_data(request):
@@ -85,16 +84,13 @@ def globals(request):
         unread_messages = inbox.messages.filter(is_read=False).only('id')
         unread_messages_count = unread_messages.count()
         
-        #  التحقق انه  لدى المستخدم هدايا جديدة
-        gift = GiftItem.objects.filter(recipient=user, is_seen=False).exclude(buyer=user).prefetch_related('gift', 'gift_recipients').order_by('-purchase_date').last()
+        
     else:
         favourite_products = []
         user_points = 0
         unread_messages_count = 0
-        gift = None
         
     return {
-        'not_seen_gift': gift,
         'men_category': men_category,
         'women_category': women_category,
         'men_categories': men_categories,

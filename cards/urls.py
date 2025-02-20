@@ -7,13 +7,8 @@ urlpatterns = [
     
     path('', cards_repo, name='cards-repo'),
     path('cards-store/', cards_store, name='cards-store'),
-    path('gift-details/<gid>', gift_details, name='gift-details'),
     path('copon-details/<cid>', copon_details, name='copon-details'),
     path('buy-copon/<cid>', buy_copon, name='buy-copon'),
-    path('buy-gift/<gid>', buy_gift, name='buy-gift'),
-    path('buy-gift2/<gid>', buy_gift2, name='buy-gift2'),
     path('verfie-code/', verfie_code, name='verfie-code'),
-    path('change-seen-status/<gid>', change_seen_status, name='change-seen-status'),
-    
-    
+        
 ]

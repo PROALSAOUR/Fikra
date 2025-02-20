@@ -3,22 +3,26 @@ from cards.models import *
 
 
 class CoponAdmin(admin.ModelAdmin):
-    list_display = ('copon_image', 'name', 'get_value_display', 'min_bill_price', 'price', 'sales_count', 'is_active',)
+    list_display = ('copon_image', 'name', 'get_value_display', 'get_price_display', 'sales_count', 'is_active',)
     search_fields = ('name','value',)
     list_filter = ('is_active',)
     ordering = ('sales_count',)   
     exclude = ('sales_count',)
     
     def get_value_display(self, obj):
-        return f"{obj.value}%"
+        return f"{obj.value}$"
     get_value_display.short_description = 'القيمة' # عنوان العمود في الواجهة
     
-class CoponUsageAdmin(admin.ModelAdmin):
-    list_display = ('get_gift_image', 'get_copon__name', 'user','sell_price', 'get_now_price', 'has_used', 'expire',)
+    def get_price_display(self, obj):
+        return f"{obj.value} points"
+    get_price_display.short_description = 'السعر' # عنوان العمود في الواجهة
+        
+class CoponItemAdmin(admin.ModelAdmin):
+    list_display = ('get_gift_image', 'get_copon__name', 'user','sell_price', 'get_now_price', 'receive_from_code' ,'has_used', 'expire',)
     search_fields = ('name','value',)
     list_filter = ('has_used','user',)
-    ordering = ('purchase_date',)   
-    exclude = ('has_used',)
+    ordering = ('-purchase_date',)  
+    readonly_fields = ('copon_code', 'user','sell_price', 'get_now_price', 'receive_from_code' ,'has_used', 'purchase_date', 'expire',) 
     
     def get_copon__name(self, obj):
         return f"{obj.copon_code.name}"
@@ -32,60 +36,21 @@ class CoponUsageAdmin(admin.ModelAdmin):
         return f"{obj.copon_code.price}"
     get_now_price.short_description = 'السعر الحالي' # عنوان العمود في الواجهة
 
-class GiftAdmin(admin.ModelAdmin):
-    list_display = ('gift_image', 'name', 'get_value_display', 'price', 'sales_count', 'is_active',)
-    search_fields = ('name','value',)
-    list_filter = ('is_active',)
-    ordering = ('sales_count',)   
-    exclude = ('sales_count',)
-    
-    def get_value_display(self, obj):
-        return f"{obj.value}"
-    get_value_display.short_description = 'القيمة' # عنوان العمود في الواجهة
-
-class GiftItemAdmin(admin.ModelAdmin):
-    list_display = ('get_gift_image', 'gift__name', 'buyer', 'recipient','sell_value', 'sell_price', 'get_now_price', 'is_seen', 'has_used', 'purchase_date',)
-    search_fields = ('gift__name','buyer',)
-    list_filter = ('has_used',)
-    ordering = ('-purchase_date',)   
-    exclude = ('has_used', 'sell_price')
-    
+class ReceiveCoponAdmin(admin.ModelAdmin):
+    list_display = ('get_gift_image', 'copon', 'is_used', 'used_by',)
+    search_fields = ('copon',)
+    list_filter = ('is_used', 'copon')
+    ordering = ('updated_at',)   
+    readonly_fields = ('code', 'is_used', 'used_by')
     
     def get_gift_image(self, obj):
-        return f"{obj.gift.gift_image()}"
+        return f"{obj.copon.copon_image()}"
     get_gift_image.short_description = 'الصورة' # عنوان العمود في الواجهة
     
     def get_now_price(self, obj):
-        return f"{obj.gift.price}"
+        return f"{obj.copon_code.price}"
     get_now_price.short_description = 'السعر الحالي' # عنوان العمود في الواجهة
-
-class GiftDealingAdmin(admin.ModelAdmin):
-    list_display = ('sender', 'receiver_name', 'receiver_phone', 'is_dealt', 'created_at', 'updated_at',)
-    search_fields = ('sender',)
-    list_filter = ('is_dealt',)
-    ordering = ('-created_at',)   
-    exclude = ('sender', 'receiver_name', 'receiver_phone',)
-
-class ReceiveGiftAdmin(admin.ModelAdmin):
-    list_display = ('get_gift_image' ,'value', 'is_used', 'created_at', 'updated_at')
-    search_fields = ('gift__name',)
-    list_filter = ('is_used',)
-    ordering = ('-updated_at',)   
-    exclude = ('is_used', )
     
-    
-    def get_gift_image(self, obj):
-        return f"{obj.gift.gift_image()}"
-    get_gift_image.short_description = 'الصورة' # عنوان العمود في الواجهة
-    
-class GiftmessageAdmin(admin.ModelAdmin):
-    list_display = ('gift_item','recipient_name', 'message')
-    search_fields = ('recipient_name',)
-
 admin.site.register(Copon, CoponAdmin)
-admin.site.register(CoponUsage, CoponUsageAdmin)
-admin.site.register(Gift, GiftAdmin)
-admin.site.register(GiftItem, GiftItemAdmin)
-admin.site.register(GiftDealing, GiftDealingAdmin)
-admin.site.register(ReceiveGift, ReceiveGiftAdmin)
-admin.site.register(GiftRecipient, GiftmessageAdmin)
+admin.site.register(CoponItem, CoponItemAdmin)
+admin.site.register(ReceiveCopon, ReceiveCoponAdmin)

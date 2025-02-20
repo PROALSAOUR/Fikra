@@ -1,6 +1,6 @@
 from orders.models import Order, OrderDealing, DealingItem
 from accounts.models import UserProfile
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from accounts.send_messages import add_order_points_message
@@ -80,4 +80,24 @@ def update_sold_and_stock(sender, instance, **kwargs):
             new_qty = instance.new_qty
             new_item.return_product(new_qty)  # تحديث المبيعات
             
-            
+@receiver([post_save, post_delete], sender=OrderDealing)
+def check_order_dealing_status(sender, instance, **kwargs):
+    """
+    تحديث حالة الطلب إلى ملغي فقط عندما لا توجد عناصر طلب وجميع عمليات التعديل مكتملة.#
+    يعمل فقط ان كانت حالة الطلب السابقة مستلم او مشحون #
+    # ان كانت حالة الطلب معالجة او تجهيز يتم التعامل من دالة العرض الخاصة بإلغاء عنصر طلب مباشرة
+    """
+
+    order = instance.order
+    status = order.status
+
+    # تحقق من أنه لا توجد عناصر طلب (OrderItem) مرتبطة بهذا الطلب
+    has_order_items = order.order_items.exists()
+
+    # تحقق مما إذا كانت جميع `OrderDealing` الخاصة بهذا الطلب `is_dealt=True`
+    all_dealt = not OrderDealing.objects.filter(order=order, is_dealt=False).exists()
+
+    # تغيير الحالة فقط إذا لم يكن هناك عناصر طلب وكل المعاملات مكتملة
+    if not has_order_items and all_dealt and ( status=="delivered" or status=="shipped" ):
+        order.status = 'canceled'
+        order.save()

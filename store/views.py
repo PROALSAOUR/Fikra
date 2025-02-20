@@ -1,5 +1,5 @@
 from store.models import *
-from cards.models import GiftItem, CoponUsage
+from cards.models import  CoponItem
 from settings.models import Settings
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -508,8 +508,7 @@ def cart_page(request):
     # ======== تضمين بطاقات المستخدم ==========
     user = request.user
     
-    user_copons = CoponUsage.objects.filter(user=user, has_used=False ,expire__gte=now().date(), copon_code__min_bill_price__lte=total_price).prefetch_related('copon_code').order_by('copon_code__value')
-    user_gifts = GiftItem.objects.filter(has_used=False, recipient=user).prefetch_related('gift').order_by('sell_value')
+    user_copons = CoponItem.objects.filter(user=user, has_used=False ,expire__gte=now().date()).prefetch_related('copon_code').order_by('copon_code__value')
     
     # ========  الاستعلام عما ان كان التوصيل مجاني ==========
     
@@ -527,7 +526,6 @@ def cart_page(request):
         'total_bonus': total_bonus,
         'delivery': delivery,
         'user_copons': user_copons,
-        'user_gifts': user_gifts,
     }
 
     return render(request, 'store/cart.html', context)

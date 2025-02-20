@@ -41,20 +41,7 @@
                 </div>
             </div>
         <!-- End Search Bar -->
-        <!-- Start repo-title -->
-            {% if not request.GET.q and not request.GET.price_min and not request.GET.price_max  %}
-            
-                <div class="container" style='margin-top:20px;'>
-                    <div class="repo-title">
-                        <input type="radio" name="repo" id="gifts-page" >
-                        <label for="gifts-page" class="active">كروت هدايا</label>
-                        <input type="radio" name="repo" id="copons-page" >
-                        <label for="copons-page">كوبونات خصم</label>
-                    </div>
-                </div>
-
-            {% endif %}  
-        <!-- End repo-title -->
+    
         <!-- Start cards quantities --> 
             {% if request.GET.q or request.GET.price_min or request.GET.price_max  %}
                 {% if results %}
@@ -67,11 +54,10 @@
             <div class="searched-products">
                 <div class="container">
 
+                    <!-- إذا كان هناك استعلام بحث، اعرض المنتجات -->
                     {% if request.GET.q or request.GET.price_min or request.GET.price_max  %}
-                        <div class="products-cards gift-cards">
+                        <div class="products-cards copons-cards">
                         
-                            <!-- إذا كان هناك استعلام بحث، اعرض المنتجات -->
-                
                             {% if results %}
 
                                 {% for card in results %}
@@ -85,24 +71,6 @@
                         </div>
 
                     {% else %}
-
-                        <!-- Start gift-products  -->
-                        <div class="products-cards gift-cards">
-                        
-                            {% if gifts %}
-
-                                {% for card in gifts %}
-                                    {% include "common/card.html" %}
-                                {% endfor %}
-
-                            {% else %}
-
-                                {% include "common/no-result.html" %}
-                    
-                            {% endif %}
-                                
-                        </div>
-                        <!-- End gift-products  -->
                         
                         <!-- Start copons-products  -->       
                         <div class="products-cards copons-cards">
@@ -174,35 +142,6 @@
 </div>
 
 {% include "pop-pages/buy-done.html" %}
-
-<div class="Pop-up-page pop-gift-details" >
-    <div class="logo">
-        <img src="{% static "/images/name logo.jpg" %}" alt="">
-    </div>
-    <form id='get-data-from-me' class="buy-as-gift">
-        <div class="form-item">
-            <label for="recipient-name"> اسم المستلم:</label>
-            <input type="text" name="recipient-name" placeholder="الاسم" id="recipient-name" required>
-        </div>
-        <div class="form-item">
-            <label for="recipient-phone"> رقم هاتف المستلم:</label>
-            <input type="text" name="recipient-phone" placeholder="رقم الهاتف " id="recipient-phone" required>
-        </div>
-        <div class="message-details">
-            <div class="form-item">
-                <label for="content"> محتوى الرسالة:</label>
-                <textarea name="message-content" id="content" placeholder="اكتب رسالتك هنا" rows="5" cols="50"></textarea>
-            </div>
-        </div>
-
-        {% comment %} <button type="submit" class="buy-this-gift">إتمام عملية الشراء</button> {% endcomment %}
-
-        <a href="" class="submit-gift-form">
-            <span>اتمام عملية الشراء</span>
-        </a> 
-    </form>
-</div>
-
 
 {% endblock content %}
 

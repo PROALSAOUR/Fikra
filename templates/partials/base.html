@@ -42,19 +42,11 @@
     {% endblock content %}
     
     {% include "pop-pages/added-to-cart.html" %}
-    {% include "pop-pages/buy-card.html" %}
     
     {% if request.path != '/accounts/sign/' and  request.path != '/accounts/verify-otp/' %}
         {% include "partials/footer.html" %}
     {% endif %}   
 
-    {% comment %} اظهار الهدية المنبثقة عند وجود هدايا غير مشاهدة {% endcomment %}
-    {% if request.path != '/cards/' %} 
-        {% if not_seen_gift %}
-            <input type='checkbox' class='hidden showsurpriseanywhere' id="showsurpriseanywhere-{{ not_seen_gift.id }}" checked>
-            {% include "pop-pages/surprise.html" with gift_item=not_seen_gift %}
-        {% endif %}
-    {% endif %}
     
     <!-- import Javascript files -->
     <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"  onload="this.media='all'"></script>
@@ -63,7 +55,6 @@
     <script src=" {% static "/javascript/pop-pages.js" %}"  onload="this.media='all'"></script>
     <script src=" {% static "/javascript/main.js" %}" onload="this.media='all'"></script>
     <script src=" {% static "/javascript/live-search.js" %}" onload="this.media='all'"></script>
-    <script src=" {% static "/javascript/fireworks.js" %}" onload="this.media='all'"></script>
 
     {% comment %} only in debugging remove later {% endcomment %}
     {% include "pop-pages/only-devolpment.html" %}

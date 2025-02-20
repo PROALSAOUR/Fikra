@@ -25,8 +25,6 @@ class Order(models.Model):
     order_date = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الطلب')
     deliverey_date = models.DateTimeField(null=True, blank=True, verbose_name='تاريخ التسليم')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')
-    with_message = models.BooleanField(default=False, verbose_name='مع رسالة؟')
-    message = models.TextField(blank=True, null=True, verbose_name='الرسالة')
         
     def get_total_items(self):
         total = 0
@@ -90,8 +88,8 @@ class OrderDealing(models.Model):
         remaining = 0
         deals = self.deals.filter(is_dealt=False)
         for deal in deals:
-            remaining += deal.price_difference if deal.price_difference else 0
-            
+            remaining += deal.price_difference if deal.price_difference else 0 
+                
         # تحديث الحقل بدون استدعاء save() لتجنب حدوث حلقة لانهائية بسبب الاشارات
         OrderDealing.objects.filter(pk=self.pk).update(remaining=remaining)
     

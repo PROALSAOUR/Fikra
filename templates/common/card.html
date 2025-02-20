@@ -2,18 +2,14 @@
 
 <div class="specific">
     <div class="product-box ">
-        {% comment %} استعملت اقل قيمة للفاتورة لمعرفة ان كان الكود لكوبون ام هدية وتحديد دالة صفحة عرض التفاصيل وفقا لذلك {% endcomment %}
-        <a href=" {% if card.min_bill_price %}{% url "cards:copon-details" card.id %}{% else %}{% url "cards:gift-details" card.id %}{% endif %}">
+        <a href=" {% url "cards:copon-details" card.id %}">
             <div class="product-image">
-                <img src="{{ card.img.url }}" alt="{{ card.name }} تخقيض">
+                <img src="{{ card.img.url }}" alt="{{ card.name }} تخفيض">
             </div>
             <div class="product-info">
                 <h4 class="product-name">{{ card.name }}</h4>
 
-                <p class="product-description">القيمة: {{ card.value }}{% if card.min_bill_price %}% {% else %} دينار{% endif %} </p>
-                {% if card.min_bill_price %}
-                    <p class="product-description"> صالح مع الطلبات بقيمة  {{ card.min_bill_price }} دينار او اكثر</p>
-                {% endif %}
+                <p class="product-description">القيمة: {{ card.value }}دينار </p>
 
                 <h4 class="product-price point">
 
@@ -30,20 +26,14 @@
         </a> 
         {% if user_points >= card.price  %}
             <span class="add-to-cart">
-                {% if card.min_bill_price %}
-                    <a href="{% url "cards:buy-copon" card.id %}" class="copon-buy-done-link">
-                        <span> شراء </span><i class="fa-solid fa-cart-shopping"></i>
-                    </a>
-                {% else %}
-                    <a href="" class="pop-gift-details-link" data-gift-id="{{ card.id }}" >
-                        <span> شراء </span><i class="fa-solid fa-cart-shopping"></i>
-                    </a>
-                {% endif %}
+                <a href="{% url "cards:buy-copon" card.id %}" class="copon-buy-done-link">
+                    <span> شراء </span><i class="fa-solid fa-cart-shopping"></i>
+                </a>
             </span>
 
         {% else %}
             <span class="add-to-cart">
-                <a href="#"><span>نقاطك لا تكفي؟ </span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                <a href="#"><span>نقاطك غير كافية!</span></a>
             </span>
         {% endif %}
     </div>

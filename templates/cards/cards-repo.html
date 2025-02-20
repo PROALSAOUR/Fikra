@@ -8,104 +8,19 @@
          
             <div class="padding-con">
                 <div class="page-title">
-                    <h2>المخزون الخاص بي</h2>
+                    <h2>الكوبونات الخاصة بي ({{ copons_count }})</h2>
                 </div>
             </div>
-            <!-- Start repo-title -->
+            <!-- Start use-code -->
                 <div class="search-bar" >
                     <div class="container">
                         <div class="repo-title">
-                            <input type="radio" name="repo" id="gifts-page" >
-                            <label for="gifts-page" class="active">كروت هدايا {% if gifts_count %}({{ gifts_count }}){% endif %}</label>
-                            <input type="radio" name="repo" id="copons-page" >
-                            <label for="copons-page">كوبونات خصم {% if copons_count %}({{ copons_count }}){% endif %}</label>
                             <span class="use-code-link">هل لديك كود هدية؟</span>
                         </div>
                     </div>
                 </div>
-            <!-- End repo-title -->
+            <!-- End use-code -->
 
-            <!-- Start gift-products  -->
-            <div class="favorite gift-cards">
-                <div class="searched-products">
-                    <div class="container">
-
-                        <!-- Start Show-related Gifts -->
-
-                        <!-- الهدايا التي قمت بشرائها لنفسي -->
-                        <label for="my-own-gifts" class="repo-inputs-cont">
-                            <input type="checkbox" name="" id="my-own-gifts"  class='hidden'>
-                            <div>
-                                <h2>الهدايا التي قمت بشرائها</h2>
-                                <i class="fa-solid fa-caret-down"></i>
-                            </div>
-                            <hr>
-                        </label>
-                        <div class="products-cards my-own-gifts hidden">
-
-                            <!-- product-start -->
-                            {% if from_self %}
-                                {% for gift_item in from_self %}
-                                    {% include "common/gift-repo-card.html" %}
-                                {% endfor %}
-                            {% else %}
-                                {% include "common/no-result.html" %}
-                            {% endif %}
-                            <!-- product-end -->
-                                                       
-                        </div>
-
-                        <!-- الهدايا التي اهديت  الي -->
-                        <label for="from-another-gifts"  class="repo-inputs-cont">
-                            <input type="checkbox" name="" id="from-another-gifts"  class='hidden'>
-                            <div>
-                                <h2>الهدايا التي اهديت اليك</h2>
-                                <i class="fa-solid fa-caret-down"></i>
-                            </div>
-                            <hr>
-                        </label>
-                        <div class="products-cards from-another-gifts  hidden">
-
-                           
-                            {% if from_frind %}
-                                {% for gift_item in from_frind %}
-                                    {% include "common/gift-repo-card.html" %}
-                                {% endfor %}
-                            {% else %}
-                                {% include "common/no-result.html" %}
-                            {% endif %}
-                           
-                            
-                        </div>
-
-                        <label for="to-another-gifts"  class="repo-inputs-cont">
-                            <input type="checkbox" name="" id="to-another-gifts" class='hidden'>
-                            <div>
-                                <h2>الهدايا التي  ارسلتها الى احدهم</h2>
-                                <i class="fa-solid fa-caret-down"></i>
-                            </div>
-                            <hr>
-                        </label>
-                        <!--  الهدايا التي اهديتها انا الي شخص اخر -->
-                        <div class="products-cards to-another-gifts hidden">
-
-                            {% if for_frind %}
-                                {% for gift_item in for_frind %}
-                                    {% include "common/gift-repo-card.html" %}
-                                {% endfor %}
-                            {% else %}
-                                {% include "common/no-result.html" %}
-                            {% endif %}
-                            
-                        </div>
-
-                        <!-- End Show-related Gifts -->
-
-                    </div>
-                </div>
-            </div>
-            <!-- End gift-products  -->
-             
             <!-- Start copons-products  -->
             <div class="favorite copons-cards ">
                 <div class="searched-products">

@@ -4,7 +4,7 @@ import json
 from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from orders.models import *
-from cards.models import GiftItem, CoponUsage
+from cards.models import CoponItem
 from settings.models import Settings
 from store.models import Cart
 from accounts.models import UserProfile
@@ -161,12 +161,13 @@ def remove_order_item(request):
             
             # تجديد بيانات الطلب بعد حذف المنتج  
             order.old_total -= order_item.price * order_item.qty
-            order.total_price = order.old_total - order.discount_amount
+            order.total_price = order.old_total - order.discount_amount if order.old_total > order.discount_amount else 0
+            
             order.total_points -= order_item.points * order_item.qty
             order.save()  
             
-            # انشاء معاملة فقط ان لم تكن حالة الطلب  جاري المعالجة
-            if order.status != 'pending' :     
+            # انشاء معاملة فقط ان كانت حالة الطلب  مسلم او مشحون
+            if order.status == 'delivered' or order.status == 'shipped' :     
                                  
                 # انشاء معاملة لإخبار الموظفين انه هنالك عملية إلغاء منتجات حصلت
                 dealing, created = OrderDealing.objects.get_or_create(order=order)
@@ -175,7 +176,7 @@ def remove_order_item(request):
                     old_item = product_variant,
                     old_qty = old_qty,
                     status = 'return',
-                    price_difference = price_difference if order.status == 'delivered' else 0, # اذا لم يكن الطلب مسلما لاداعي لإنشاء فارق سعر 
+                    price_difference = price_difference , 
                 )
                 dealing.save()               
                 #  ارسال رسالة الى المستخدم عند ارجاع منتج من الطلب
@@ -187,6 +188,13 @@ def remove_order_item(request):
                 # تحديث المخزون والمبيعات للمنتجات القديمة والجديدة
                 product_variant.return_product(old_qty)  # إعادة الكمية القديمة إلى المخزون
                 
+            # تعديل حالة الطلب الى ملغي ان لم يتبقى عناصر داخله 
+            # يعمل فقط اذا كانت حالة الطلب جاري المعالجة او التجهيز
+            # ان كانت الحالة مسلم او مشحون يتم التعمال منها عبر السيجنال وليس من هنا
+            if not order.order_items.exists() and order.status == 'pending' or order.status == 'checking':
+                order.status = 'canceled'
+                order.save()
+                    
             return JsonResponse({'success': True, 'message':'تمت ازالة المنتج من الطلب بنجاح' })
                   
         except OrderItem.DoesNotExist:
@@ -279,7 +287,7 @@ def edit_order(request):
                         
                     # تحديث إجمالي الطلب
                     order.old_total = sum([i.price * i.qty for i in order.order_items.all()])
-                    order.total_price = order.old_total - order.discount_amount
+                    order.total_price = order.old_total - order.discount_amount if order.old_total > order.discount_amount else 0
                     order.total_points = sum([i.points * i.qty for i in order.order_items.all()])
                     
                     # التحقق من أن السعر الإجمالي لا يمكن أن يكون أقل من الصفر
@@ -296,8 +304,8 @@ def edit_order(request):
                         profile.points = order.total_points  # تعديل النقاط بناءً على الطلب المعدل
                         profile.save()
                     
-                    # انشاء معاملة فقط ان لم تكن حالة الطلب  جاري المعالجة
-                    if order.status != 'pending' :   
+                    # انشاء معاملة فقط ان كانت حالة الطلب  مسلم او مشحون
+                    if order.status == 'delivered' or order.status == 'shipped' :   
                         # انشاء معاملة لإخبار الموظفين انه هنالك عملية استبدال منتجات حصلت
                         dealing, created = OrderDealing.objects.get_or_create(order=order)
                         DealingItem.objects.create(
@@ -305,9 +313,9 @@ def edit_order(request):
                             old_item = old_variation,
                             new_item = new_variation,
                             old_qty = old_qty,
-                            new_qty = item.qty,
+                            new_qty = new_qty,
                             status = 'replace',
-                            price_difference = new_total - old_total if order.status == 'delivered' else 0, # اذا لم يكن الطلب مسلما لاداعي لإنشاء فارق سعر 
+                            price_difference = new_total - old_total,
                         )
                         dealing.save()
                         #  ارسال رسالة الى المستخدم عند تعديل الطلب
@@ -339,7 +347,6 @@ def edit_order(request):
 def create_order(request):
     user = request.user
     if request.method == 'POST':
-        card_type = request.POST.get('card-type')
         card_id = request.POST.get('card-id')
         use_this = request.POST.get('use-this')
         
@@ -347,8 +354,6 @@ def create_order(request):
         total_price = 0
         total_bonus = 0
         available_items = []
-        with_message = False
-        message = 'لايوجد رسالة مرفقة'
 
         try:
             cart = Cart.objects.get(user=user)
@@ -378,53 +383,33 @@ def create_order(request):
 
 
         # Check if user wants to use discount
-        if use_this and card_type:
-            if card_type == 'gift':
-                try:
-                    gift = GiftItem.objects.get(id=card_id, recipient=user, has_used=False)
-                    gift.has_used = True
-                    discount_amount = min(gift.sell_value, total_price)
+        if use_this :
+            try:
+                copon = CoponItem.objects.get(id=card_id, user=user, has_used=False)
+                if copon.is_expire():
+                    return JsonResponse({'success': False, 'error': 'الكوبون الذي ادخلته منتهي الصلاحية'})
+                else:
+                    copon.has_used = True
+                    discount_amount = copon.copon_code.value
+                    
 
-                    if gift.has_recipient():  # تحقق مما إذا كان هناك مستلم
-                        with_message = True
-                        # تحقق من وجود المستلم ثم احصل على الرسالة
-                        gift_recipient = gift.gift_recipients if hasattr(gift, 'gift_recipients') else None  # استخدم hasattr للتحقق من وجود gift_recipients
-                        message = gift_recipient.message if gift_recipient else 'لا يوجد رسالة مرفقة'
-
-
-                except GiftItem.DoesNotExist:
-                    return JsonResponse({'success': False, 'error': 'كود الهدية الذي ادخلته غير موجود في مخزونك!'})
-
-            elif card_type == 'copon':
-                try:
-                    copon = CoponUsage.objects.get(id=card_id, user=user, has_used=False)
-                    if copon.is_expire():
-                        return JsonResponse({'success': False, 'error': 'الكوبون الذي ادخلته منتهي الصلاحية'})
-                    if copon.copon_code.min_bill_price > total_price:
-                        return JsonResponse({'success': False, 'error': 'لايمكن استعمال الكوبون الذي ادخلته مع هذه الفاتورة'})
-                    else:
-                        copon.has_used = True
-                        discount_percentage = Decimal(copon.copon_code.value) / Decimal(100)
-                        discount_amount = total_price * discount_percentage
-
-                except CoponUsage.DoesNotExist:
-                    return JsonResponse({'success': False, 'error': 'كود الكوبون الذي ادخلته غير موجود في مخزونك!'})
+            except CoponItem.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'كود الكوبون الذي ادخلته غير موجود في مخزونك!'})
 
         # ========  الاستعلام عما ان كان التوصيل مجاني ==========
         
         settings =  Settings.get_settings()
         delivery = settings.free_delivery
+        total_after_discount = total_price - discount_amount if total_price > discount_amount else 0
 
         # إنشاء الطلب
         order = Order.objects.create(
             user=user,
             old_total=total_price,
-            total_price=total_price - discount_amount , 
+            total_price=total_after_discount, 
             total_points=total_bonus,
             discount_amount=discount_amount,
             free_delivery = delivery,
-            with_message=with_message,
-            message=message,
         )
         
         # إنشاء عناصر الطلب
@@ -448,9 +433,7 @@ def create_order(request):
         cart.delete()
 
         # حفظ التغييرات على الهدايا والكوبونات
-        if use_this and card_type == 'gift':
-            gift.save()
-        elif use_this and card_type == 'copon':
+        if use_this:
             copon.save()
 
         # منطق نجاح الطلب

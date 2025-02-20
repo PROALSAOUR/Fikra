@@ -25,11 +25,11 @@ class OrderItemInline(admin.TabularInline):
     get_product_image.short_description = 'الصورة' 
     
 class MyOrdersAdmin(admin.ModelAdmin):
-    list_display = ('serial_number', 'user', 'total_price', 'colored_status', 'with_message', 'order_date',)
+    list_display = ('serial_number', 'user', 'total_price', 'colored_status',  'order_date',)
     search_fields = ('serial_number', 'user__phone_number',)
-    list_filter = ('status', 'with_message', 'user__phone_number',)
+    list_filter = ('status', 'user__phone_number',)
     ordering = ('-order_date', '-updated_at',)
-    readonly_fields = ( 'user', 'serial_number', 'old_total', 'discount_amount', 'total_price', 'total_points', 'free_delivery', 'order_date', 'deliverey_date', 'message',)
+    readonly_fields = ( 'user', 'serial_number', 'old_total', 'discount_amount', 'total_price', 'total_points', 'free_delivery', 'order_date', 'deliverey_date', )
     exclude = ('with_message',)
     inlines = [OrderItemInline] 
     
