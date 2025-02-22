@@ -37,13 +37,38 @@
                 {% endif %}
             </div>
             {% if available_items %}
-                <button type="submit" class="hide-replace-link">
+                <button type="submit" class="hide-replace-link" id='confirm-replace-button'>
                     استعمال
                 </button>
             {% endif %}
    
     </form>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function disableClickTemporarily(button, delay = 2000) {
+            if (button.classList.contains("disabled")) return; // منع إعادة النقر أثناء التعطيل
+            button.classList.add("disabled");
+            button.style.pointerEvents = "none"; // تعطيل النقر
+            button.style.opacity = "0.5"; // جعل الزر شبه شفاف أثناء التعطيل
+    
+            setTimeout(() => {
+                button.classList.remove("disabled");
+                button.style.pointerEvents = "auto"; // إعادة تفعيل النقر
+                button.style.opacity = ""; // إعادة الزر لوضعه الطبيعي
+            }, delay);
+        }
+    
+        // تعطيل الزر
+        const confirmReplaceButton = document.getElementById("confirm-replace-button");
+        if (confirmReplaceButton) {
+            confirmReplaceButton.addEventListener("click", function (event) {
+                disableClickTemporarily(this);
+            });
+        }
+    });
+    
+</script>
 <!-- End add-copon-pop-page Section -->
 
 

@@ -18,7 +18,8 @@ class Order(models.Model):
     serial_number = models.IntegerField(unique=True, verbose_name='الرقم التسلسلي')
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending' , verbose_name='الحالة')
     old_total = models.IntegerField(verbose_name='الإجمالي القديم')
-    total_price = models.PositiveIntegerField(verbose_name='الإجمالي')
+    reference_value = models.IntegerField(default=0, verbose_name='قيمة المرجعات') # سعر المنتجات المستبدلة والمرجعة (سالب للزبون وموجب للمحل)
+    total_price = models.IntegerField(verbose_name='الإجمالي')
     total_points = models.PositiveIntegerField(null=True, verbose_name='المكافأة')
     discount_amount = models.IntegerField(default=0, verbose_name='قيمة الخصم')
     free_delivery =  models.BooleanField(default=False, verbose_name='توصيل مجاني؟' )
@@ -67,6 +68,7 @@ class OrderItem(models.Model):
     order_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='order_items' , verbose_name='المنتج')
     qty = models.PositiveIntegerField(default=1, verbose_name='الكمية')
     price = models.PositiveIntegerField(verbose_name='السعر')
+    discount_price = models.IntegerField(default=0, verbose_name='الإجمالي بعد الخصم')  # سعر  المنتج بعد الخصم بواسطة الكوبون ان وجد 
     points = models.IntegerField(null=True, verbose_name='المكافأة')
     
     def __str__(self):
@@ -123,6 +125,8 @@ class DealingItem(models.Model):
     new_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='new_deals', null=True, blank=True , verbose_name='المنتج الجديد')
     old_qty = models.IntegerField(null=True, blank=True , verbose_name='الكمية القديمة')
     new_qty = models.IntegerField(null=True, blank=True , verbose_name='الكمية الجديدة')
+    old_price = models.IntegerField(default=0, verbose_name='السعر القديم')
+    new_price = models.IntegerField(default=0, verbose_name='السعر الجديد')
     price_difference = models.IntegerField(null=True, blank=True , verbose_name='فرق السعر')  
     is_dealt = models.BooleanField(default=False , verbose_name='المعالجة') # هل تم تنفيذ عملية التعديل  
     status = models.CharField(max_length=20, choices=Dealing_status, blank=True , verbose_name='الحالة') 

@@ -5,11 +5,12 @@ from orders.models import *
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0  # عدم إظهار حقول إضافية
-    readonly_fields = ('get_product_image', 'order_item', 'qty', 'price', 'get_total')  # جعل الحقول قابلة للقراءة فقط
-    fields = ('get_product_image', 'order_item', 'qty', 'price', 'get_total', )  # تحديد ترتيب الحقول
+    readonly_fields = ('get_product_image', 'order_item', 'qty', 'price', 'get_total', 'discount_price',)  # جعل الحقول قابلة للقراءة فقط
+    fields = ('get_product_image', 'order_item', 'qty', 'price', 'get_total', 'discount_price', )  # تحديد ترتيب الحقول
     can_delete = False  # منع حذف العناصر
     max_num = 0  # منع إضافة عناصر جديدة
     show_change_link = True  
+    verbose_name_plural = 'عناصر الطلب'
     
     def get_total(self, obj):
         if obj.qty is not None and obj.price is not None:
@@ -24,14 +25,39 @@ class OrderItemInline(admin.TabularInline):
         return "No Image"
     get_product_image.short_description = 'الصورة' 
     
+class OrderDealingInline(admin.TabularInline):
+    model = OrderDealing
+    extra = 0  # عدم إظهار حقول إضافية
+    readonly_fields = ('get_dealing_items_number', 'get_dealt_items_number', 'get_not_dealt_items_number', 'is_dealt', 'remaining' )  # جعل الحقول قابلة للقراءة فقط
+    fields = ('get_dealing_items_number', 'get_dealt_items_number', 'get_not_dealt_items_number', 'is_dealt', 'remaining' )  # تحديد ترتيب الحقول
+    can_delete = False  # منع حذف العناصر
+    max_num = 0  # منع إضافة عناصر جديدة
+    show_change_link = True  
+    verbose_name_plural = 'التعديلات '
+     
+    def get_dealing_items_number(self, obj):
+        """تعيد عدد التعديلات الاجمالي التابعة للطلب"""
+        return obj.modifications_numbers()
+    get_dealing_items_number.short_description = "عدد التعديلات"
+    
+    def get_dealt_items_number(self, obj):
+        """تعيد عدد التعديلات  المعالجة التابعة للطلب""" 
+        return obj.deals.filter(is_dealt=True).count()
+    get_dealt_items_number.short_description = "المعالجة"
+    
+    def get_not_dealt_items_number(self, obj):
+        """تعيد عدد التعديلات الغير معالجة التابعة للطلب"""
+        return obj.deals.filter(is_dealt=False).count()
+    get_not_dealt_items_number.short_description = "المتبقية"
+    
 class MyOrdersAdmin(admin.ModelAdmin):
     list_display = ('serial_number', 'user', 'total_price', 'colored_status',  'order_date',)
     search_fields = ('serial_number', 'user__phone_number',)
     list_filter = ('status', 'user__phone_number',)
     ordering = ('-order_date', '-updated_at',)
-    readonly_fields = ( 'user', 'serial_number', 'old_total', 'discount_amount', 'total_price', 'total_points', 'free_delivery', 'order_date', 'deliverey_date', )
+    readonly_fields = ( 'user', 'serial_number', 'old_total', 'reference_value', 'discount_amount', 'total_price', 'total_points', 'free_delivery', 'order_date', 'deliverey_date', )
     exclude = ('with_message',)
-    inlines = [OrderItemInline] 
+    inlines = [OrderItemInline, OrderDealingInline] 
     
     def get_readonly_fields(self, request, obj=None):
         """جعل حقل الحالة غير قابل للتعديل إذا كانت الحالة مُلغاة."""
@@ -53,7 +79,7 @@ class MyOrdersAdmin(admin.ModelAdmin):
             return format_html('<span style="color:#e1d221; font-weight:900;">{}</span>', obj.get_status_display())
     colored_status.short_description = 'الحالة'   
 
-class DealingInline(admin.TabularInline):
+class DealingItemsInline(admin.TabularInline):
     model = DealingItem
     extra = 0  # عدم إظهار حقول إضافية
     readonly_fields = ('old_item', 'new_item', 'old_qty', 'new_qty', 'price_difference', 'status', ) 
@@ -68,12 +94,11 @@ class DealingAdmin(admin.ModelAdmin):
     list_filter = ('order', 'is_dealt',)
     ordering = ('is_dealt', '-updated_at', '-created_at',)
     readonly_fields = ( 'order', 'remaining', 'created_at', 'updated_at',)
-    inlines = [DealingInline] 
+    inlines = [DealingItemsInline] 
     
     def get_modifications(self, obj):
         return obj.modifications_numbers()
     get_modifications.short_description = 'التعديلات'
-
   
     def status(self, obj):
         """إرجاع الحالة مع تلوين خاص بناءً على القيمة."""

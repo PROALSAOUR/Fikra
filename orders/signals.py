@@ -7,6 +7,10 @@ from accounts.send_messages import add_order_points_message
 
 @receiver(pre_save, sender=Order)
 def update_user_points(sender, instance, **kwargs):
+    """تحديث نقاط المستخدم عندما تتحول حالة الطلب من
+    مسلم الى ملغي = خصم النقاط
+    اي حالة الى مسلم = اضافة النقاط
+    """
     try:
         previous_order = Order.objects.get(pk=instance.pk)
     except Order.DoesNotExist:
@@ -28,7 +32,6 @@ def update_user_points(sender, instance, **kwargs):
 
         # إضافة تاريخ التسليم إلى الطلب
         instance.deliverey_date = timezone.now()
-
 
     user_inbox.save()  # حفظ تحديثات صندوق الوارد
     
@@ -98,6 +101,6 @@ def check_order_dealing_status(sender, instance, **kwargs):
     all_dealt = not OrderDealing.objects.filter(order=order, is_dealt=False).exists()
 
     # تغيير الحالة فقط إذا لم يكن هناك عناصر طلب وكل المعاملات مكتملة
-    if not has_order_items and all_dealt and ( status=="delivered" or status=="shipped" ):
+    if not has_order_items and all_dealt and status=="delivered":
         order.status = 'canceled'
         order.save()

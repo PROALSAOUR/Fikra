@@ -95,6 +95,21 @@ def add_order_points_message(order_se, user_name, points):
     message.save()
     return message
 
+def remove_order_points_message(order_se, user_name, points):
+    """الرسالة التي ترسل الى المستخدم عنما يتعدل الطلب الخاص به تفيد بأنه تم خصم او اضافة النقاط الى حسابه"""
+    message = Message(
+            subject= f'تم اضافة نقاط الطلب [{str(order_se).zfill(6)}] !',
+            content= 
+            f"""
+            مرحبا {user_name} 
+            لقد تمت اضافة النقاط التابعة للطلب [{str(order_se).zfill(6)}] والتي قيمتها {points} نقطة بنجاح الى حسابك, 
+            نرجو لك وقتا سعيداً.
+            """,
+            timestamp=timezone.now()
+            )
+    message.save()
+    return message
+
 def create_order_message(user_name, order):
     """الرسالة التي ترسل عند انشاء طلب جديد"""
     message = Message(
@@ -159,6 +174,8 @@ def return_order_item_message(user_name, order):
     message.save()
     return message
     
+
+
 
 
 

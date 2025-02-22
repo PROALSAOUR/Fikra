@@ -34,11 +34,11 @@
                                 <tr>
                                     <th>الصورة</th>
                                     <th style='width:fit-content;'>id</th>
-                                    <th>اسم المنتج</th>
                                     <th>المقاس</th>
                                     <th>الكمية</th>
                                     <th>السعر</th>
                                     <th>المجموع</th>
+                                    <th>بعد الخصم</th>
                                     <th>استبدال</th>
                                     <th>حذف</th>
                                 </tr>
@@ -48,11 +48,11 @@
                                     <tr>
                                         <td><img src="{{ item.order_item.product_item.image.url }}"></td>
                                         <td>{{ item.order_item.id }}</td>
-                                        <td>{{ item.order_item.product_item.product.name }}</td>
                                         <td>{{ item.order_item.size }}</td>
                                         <td>{{ item.qty }}</td>
                                         <td>${{item.price}}</td>
                                         <td>${{ item.total_price }}</td>
+                                        <td>${{ item.discount_price }}</td>
                                         <td class='replace' data-item-id="{{ item.id }}">
                                             {% if item.status == "confirmed" %}
                                                 <i class="fa-solid fa-repeat {% if order.status != 'canceled' %} replace-clicable {% else %}unclicable{% endif %}"></i>
@@ -81,6 +81,14 @@
                                     <td>{{ order.old_total }} دل </td>
                                     <td colspan="2"></td>
                                 </tr>
+                                {% if order.reference_value %}
+                                    <tr>
+                                        <td colspan="6">  قيمة المُرجعات:</td>
+                                        {% comment %} وضع اشارة الناقص فقط ان كانت القيمة موجبة لان هذا يعني ان قيمتها مخصومة من الفاتورة وليست مضافة {% endcomment %}
+                                        <td>{% if order.reference_value > 0 %}+{{ order.reference_value }}{% else %}{{ order.reference_value }}{% endif %}دل </td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                {% endif %}
                                 {% if order.discount_amount %}
                                     <tr>
                                         <td colspan="6">  قيمة الخصم:</td>
@@ -103,6 +111,8 @@
         </div>
     <!-- End Order Details -->
 </div>
+
+
 
 {% include "pop-pages/edit-order.html" %}
 

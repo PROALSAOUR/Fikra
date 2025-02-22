@@ -167,6 +167,7 @@ def verfie_code(request):
 
                 verfie_copon.copon.sales_count += 1 
                 copon_item.buy_copon()
+                copon_item.sell_price = 0 # عند الحصول على الكوبون من كود فإن سعر شراءه صفر 
                 verfie_copon.copon.save()
                 copon_item.save()
                 

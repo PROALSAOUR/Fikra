@@ -152,46 +152,43 @@ def remove_order_item(request):
             order_item = order.order_items.get(id=remove_id)
             
             old_qty = order_item.qty
-            old_item_price = order_item.order_item.product_item.product.get_price() 
-            price_difference = 0 - (old_qty * old_item_price)
+            
+            # جلب سعر المنتج المخفض 
+            discount_price = order_item.discount_price 
             
             order_item.delete()
             
             product_variant = order_item.order_item 
             
             # تجديد بيانات الطلب بعد حذف المنتج  
-            order.old_total -= order_item.price * order_item.qty
-            order.total_price = order.old_total - order.discount_amount if order.old_total > order.discount_amount else 0
+            order.total_price -= discount_price
+            order.reference_value -= discount_price 
             
-            order.total_points -= order_item.points * order_item.qty
+            order.total_points -= order_item.points * old_qty 
             order.save()  
-            
-            # انشاء معاملة فقط ان كانت حالة الطلب  مسلم او مشحون
-            if order.status == 'delivered' or order.status == 'shipped' :     
                                  
-                # انشاء معاملة لإخبار الموظفين انه هنالك عملية إلغاء منتجات حصلت
-                dealing, created = OrderDealing.objects.get_or_create(order=order)
-                DealingItem.objects.create(
-                    order_dealing= dealing,
-                    old_item = product_variant,
-                    old_qty = old_qty,
-                    status = 'return',
-                    price_difference = price_difference , 
-                )
-                dealing.save()               
-                #  ارسال رسالة الى المستخدم عند ارجاع منتج من الطلب
-                message = return_order_item_message(user_name=user.first_name, order=order.serial_number)
-                inbox = user.profile.inbox
-                inbox.add_message(message)
-                inbox.save()
-            else: # اذا كانت حالة الطلب معالجة لن يتم انشاء طلب ارجاع لذا سيتم تعديل الكميات مباشرة
-                # تحديث المخزون والمبيعات للمنتجات القديمة والجديدة
-                product_variant.return_product(old_qty)  # إعادة الكمية القديمة إلى المخزون
+            # انشاء معاملة لإخبار الموظفين انه هنالك عملية إلغاء منتجات حصلت
+            dealing, created = OrderDealing.objects.get_or_create(order=order)
+            DealingItem.objects.create(
+                order_dealing= dealing,
+                old_item = product_variant,
+                old_qty = old_qty,
+                old_price = discount_price, # السعر القديم هو المبلغ المخفض للمنتج المرجع
+                status = 'return',
+                # يتم وضع قيمة لفارق السعر فقط ان كان الطلب مسلما
+                price_difference =(discount_price * -1) if order.status=='delivered' else 0 , # لأن المبلغ للزبون وليس للمتجر لهذا يكون سالبا
+            )
+            dealing.save()               
+            #  ارسال رسالة الى المستخدم عند ارجاع منتج من الطلب
+            message = return_order_item_message(user_name=user.first_name, order=order.serial_number)
+            inbox = user.profile.inbox
+            inbox.add_message(message)
+            inbox.save()            
                 
             # تعديل حالة الطلب الى ملغي ان لم يتبقى عناصر داخله 
-            # يعمل فقط اذا كانت حالة الطلب جاري المعالجة او التجهيز
-            # ان كانت الحالة مسلم او مشحون يتم التعمال منها عبر السيجنال وليس من هنا
-            if not order.order_items.exists() and order.status == 'pending' or order.status == 'checking':
+            #  يعمل فقط اذا كانت حالة الطلب جاري المعالجة او التجهيز او الشحن
+            # ان كانت الحالة مسلم  يتم التعامل منها عبر السيجنال وليس من هنا
+            if not order.order_items.exists() and (order.status == 'pending' or order.status == 'checking' or order.status == 'shipped' ):
                 order.status = 'canceled'
                 order.save()
                     
@@ -243,8 +240,10 @@ def edit_order(request):
                     # تخزين الكميتين كي يتم استعمالهم مع المخزون و المباع
                     old_qty = item.qty # الكمية القديمة
                     new_qty = new_item.qty # الكمية الجديدة
-                    
-                    
+                    old_price = item.price 
+                    old_discount_price = item.discount_price
+                    new_price = new_item.cart_item.product_item.product.get_price()
+                    old_order_points = order.total_points # يستعمل لاحقا عند التعديل على نقاط المستخدم
                     
                     if new_item.cart_item.stock <= 0:  # تحقق من توفر المنتج الجديد
                         return JsonResponse({'success': False, 'error': 'المنتج المستبدل غير متاح حاليا'})
@@ -272,6 +271,9 @@ def edit_order(request):
 
                             # إزالة العنصر القديم
                             item.delete()
+                            
+                            # ارجع خزن الايتم مشان نكمل استعماله تحت دون اخطاء
+                            item = existing_order_item
 
                         else:
                             # استبدال العنصر القديم بالجديد
@@ -282,58 +284,71 @@ def edit_order(request):
                             item.status = 'replaced'
                             item.save()
 
-                    # تخزين السعر القديم للطلب قبل التعديل  لإستعماله في جلب الفارق بين المنتجين المعدلين
-                    old_total =  order.total_price  
-                        
-                    # تحديث إجمالي الطلب
-                    order.old_total = sum([i.price * i.qty for i in order.order_items.all()])
-                    order.total_price = order.old_total - order.discount_amount if order.old_total > order.discount_amount else 0
-                    order.total_points = sum([i.points * i.qty for i in order.order_items.all()])
-                    
+                    # تحديث إجمالي الطلب 
+                    order.total_points = order.order_items.aggregate(total=models.Sum(models.F('points') * models.F('qty')))['total'] or 0
+                    old_total = order.old_total
+                    discount = order.discount_amount  
+                    order.reference_value += round(( new_price * new_qty ) - ( old_price * old_qty )) 
+                    reference = order.reference_value  
+                    order.total_price = round( old_total - discount + reference )
                     # التحقق من أن السعر الإجمالي لا يمكن أن يكون أقل من الصفر
                     if order.total_price < 0:
                         order.total_price = 0
-                        
-                    # تخزين السعر الجديد للطلب بعد التعديل  لإستعماله في جلب الفارق بين المنتجين المعدلين
-                    new_total =  order.total_price
+                    
+                    new_total = order.total_price
                     order.save()
-
+                    
+                    #  اعد حساب سعر مابعد الخصم لكل عنصر بالطلب بعد التعديل
+                    order_items = order.order_items.all()
+                    for item in order_items:
+                        item_price =  item.price
+                        item_qty = item.qty
+                        if discount:
+                            item.discount_price = round(((item_price * item_qty) / (old_total + reference) ) * new_total)
+                        else:
+                            # لايوجد كوبون مستعمل لذا سعر القطعة بعد الخصم نفس السعر الاصلي
+                            item.discount_price = item_price * item_qty
+                        item.save()
+                        
+                    
+                    new_discount_price = round(((new_price * new_qty) / (old_total + reference)) * new_total) # السعر المخفض الجديد للمنتج المستبدل
+                    price_difference = new_discount_price - old_discount_price
+                    print('price_difference =', price_difference)
+                        
+                    # انشاء معاملة لإخبار الموظفين انه هنالك عملية استبدال منتجات حصلت
+                    dealing, created = OrderDealing.objects.get_or_create(order=order)
+                    DealingItem.objects.create(
+                        order_dealing= dealing,
+                        old_item = old_variation,
+                        new_item = new_variation,
+                        old_qty = old_qty,
+                        old_price = old_discount_price,
+                        new_price = new_discount_price,
+                        new_qty = new_qty,
+                        status = 'replace',
+                        # يتم وضع قيمة لفارق السعر فقط ان كان الطلب مسلما
+                        price_difference = price_difference if order.status=='delivered' else 0 ,
+                    )
+                    dealing.save()
+                    #  ارسال رسالة الى المستخدم عند تعديل الطلب
+                    message = edit_order_message(user_name=user.first_name, order=order.serial_number)
+                    inbox = user.profile.inbox
+                    inbox.add_message(message)
+                    inbox.save() 
+                    
                     # تعديل النقاط إذا كان الطلب قد تم تسليمه بالفعل
                     if order.status == 'delivered':
                         profile = UserProfile.objects.get(user=user)
-                        profile.points = order.total_points  # تعديل النقاط بناءً على الطلب المعدل
+                        points_change = order.total_points - old_order_points # ايجاد فارق النقاط بين الطلب قبل التعديل وبعد التعديل
+                        profile.points += points_change  # تعديل النقاط بناءً على الطلب المعدل
                         profile.save()
-                    
-                    # انشاء معاملة فقط ان كانت حالة الطلب  مسلم او مشحون
-                    if order.status == 'delivered' or order.status == 'shipped' :   
-                        # انشاء معاملة لإخبار الموظفين انه هنالك عملية استبدال منتجات حصلت
-                        dealing, created = OrderDealing.objects.get_or_create(order=order)
-                        DealingItem.objects.create(
-                            order_dealing= dealing,
-                            old_item = old_variation,
-                            new_item = new_variation,
-                            old_qty = old_qty,
-                            new_qty = new_qty,
-                            status = 'replace',
-                            price_difference = new_total - old_total,
-                        )
-                        dealing.save()
-                        #  ارسال رسالة الى المستخدم عند تعديل الطلب
-                        message = edit_order_message(user_name=user.first_name, order=order.serial_number)
-                        inbox = user.profile.inbox
-                        inbox.add_message(message)
-                        inbox.save() 
-                        
-                    else: # اذا كانت حالة الطلب معالجة لن يتم انشاء طلب تعديل لذا سيتم تعديل الكميات مباشرة
-                        # تحديث المخزون والمبيعات للمنتجات القديمة والجديدة
-                        old_variation.return_product(old_qty)  # إعادة الكمية القديمة إلى المخزون
-                        new_variation.sell(new_qty)  # تحديث المبيعات
                             
-                        
                     return JsonResponse({'success': True, 'message': 'تم تعديل المنتج بنجاح'})
 
                 except OrderItem.DoesNotExist:
                     return JsonResponse({'success': False, 'error': 'المنتج المستبدل غير موجود'})
+                except Exception as e:
+                    return JsonResponse({'success': False, 'error': f'{e} وقع هذا الخطأ '})
             except Order.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'الطلب الذي تحاول تعديله غير صالح'})
         else:
@@ -414,12 +429,21 @@ def create_order(request):
         
         # إنشاء عناصر الطلب
         for item in available_items:
+            item_price =  item['product_variation'].product_item.product.get_price()
+            item_qty = item['qty']
+            if use_this:
+                discount_price = round((item_price * item_qty / order.old_total) * order.total_price)
+            else:
+                # لايوجد كوبون مستعمل لذا سعر القطعة بعد الخصم نفس السعر الاصلي
+                discount_price = item_price * item_qty
+            
             OrderItem.objects.create(
                 order=order,
                 order_item=item['product_variation'],
                 qty=item['qty'],
                 points = item['points'],
                 price=item['product_variation'].product_item.product.get_price(),
+                discount_price = discount_price,
             )
             item['product_variation'].sell(item['qty'])
 
@@ -464,13 +488,14 @@ def order_dealing(request, oid):
             
             remaining = order_dealing.remaining
             # تحديد ما إذا كانت القيمة المتبقية لك أو عليك بناءً على علامة القيمة
-            if remaining < 0:
-                remaining_label = "لك"
-                remaining = abs(remaining)  # تحويل القيمة إلى موجبة
-            elif remaining >0:
+            if remaining > 0:
                 remaining_label = "عليك"
+            elif remaining < 0:
+                remaining_label = "لك"
             else: # remaining = 0
                 remaining_label = "لا يوجد"
+                
+            remaining = abs(remaining)  # تحويل القيمة إلى موجبة
                 
             context.update({
                 'order_dealing': order_dealing,

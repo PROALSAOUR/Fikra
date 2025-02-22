@@ -162,7 +162,7 @@ class Product(models.Model):
     featured = models.BooleanField(default=False , verbose_name='مميز؟')
     purchase_price =  models.IntegerField(default=0 , verbose_name='سعر الشراء') 
     price = models.IntegerField(default=0 , verbose_name='سعر البيع') 
-    new_price = models.DecimalField(decimal_places=2, max_digits=10, blank=True, null=True , verbose_name='سعر التخفيض')
+    new_price = models.IntegerField( blank=True, null=True , verbose_name='سعر التخفيض')
     bonus =  models.IntegerField(blank=True, null=True, default=20 , verbose_name='المكافأة')
     offer = models.BooleanField(default=False , verbose_name='مخفض؟')
     ready_to_sale = models.BooleanField(default=False , verbose_name='معروض؟')
@@ -185,7 +185,7 @@ class Product(models.Model):
         return 0
 
     def get_price(self):
-        """تعيد السعر المنتج وفقا لحالة التخفيض """
+        """تعيد سعر المنتج وفقا لحالة التخفيض """
         if self.offer :
             return self.new_price
         else:

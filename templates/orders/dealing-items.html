@@ -12,7 +12,6 @@
                     <div class="order-info">
                         <div class="order-id-status">
                             <h3>الطلب رقم <span>{{ serial_number|stringformat:"06d" }}</span></h3>
-                            {% comment %}  اذا كان الرقم سالب اعطي المستخدم اذا كان موجب المستخدم يعطينا {% endcomment %} 
                             <h3> متبقي الدفع 
                                 {% if remaining %} {% comment %} يوجد متبقي سواء لك او عليك {% endcomment %}
                                     <span style="color: {% if remaining_label == 'لك' %} #27bc27{% else %}#cf2222{% endif %};">
@@ -44,6 +43,8 @@
                                     <th>المنتج الجديد</th>
                                     <th>الكمية القديمة</th>
                                     <th>الكمية الجديدة</th>
+                                    <th>السعر القديم</th>
+                                    <th>السعر الجديد</th>
                                     <th>فرق السعر</th>
                                     <th>مُسلمة</th>
                                 </tr>
@@ -56,6 +57,8 @@
                                         <td><img src="{{ deal.new_item.product_item.image.url }}"></td>
                                         <td>{% if deal.old_qty %}{{ deal.old_qty }}{% else %}0{% endif %}</td>
                                         <td>{% if deal.new_qty %}{{ deal.new_qty }}{% else %}-{% endif %}</td>
+                                        <td>{{ deal.old_price }}</td>
+                                        <td>{{ deal.new_price }}</td>
                                         <td>{{deal.price_difference}}</td>
                                         <td>{% if deal.is_dealt %}✅{% else %}❌{% endif %}</td>
                                     </tr> 
