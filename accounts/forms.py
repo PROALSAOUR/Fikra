@@ -5,6 +5,9 @@ from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 import phonenumbers
 
+import logging
+logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
+
 class UserSignUpForm(UserCreationForm):
     
     first_name = forms.CharField(widget=forms.TextInput(attrs={'id':"user-first-name"}))
@@ -31,6 +34,10 @@ class UserSignUpForm(UserCreationForm):
                 raise ValidationError("رقم الهاتف غير صالح.")
         except phonenumbers.NumberParseException:
             raise ValidationError("يرجى إدخال رقم هاتف صحيح.")
+        except Exception as e:
+            logger.error(f"خطأ داخل نموذج انشاء حساب: {e}", exc_info=True)
+            raise ValidationError( 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا')
+        
         # التحقق مما إذا كان الرقم مسجلاً مسبقًا
         if User.objects.filter(phone_number=phone_number).exists():
             raise ValidationError("رقم الهاتف مستخدم بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.")

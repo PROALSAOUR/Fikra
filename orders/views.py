@@ -1,7 +1,8 @@
 from django.http import JsonResponse
+from django.db.utils import IntegrityError
 from django.shortcuts import render, get_object_or_404
 import json
-from decimal import Decimal
+from django.core.cache import cache
 from django.contrib.auth.decorators import login_required
 from orders.models import *
 from cards.models import CoponItem
@@ -10,6 +11,9 @@ from store.models import Cart
 from accounts.models import UserProfile
 from django.utils import timezone
 from accounts.send_messages import create_order_message, cancel_order_message, edit_order_message, return_order_item_message
+import logging
+
+logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
 
 
 # دالة عرض الطلبات
@@ -35,7 +39,11 @@ def order_details(request, oid):
         order_dealing = OrderDealing.objects.get(order=order)      
     except OrderDealing.DoesNotExist:
         order_dealing = None
+    except Exception as e:
+        logger.error(f"خطأ بالطلب: {e}", exc_info=True)
+        order_dealing = None
     
+
     
     # إضافة حقل السعر الإجمالي لكل عنصر
     for item in items:
@@ -61,11 +69,11 @@ def order_details(request, oid):
                         'qty': item.qty,
                     })
                 
-        except Exception:
+        except Exception as e:
+            logger.error(f"خطأ بالطلب: {e}", exc_info=True)
             available_items = None    
     
-    
-    
+
     context = {
         'order':order,
         'items':items,
@@ -116,13 +124,16 @@ def cancel_order(request):
             return JsonResponse({'success': False, 'error': 'لم يتم ايجاد الطلب.'})
         except json.JSONDecodeError:
             return JsonResponse({'success': False, 'error': 'المعذرة يبدو انه هنالك بيانات ناقصة يرجى المحاولة لاحقا.'})
+        except Exception as e:
+            logger.error(f"خطأ بإلغاء الطلب: {e}", exc_info=True)
+            return JsonResponse({'success': False, 'error': 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا'})
     
     return JsonResponse({'success': False, 'error': 'طريقة طلب خاطئة.'})
 # دالة حذف منتج من الطلب
 @login_required
-def remove_order_item(request):
+def remove_order_item(request): 
     user = request.user
-    if request.method == 'POST':
+    if request.method == 'POST':    
         try:
             data = json.loads(request.body)
             order_id = data.get('order_id')
@@ -131,6 +142,12 @@ def remove_order_item(request):
             if not remove_id or not order_id :
                 return JsonResponse({'success': False, 'error': 'المعذرة يبدو انه هنالك بيانات ناقصة يرجى المحاولة لاحقا.'})
             
+            # نستعمل الكاش هنا لمنع المستخدم من النقر المتتالي على زر التعديل وبالتالي منع امكانية التكرار
+            lock_id = f"edit_order_lock_{user.id}_{order_id}"
+            if cache.get(lock_id):
+                return JsonResponse({'success': False, 'error': 'تم استلام طلب الإرجاع الخاص بك، يرجى الانتظار قبل المحاولة مجددًا'})
+            cache.set(lock_id, True, timeout=3)  # وضع القفل
+        
             # تحقق من حالة الطلب
             order = Order.objects.get(id=order_id, user=user)
             if order.status == 'canceled':
@@ -150,35 +167,43 @@ def remove_order_item(request):
                 
             
             order_item = order.order_items.get(id=remove_id)
-            
             old_qty = order_item.qty
-            
-            # جلب سعر المنتج المخفض 
-            discount_price = order_item.discount_price 
+            old_bounce = order_item.points
+            old_discount_price =  order_item.discount_price 
             
             order_item.delete()
             
             product_variant = order_item.order_item 
             
-            # تجديد بيانات الطلب بعد حذف المنتج  
-            order.total_price -= discount_price
-            order.reference_value -= discount_price 
-            
-            order.total_points -= order_item.points * old_qty 
-            order.save()  
-                                 
-            # انشاء معاملة لإخبار الموظفين انه هنالك عملية إلغاء منتجات حصلت
+            # =================================================================
+            # تعديل النقاط إذا كان الطلب قد تم تسليمه بالفعل
+            if order.status == 'delivered':
+                profile = UserProfile.objects.get(user=user)
+                points_change = old_bounce * old_qty
+                profile.points -= points_change  # تعديل النقاط بناءً على الطلب المعدل
+                profile.save()
+            # =================================================================   
+            # اعد حساب جميع القيم
+            order.old_total = order.order_items.aggregate(total=models.Sum(models.F('price') * models.F('qty')))['total'] or 0
+            order.total_price = order.order_items.aggregate(total=models.Sum(models.F('discount_price')))['total'] or 0
+            order.used_discount = order.old_total - order.total_price
+            order.save()
+            # =================================================================
+            price_difference = 0 - old_discount_price
+            # انشاء معاملة لإخبار الموظفين انه هنالك عملية استبدال منتجات حصلت
             dealing, created = OrderDealing.objects.get_or_create(order=order)
             DealingItem.objects.create(
                 order_dealing= dealing,
                 old_item = product_variant,
                 old_qty = old_qty,
-                old_price = discount_price, # السعر القديم هو المبلغ المخفض للمنتج المرجع
+                old_price = old_discount_price, # السعر المخفض القديم
                 status = 'return',
                 # يتم وضع قيمة لفارق السعر فقط ان كان الطلب مسلما
-                price_difference =(discount_price * -1) if order.status=='delivered' else 0 , # لأن المبلغ للزبون وليس للمتجر لهذا يكون سالبا
+                price_difference = price_difference if order.status=='delivered' else 0,
             )
-            dealing.save()               
+            dealing.save()
+            # =================================================================
+                                         
             #  ارسال رسالة الى المستخدم عند ارجاع منتج من الطلب
             message = return_order_item_message(user_name=user.first_name, order=order.serial_number)
             inbox = user.profile.inbox
@@ -191,16 +216,25 @@ def remove_order_item(request):
             if not order.order_items.exists() and (order.status == 'pending' or order.status == 'checking' or order.status == 'shipped' ):
                 order.status = 'canceled'
                 order.save()
-                    
+
             return JsonResponse({'success': True, 'message':'تمت ازالة المنتج من الطلب بنجاح' })
                   
         except OrderItem.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'العنصر المطلوب غير موجود'})
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+            logger.error(f"خطأ عند ارجاع عنصر من الطلب: {e}", exc_info=True)
+            return JsonResponse({'success': False, 'error': 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا'})
+        finally:
+                try:
+                    cache.delete(lock_id)
+                except Exception as e:
+                    logger.warning(f"فشل في حذف القفل من الكاش: {e}", exc_info=True)  # إزالة القفل بعد الانتهاء سواء نجحت العملية أم لا
+    # إذا كان الطلب ليس POST
+    return JsonResponse({'success': False, 'error': 'طريقة وصول خاطئة'})
 # دالة تعديل الطلب
 @login_required
 def edit_order(request):
+
     user = request.user
     if request.method == 'POST':
         # الحصول على البيانات المرسلة من الفورم
@@ -210,6 +244,13 @@ def edit_order(request):
         
         # تأكد من أن البيانات موجودة
         if replace_item_id and selected_new_item and order_id:
+            
+            # نستعمل الكاش هنا لمنع المستخدم من النقر المتتالي على زر التعديل وبالتالي منع امكانية التكرار
+            lock_id = f"edit_order_lock_{user.id}_{order_id}"
+            if cache.get(lock_id):
+                return JsonResponse({'success': False, 'error': 'تم استلام طلب التعديل الخاص بك، يرجى الانتظار قبل المحاولة مجددًا'})
+            cache.set(lock_id, True, timeout=3)  # وضع القفل
+
             try:
                 # تحقق من حالة الطلب
                 order = Order.objects.get(id=order_id, user=user)
@@ -230,6 +271,11 @@ def edit_order(request):
                 try:
                     # الحصول على عنصر الطلب المراد استبداله
                     item = order.order_items.get(id=replace_item_id)
+                    
+                    # منع استبدال منتج مستبدل بالفعل
+                    if item.status == 'replaced': # إذا كان قد تم استبداله بالفعل
+                        return JsonResponse({'success': False, 'error': "لقد قمت بإستبدال هذا المنتج سابقا"})
+                    
                     cart = Cart.objects.get(user=user)
                     # الحصول على عنصر السلة الجديد
                     new_item = cart.items.prefetch_related('cart_item__product_item__variations__size')\
@@ -241,116 +287,88 @@ def edit_order(request):
                     old_qty = item.qty # الكمية القديمة
                     new_qty = new_item.qty # الكمية الجديدة
                     old_price = item.price 
-                    old_discount_price = item.discount_price
+                    old_discount_price = item.discount_price # سعر المنتج القديم المخفض
+                    old_discount_value = round(old_qty * old_price ) - item.discount_price # قيمة الخصم على المنتج المستبدل
                     new_price = new_item.cart_item.product_item.product.get_price()
                     old_order_points = order.total_points # يستعمل لاحقا عند التعديل على نقاط المستخدم
                     
                     if new_item.cart_item.stock <= 0:  # تحقق من توفر المنتج الجديد
                         return JsonResponse({'success': False, 'error': 'المنتج المستبدل غير متاح حاليا'})
                     
-                    # التحقق مما إذا كان المنتج القديم والجديد مرتبطين بنفس متغير المنتج
-                    if old_variation == new_variation:
-                        # تحديث الكمية والسعر فقط دون حذف العنصر القديم
-                        item.qty = new_item.qty
-                        item.price = new_item.cart_item.product_item.product.get_price()  # تحديث السعر بناءً على المتغير الجديد
-                        item.points = new_item.cart_item.product_item.product.bonus
-                        item.status = 'replaced'
-                        item.save()
-
-                    else:
-                        # التحقق مما إذا كان العنصر الجديد موجودًا بالفعل في الطلب
-                        existing_order_item = order.order_items.filter(order_item=new_item.cart_item).first()
-                        
-                        if existing_order_item:
-                            # دمج الكميات وتحديث السعر إذا كانت العناصر موجودة بالفعل في الطلب
-                            existing_order_item.qty += new_item.qty
-                            existing_order_item.price = new_item.cart_item.product_item.product.get_price()  # تحديث السعر بناءً على الكمية الجديدة
-                            existing_order_item.points = new_item.cart_item.product_item.product.bonus
-                            existing_order_item.status = 'replaced'
-                            existing_order_item.save()
-
-                            # إزالة العنصر القديم
-                            item.delete()
-                            
-                            # ارجع خزن الايتم مشان نكمل استعماله تحت دون اخطاء
-                            item = existing_order_item
-
-                        else:
-                            # استبدال العنصر القديم بالجديد
-                            item.order_item = new_item.cart_item
-                            item.qty = new_item.qty
-                            item.price = new_item.cart_item.product_item.product.get_price()
-                            item.points = new_item.cart_item.product_item.product.bonus
-                            item.status = 'replaced'
-                            item.save()
-
-                    # تحديث إجمالي الطلب 
+                    # =================================================================
+                    # استبدال العنصر القديم بالجديد
+                    item.order_item = new_item.cart_item
+                    item.qty = new_item.qty
+                    item.price = new_price
+                    # قيمة الخصم الجديدة نفس قيمة الخصم القديمة بشرط ان قيمة الخصم القديمة ليست اكبر من اجمالي المنتج الجديد
+                    new_discount_value = old_discount_value if old_discount_value < (item.qty*item.price) else (item.qty*item.price)
+                    item.discount_price = (item.qty*item.price) - new_discount_value
+                    new_discount_price = item.discount_price # سعر المنتج الجديد المخفض
+                    item.points = new_item.cart_item.product_item.product.bonus
+                    item.status = 'replaced'
+                    item.save()
+                    new_item.delete()
+                    # =================================================================
+                    # تحديث إجمالي نقاط الطلب 
                     order.total_points = order.order_items.aggregate(total=models.Sum(models.F('points') * models.F('qty')))['total'] or 0
-                    old_total = order.old_total
-                    discount = order.discount_amount  
-                    order.reference_value += round(( new_price * new_qty ) - ( old_price * old_qty )) 
-                    reference = order.reference_value  
-                    order.total_price = round( old_total - discount + reference )
-                    # التحقق من أن السعر الإجمالي لا يمكن أن يكون أقل من الصفر
-                    if order.total_price < 0:
-                        order.total_price = 0
-                    
-                    new_total = order.total_price
-                    order.save()
-                    
-                    #  اعد حساب سعر مابعد الخصم لكل عنصر بالطلب بعد التعديل
-                    order_items = order.order_items.all()
-                    for item in order_items:
-                        item_price =  item.price
-                        item_qty = item.qty
-                        if discount:
-                            item.discount_price = round(((item_price * item_qty) / (old_total + reference) ) * new_total)
-                        else:
-                            # لايوجد كوبون مستعمل لذا سعر القطعة بعد الخصم نفس السعر الاصلي
-                            item.discount_price = item_price * item_qty
-                        item.save()
-                        
-                    
-                    new_discount_price = round(((new_price * new_qty) / (old_total + reference)) * new_total) # السعر المخفض الجديد للمنتج المستبدل
-                    price_difference = new_discount_price - old_discount_price
-                    print('price_difference =', price_difference)
-                        
-                    # انشاء معاملة لإخبار الموظفين انه هنالك عملية استبدال منتجات حصلت
-                    dealing, created = OrderDealing.objects.get_or_create(order=order)
-                    DealingItem.objects.create(
-                        order_dealing= dealing,
-                        old_item = old_variation,
-                        new_item = new_variation,
-                        old_qty = old_qty,
-                        old_price = old_discount_price,
-                        new_price = new_discount_price,
-                        new_qty = new_qty,
-                        status = 'replace',
-                        # يتم وضع قيمة لفارق السعر فقط ان كان الطلب مسلما
-                        price_difference = price_difference if order.status=='delivered' else 0 ,
-                    )
-                    dealing.save()
-                    #  ارسال رسالة الى المستخدم عند تعديل الطلب
-                    message = edit_order_message(user_name=user.first_name, order=order.serial_number)
-                    inbox = user.profile.inbox
-                    inbox.add_message(message)
-                    inbox.save() 
-                    
                     # تعديل النقاط إذا كان الطلب قد تم تسليمه بالفعل
                     if order.status == 'delivered':
                         profile = UserProfile.objects.get(user=user)
                         points_change = order.total_points - old_order_points # ايجاد فارق النقاط بين الطلب قبل التعديل وبعد التعديل
                         profile.points += points_change  # تعديل النقاط بناءً على الطلب المعدل
                         profile.save()
+                    # =================================================================   
+                    # اعد حساب جميع القيم
+                    order.old_total = order.order_items.aggregate(total=models.Sum(models.F('price') * models.F('qty')))['total'] or 0
+                    order.total_price = order.order_items.aggregate(total=models.Sum(models.F('discount_price')))['total'] or 0
+                    order.used_discount = order.old_total - order.total_price
+                    order.save()
+                    # =================================================================
+                    price_difference = new_discount_price - old_discount_price
+                    # انشاء معاملة لإخبار الموظفين انه هنالك عملية استبدال منتجات حصلت
+                    dealing, created = OrderDealing.objects.get_or_create(order=order)
+                    try:
+                        DealingItem.objects.create(
+                            order_dealing= dealing,
+                            old_item = old_variation,
+                            new_item = new_variation,
+                            old_qty = old_qty,
+                            new_qty = new_qty,
+                            old_price = old_discount_price, # السعر المخفض القديم
+                            new_price = new_discount_price, # السعر المخفض الجديد
+                            status = 'replace',
+                            # يتم وضع قيمة لفارق السعر فقط ان كان الطلب مسلما
+                            price_difference = price_difference if order.status=='delivered' else 0,
+                        )
+                    except IntegrityError:
+                        return JsonResponse({'success': False, 'error': 'لقد قمت بالفعل بتسجيل هذه المعاملة سابقًا'})
+                    except Exception as e:
+                        logger.error(f"خطأ أثناء تعديل الطلب: تحديدا عند انشاء عنصر معالجة {e}", exc_info=True)
+                        return JsonResponse({'success': False, 'error': 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا'})
+                    
+                    dealing.save()
+                    
+                    # =================================================================
+                    #  ارسال رسالة الى المستخدم عند تعديل الطلب
+                    message = edit_order_message(user_name=user.first_name, order=order.serial_number)
+                    inbox = user.profile.inbox
+                    inbox.add_message(message)
+                    inbox.save() 
                             
                     return JsonResponse({'success': True, 'message': 'تم تعديل المنتج بنجاح'})
 
                 except OrderItem.DoesNotExist:
                     return JsonResponse({'success': False, 'error': 'المنتج المستبدل غير موجود'})
                 except Exception as e:
-                    return JsonResponse({'success': False, 'error': f'{e} وقع هذا الخطأ '})
+                    logger.error(f"خطأ أثناء تعديل الطلب: {e}", exc_info=True)
+                    return JsonResponse({'success': False, 'error': 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا'})
             except Order.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'الطلب الذي تحاول تعديله غير صالح'})
+            finally:
+                try:
+                    cache.delete(lock_id)
+                except Exception as e:
+                    logger.warning(f"فشل في حذف القفل من الكاش: {e}", exc_info=True)  # إزالة القفل بعد الانتهاء سواء نجحت العملية أم لا
         else:
             # إذا كانت البيانات مفقودة أو غير صالحة
             return JsonResponse({'success': False, 'error': 'نعتذر، يبدو أن هناك بيانات ناقصة'})
@@ -365,7 +383,8 @@ def create_order(request):
         card_id = request.POST.get('card-id')
         use_this = request.POST.get('use-this')
         
-        discount_amount = 0
+        copon_value = 0
+        old_total = 0
         total_price = 0
         total_bonus = 0
         available_items = []
@@ -385,16 +404,17 @@ def create_order(request):
                         'qty': item.qty,
                         'points': product_variation.product_item.product.bonus
                     })
-                    total_price += product_variation.product_item.product.get_price() * item.qty
+                    old_total += product_variation.product_item.product.get_price() * item.qty
                     total_bonus += product_variation.product_item.product.bonus * item.qty
 
             if not available_items:
                 return JsonResponse({'success': False, 'error': 'نفذت الكمية الخاصة بجميع المنتجات التي طلبتها'})
 
         except Cart.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'السلة غير موجودة!'})
+            return JsonResponse({'success': False, 'error': 'يبدو ان سلتك فارغة ، يرجى ملؤها اولاً'})
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+            logger.error(f"خطأ أثناء انشاء طلب: {e}", exc_info=True)
+            return JsonResponse({'success': False, 'error': 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا'})
 
 
         # Check if user wants to use discount
@@ -405,25 +425,27 @@ def create_order(request):
                     return JsonResponse({'success': False, 'error': 'الكوبون الذي ادخلته منتهي الصلاحية'})
                 else:
                     copon.has_used = True
-                    discount_amount = copon.copon_code.value
+                    copon_value = copon.copon_code.value
+                    used_discount = copon_value if not copon_value > total_price else old_total
                     
-
             except CoponItem.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'كود الكوبون الذي ادخلته غير موجود في مخزونك!'})
+            except Exception as e:
+                logger.error(f"خطأ أثناء انشاء طلب تحديدا عند جزئية كوبون الخصم: {e}", exc_info=True)
+                return JsonResponse({'success': False, 'error': 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا'})
 
         # ========  الاستعلام عما ان كان التوصيل مجاني ==========
         
         settings =  Settings.get_settings()
         delivery = settings.free_delivery
-        total_after_discount = total_price - discount_amount if total_price > discount_amount else 0
-
+        
         # إنشاء الطلب
         order = Order.objects.create(
             user=user,
-            old_total=total_price,
-            total_price=total_after_discount, 
+            old_total=old_total,
+            total_price=total_price,
             total_points=total_bonus,
-            discount_amount=discount_amount,
+            copon_value=copon_value,
             free_delivery = delivery,
         )
         
@@ -432,11 +454,14 @@ def create_order(request):
             item_price =  item['product_variation'].product_item.product.get_price()
             item_qty = item['qty']
             if use_this:
-                discount_price = round((item_price * item_qty / order.old_total) * order.total_price)
+                discount_value = round((item_price * item_qty / order.old_total) * used_discount ) # قيمة الخصم على المنتج من قيمة الكوبون الاجمالية
+                discount_price = (item_price * item_qty) - discount_value
             else:
                 # لايوجد كوبون مستعمل لذا سعر القطعة بعد الخصم نفس السعر الاصلي
                 discount_price = item_price * item_qty
-            
+                
+            order.total_price += discount_price # قيمة الطلب النهائية تساوي مجموع اسعار المنتجات بعد التخفيض ان وجد
+                            
             OrderItem.objects.create(
                 order=order,
                 order_item=item['product_variation'],
@@ -446,6 +471,9 @@ def create_order(request):
                 discount_price = discount_price,
             )
             item['product_variation'].sell(item['qty'])
+            
+        order.used_discount = used_discount 
+        order.save()
 
         # ارسال رسالة عند اتمام الطلب 
         message = create_order_message(user_name=user.first_name, order=order.serial_number)
@@ -459,10 +487,8 @@ def create_order(request):
         # حفظ التغييرات على الهدايا والكوبونات
         if use_this:
             copon.save()
-
-        # منطق نجاح الطلب
+            
         return JsonResponse({'success': True, 'message': 'تمت عملية الطلب بنجاح!'})
-
     return JsonResponse({'success': False, 'error': 'طلب غير صالح'})
 # دالة عرض عناصر طلبات الاستبدال والاسترجاع
 @login_required
@@ -478,6 +504,9 @@ def order_dealing(request, oid):
             
         except OrderDealing.DoesNotExist:
             order_dealing = None
+        except Exception as e:
+            logger.error(f"خطأ  داخل دالة عرض طلبات التعديل والارجاع: {e}", exc_info=True)
+            order_dealing = None   
         
         if order_dealing:
             dealing_items = order_dealing.deals.prefetch_related(

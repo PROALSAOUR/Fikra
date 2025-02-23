@@ -66,6 +66,11 @@ class PointsUsageAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         """منع حذف سجلات النقاط من لوحة الإدارة"""
         return False
+    
+    def has_add_permission(self, request):
+        return False  # يمنع إضافة كائنات جديدة من لوحة الإدارة
+
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(UserProfile, ProfileAdmin)

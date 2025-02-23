@@ -13,6 +13,9 @@ from django.core.exceptions import ValidationError
 import phonenumbers
 import time
 
+import logging
+logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
+
 # دالة صفحة الحساب الرئيسية
 @login_required
 def main_account_page(request):
@@ -288,6 +291,9 @@ def phone_number_of_forgeted_password(request):
                 raise ValidationError("رقم الهاتف غير صالح.")
         except phonenumbers.NumberParseException:
             raise ValidationError("يرجى إدخال رقم هاتف صحيح.")
+        except Exception as e:
+                logger.error(f"خطأ بدالة phone_number_of_forgeted_password: {e}", exc_info=True)
+                raise ValidationError('حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا')
         # التحقق مما إذا كان الرقم مسجلاً مسبقًا
         if not User.objects.filter(phone_number=phone_number).exists():
             raise ValidationError("رقم الهاتف الذي ادخلته غير مرتبط بأي حساب  لدينا.")
@@ -305,13 +311,17 @@ def reset_password(request):
         if not phone_number:
             messages.error(request, 'رقم الهاتف يحتوي على خطأ')
             time.sleep(1) # اخر تنفيذ التحويل لمدة ثانية
-            return redirect('accounts:forget_password')  # العودة لصفحة forget_password
+            return redirect('accounts:forget_password') 
         
         try:
             user = User.objects.get(phone_number=phone_number)
         except User.DoesNotExist:
             messages.error(request, 'حدث خطأ يرجى المحاولة مرة أخرى أو التواصل مع الدعم في حال استمرت المشكلة')
             time.sleep(1)  # تأخير التنفيذ لمدة ثانية
+            return redirect('accounts:forget_password')
+        except Exception as e:
+            logger.error(f"خطأ ب: {e}", exc_info=True)
+            messages.error(request, 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا')
             return redirect('accounts:forget_password')
         
         # تحقق من كلمات السر 

@@ -4,6 +4,8 @@ from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from accounts.send_messages import add_order_points_message
+import logging
+logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
 
 @receiver(pre_save, sender=Order)
 def update_user_points(sender, instance, **kwargs):
@@ -16,6 +18,10 @@ def update_user_points(sender, instance, **kwargs):
     except Order.DoesNotExist:
         # إذا كان الطلب جديدًا، لا يوجد حالة سابقة، فنخرج من الدالة
         return
+    except Exception as e:
+        logger.error(f"خطأ بدالة تحديث نقاط المستخدم داخل اشارات الطلب: {e}", exc_info=True)
+        return 
+    
 
     user_profile = UserProfile.objects.get(user=instance.user)
     user_inbox = user_profile.inbox  # الحصول على صندوق الوارد الخاص بالمستخدم
@@ -50,6 +56,9 @@ def update_sold_and_stock(sender, instance, **kwargs):
     except DealingItem.DoesNotExist:
         # إذا كان الطلب جديدًا، لا يوجد حالة سابقة، فنخرج من الدالة
         return
+    except Exception as e:
+        logger.error(f"خطأ بدالة تحديث المُبا و المُخزن داخل اشارات الطلب: {e}", exc_info=True)
+        return 
     
     # الدالة تعمل فقط عند تعديل حالة المعالجة الى تمت المعالجة
     if not previous_dealing_item.is_dealt and instance.is_dealt :

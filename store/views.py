@@ -8,6 +8,8 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.timezone import now 
 from django.core.cache import cache
+import logging
+logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
 
 # صفحة الاوف لاين
 def offline(request):
@@ -81,7 +83,9 @@ def brand_page(request, slug):
         all_brand_products = paginator_all.page(1)
     except EmptyPage:
         all_brand_products = paginator_all.page(paginator_all.num_pages)
-    
+    except Exception as e:
+        logger.error(f"خطأ بدالة البراند داخل المتجر: {e}", exc_info=True)
+                
     # ===========================================================
     # إضافة فلترة أخرى بناءً على معايير المستخدم (البحث، السعر، العلامة التجارية)
     query = request.GET.get('q', '')
@@ -130,6 +134,8 @@ def brand_page(request, slug):
         products = paginator.page(1)
     except EmptyPage:
         products = paginator.page(paginator.num_pages)
+    except Exception as e:
+        logger.error(f"خطأ بدالة البراند داخل المتجر: {e}", exc_info=True)
 
     # البيانات الإضافية للعرض
     
@@ -218,6 +224,8 @@ def category_page(request, slug):
         products = paginator.page(1)
     except EmptyPage:
         products = paginator.page(paginator.num_pages)
+    except Exception as e:
+        logger.error(f"خطأ بدالة التصنيف داخل المتجر: {e}", exc_info=True)
 
     # البيانات الإضافية للعرض
     brands = Brand.objects.all()
@@ -248,6 +256,8 @@ def offer_page(request):
         offerd_products = paginator.page(1)
     except EmptyPage:
         offerd_products = paginator.page(paginator.num_pages)
+    except Exception as e:
+        logger.error(f"خطأ بدالة العروض داخل المتجر: {e}", exc_info=True)
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         results_data = list(offerd_products.object_list.values())
@@ -274,6 +284,8 @@ def best_sales(request):
         best_products = paginator.page(1)
     except EmptyPage:
         best_products = paginator.page(paginator.num_pages)
+    except Exception as e:
+        logger.error(f"خطأ بدالة اعلى المبيعات داخل المتجر: {e}", exc_info=True)
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         results_data = list(best_products.object_list.values())
@@ -337,6 +349,8 @@ def search_page(request):
         products = paginator.page(1)
     except EmptyPage:
         products = paginator.page(paginator.num_pages)
+    except Exception as e:
+        logger.error(f"خطأ بدالة البحث داخل المتجر: {e}", exc_info=True)
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         results_data = list(products.object_list.values())
@@ -401,6 +415,8 @@ def get_stock(request):
         return JsonResponse({'stock': stock})
     except ProductVariation.DoesNotExist:
         return JsonResponse({'stock': 0})  # إذا لم يتم العثور على المتغير، رجع 0
+    except Exception as e:
+        logger.error(f"خطأ بدالة الحصول على كمية المخزون داخل المتجر: {e}", exc_info=True)
 # ===================================================
 # صفحة المفضلة
 @login_required
@@ -562,6 +578,8 @@ def add_to_cart(request):
 
         except ProductVariation.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'المتغير غير موجود'})
+        except Exception as e:
+            logger.error(f"خطأ بدالة الاضافة الى السلة1 داخل المتجر: {e}", exc_info=True)
 
     return JsonResponse({'status': 'error', 'message': 'طلب غير صالح'})
 # دالة الاضافة الى السلة من بطاقة المنتج 
@@ -619,7 +637,9 @@ def remove_from_cart(request, cart_item_id):
         except CartItem.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'CartItem does not exist'})
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+            logger.error(f"خطأ بدالة الازالة من السلة: {e}", exc_info=True)
+            return JsonResponse({'success': False, 'error': 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا'})
+        
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 # دالة زر تغيير الكمية داخل السلة
 @login_required
@@ -656,7 +676,8 @@ def update_cart_item_qty(request):
         except ValueError:
             return JsonResponse({'error': 'الكمية يجب أن تكون عددًا صحيحًا.'}, status=400)
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500) # المشكلة تأتي من هنا
+            logger.error(f"خطأ بدالة تحديث الكمية المختارة داخل السلة: {e}", exc_info=True)
+            return JsonResponse({'success': False, 'error': 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا'})
 
     return JsonResponse({'error': 'طريقة غير صحيحة، يجب أن تكون POST.'}, status=400)
 # ===================================================

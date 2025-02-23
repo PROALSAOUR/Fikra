@@ -18,10 +18,10 @@ class Order(models.Model):
     serial_number = models.IntegerField(unique=True, verbose_name='الرقم التسلسلي')
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending' , verbose_name='الحالة')
     old_total = models.IntegerField(verbose_name='الإجمالي القديم')
-    reference_value = models.IntegerField(default=0, verbose_name='قيمة المرجعات') # سعر المنتجات المستبدلة والمرجعة (سالب للزبون وموجب للمحل)
     total_price = models.IntegerField(verbose_name='الإجمالي')
     total_points = models.PositiveIntegerField(null=True, verbose_name='المكافأة')
-    discount_amount = models.IntegerField(default=0, verbose_name='قيمة الخصم')
+    copon_value = models.IntegerField(default=0, verbose_name='قيمة الكوبون')
+    used_discount = models.IntegerField(default=0, verbose_name='الخصم المستعمل')
     free_delivery =  models.BooleanField(default=False, verbose_name='توصيل مجاني؟' )
     order_date = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الطلب')
     deliverey_date = models.DateTimeField(null=True, blank=True, verbose_name='تاريخ التسليم')
@@ -127,6 +127,7 @@ class DealingItem(models.Model):
     new_qty = models.IntegerField(null=True, blank=True , verbose_name='الكمية الجديدة')
     old_price = models.IntegerField(default=0, verbose_name='السعر القديم')
     new_price = models.IntegerField(default=0, verbose_name='السعر الجديد')
+    discount = models.IntegerField(default=0, verbose_name='الخصم')
     price_difference = models.IntegerField(null=True, blank=True , verbose_name='فرق السعر')  
     is_dealt = models.BooleanField(default=False , verbose_name='المعالجة') # هل تم تنفيذ عملية التعديل  
     status = models.CharField(max_length=20, choices=Dealing_status, blank=True , verbose_name='الحالة') 
@@ -151,3 +152,5 @@ class DealingItem(models.Model):
     def __str__(self) -> str:
         return f'{self.order_dealing.order.user} => {self.order_dealing.order.serial_number}'
     
+    class Meta:
+        unique_together = ('order_dealing', 'old_item', 'new_item', 'old_qty', 'new_qty', 'discount') # منع إدخال نفس المعاملة مرتين 

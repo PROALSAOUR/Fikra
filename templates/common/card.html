@@ -38,5 +38,29 @@
         {% endif %}
     </div>
 </div>
+<script>
+    {% comment %} دالة تمنع النقر المتتالي على زر الشراء {% endcomment %}
+    document.addEventListener("DOMContentLoaded", function () {
+        function disableClickTemporarily(link, delay = 2000) {
+            if (link.classList.contains("disabled")) return; // منع النقر المتكرر أثناء التعطيل
+            link.classList.add("disabled");
+            link.style.pointerEvents = "none"; // تعطيل النقر
+            link.style.opacity = "0.5"; // تقليل الشفافية أثناء التعطيل
 
+            setTimeout(() => {
+                link.classList.remove("disabled");
+                link.style.pointerEvents = "auto"; // إعادة تفعيل النقر
+                link.style.opacity = ""; // إعادة الرابط لوضعه الطبيعي
+            }, delay);
+        }
+
+        // استهداف جميع الروابط التي تحتوي على الكلاس "copon-buy-done-link"
+        const links = document.querySelectorAll(".copon-buy-done-link");
+        links.forEach(link => {
+            link.addEventListener("click", function (event) {
+                disableClickTemporarily(this);
+            });
+        });
+    });    
+</script>
 

@@ -45,6 +45,7 @@
     </form>
 </div>
 <script>
+    {% comment %} دالة تمنع النقر المتتالي على زر الاستبدال {% endcomment %}
     document.addEventListener("DOMContentLoaded", function () {
         function disableClickTemporarily(button, delay = 2000) {
             if (button.classList.contains("disabled")) return; // منع إعادة النقر أثناء التعطيل

@@ -55,7 +55,7 @@ class MyOrdersAdmin(admin.ModelAdmin):
     search_fields = ('serial_number', 'user__phone_number',)
     list_filter = ('status', 'user__phone_number',)
     ordering = ('-order_date', '-updated_at',)
-    readonly_fields = ( 'user', 'serial_number', 'old_total', 'reference_value', 'discount_amount', 'total_price', 'total_points', 'free_delivery', 'order_date', 'deliverey_date', )
+    readonly_fields = ( 'user', 'serial_number', 'old_total', 'used_discount', 'copon_value', 'total_price', 'total_points', 'free_delivery', 'order_date', 'deliverey_date', )
     exclude = ('with_message',)
     inlines = [OrderItemInline, OrderDealingInline] 
     
@@ -78,6 +78,9 @@ class MyOrdersAdmin(admin.ModelAdmin):
         else: # status = pending
             return format_html('<span style="color:#e1d221; font-weight:900;">{}</span>', obj.get_status_display())
     colored_status.short_description = 'الحالة'   
+
+    def has_add_permission(self, request):
+        return False  # يمنع إضافة كائنات جديدة من لوحة الإدارة
 
 class DealingItemsInline(admin.TabularInline):
     model = DealingItem
@@ -113,6 +116,10 @@ class DealingAdmin(admin.ModelAdmin):
         else: # status = pending
             return format_html('<span style="color:#e1d221; font-weight:900;">{}</span>', obj.order.get_status_display())
     status.short_description = 'حالة الطلب'   
+    
+    def has_add_permission(self, request):
+        return False  # يمنع إضافة كائنات جديدة من لوحة الإدارة
+
 
 admin.site.register(Order, MyOrdersAdmin)
 admin.site.register(OrderDealing, DealingAdmin)

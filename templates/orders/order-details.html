@@ -81,18 +81,10 @@
                                     <td>{{ order.old_total }} دل </td>
                                     <td colspan="2"></td>
                                 </tr>
-                                {% if order.reference_value %}
-                                    <tr>
-                                        <td colspan="6">  قيمة المُرجعات:</td>
-                                        {% comment %} وضع اشارة الناقص فقط ان كانت القيمة موجبة لان هذا يعني ان قيمتها مخصومة من الفاتورة وليست مضافة {% endcomment %}
-                                        <td>{% if order.reference_value > 0 %}+{{ order.reference_value }}{% else %}{{ order.reference_value }}{% endif %}دل </td>
-                                        <td colspan="2"></td>
-                                    </tr>
-                                {% endif %}
-                                {% if order.discount_amount %}
+                                {% if order.copon_value %}
                                     <tr>
                                         <td colspan="6">  قيمة الخصم:</td>
-                                        <td>-{{ order.discount_amount }} دل </td>
+                                        <td>-{{ order.used_discount }} دل </td>
                                         <td colspan="2"></td>
                                     </tr>
                                 {% endif %}

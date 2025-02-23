@@ -355,9 +355,10 @@ class MonthlyInvestmentGroupInline(admin.TabularInline):
     verbose_name_plural = 'الاستثمارات'
 # دالة عرض الاحصائية الرئيسية
 class MonthlyTotalAdmin(admin.ModelAdmin):
-    list_display = ('history', 'total_income', 'colored_total_profit' ,'sales_number')
+    list_display = ('history', 'colored_total_income', 'colored_total_profit' ,'sales_number')
     search_fields = ('history',)
-    ordering = ('-month', '-year')
+    ordering = ('-year', '-month', )
+    fields = ('history', 'colored_total_income', 'colored_additional_income', 'colored_total_costs', 'colored_total_packaging', 'colored_goods_price', 'colored_total_profit', 'sales_number',)
     readonly_fields = ('history', 'colored_total_income', 'colored_additional_income', 'colored_total_costs', 'colored_total_packaging', 'colored_goods_price', 'colored_total_profit', 'sales_number',)
     exclude = ('total_income', 'additional_income', 'total_costs', 'total_packaging', 'goods_price','total_profit', 'month', 'year')
     inlines = [CostInline, AdditionalInline, PackForMonthInline, MonthPartnersProfitInline, MonthlyInvestmentGroupInline]

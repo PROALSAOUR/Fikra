@@ -10,6 +10,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import json
 from accounts.send_messages import buy_copon_done_message, receive_copon_done_message
 
+import logging
+logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
+
 # ===================================================
 # مستودع البطاقات
 def cards_repo(request):
@@ -47,6 +50,8 @@ def cards_store(request):
         copons = paginator_all.page(1)
     except EmptyPage:
         copons = paginator_all.page(paginator_all.num_pages)
+    except Exception as e:
+        logger.error(f"خطأ بمتجر الكوبونات: {e}", exc_info=True)
     
     # =====================================================
     
@@ -83,6 +88,8 @@ def cards_store(request):
         results = paginator.page(1)
     except EmptyPage:
         results = paginator.page(paginator.num_pages)
+    except Exception as e:
+        logger.error(f"خطأ بمتجر الكوبونات: {e}", exc_info=True)
 
     results_count = len(results_list)
     
@@ -148,45 +155,45 @@ def verfie_code(request):
     user = request.user
 
     if request.method == 'POST':        
-        try:
-            data = json.loads(request.body)
-            verfie_code = data.get('verfie-code')
         
-            try:
-                verfie_copon = ReceiveCopon.objects.get(code=verfie_code)
+        data = json.loads(request.body)
+        verfie_code = data.get('verfie-code')
+    
+        try:
+            verfie_copon = ReceiveCopon.objects.get(code=verfie_code)
 
-                if verfie_copon.is_used:
-                    return JsonResponse({"success": False, "message": "الكود الذي ادخلته مستخدم بالفعل"})
+            if verfie_copon.is_used:
+                return JsonResponse({"success": False, "message": "الكود الذي ادخلته مستخدم بالفعل"})
 
-                # إنشاء CoponItem جديد
-                copon_item = CoponItem.objects.create(
-                    user=user,
-                    copon_code=verfie_copon.copon,   
-                    receive_from_code=True, 
-                )
+            # إنشاء CoponItem جديد
+            copon_item = CoponItem.objects.create(
+                user=user,
+                copon_code=verfie_copon.copon,   
+                receive_from_code=True, 
+            )
 
-                verfie_copon.copon.sales_count += 1 
-                copon_item.buy_copon()
-                copon_item.sell_price = 0 # عند الحصول على الكوبون من كود فإن سعر شراءه صفر 
-                verfie_copon.copon.save()
-                copon_item.save()
-                
-                # تحديث حالة الكود إلى "مستخدم"
-                verfie_copon.is_used = True
-                verfie_copon.used_by = user
-                verfie_copon.save()
-                
-                # ارسال رسالة عند اتمام استلام الكوبون
-                message = receive_copon_done_message(user_name=request.user.first_name, copon_name=verfie_copon.copon)
-                request.user.inbox.add_message(message)
-                
-                return JsonResponse({"success": True, "message": 'تهانينا! تم استلام الكوبون بنجاح.'})
-
-            except ReceiveCopon.DoesNotExist:
-                return JsonResponse({"success": False, "message": "الكود غير صحيح."})
+            verfie_copon.copon.sales_count += 1 
+            copon_item.buy_copon()
+            copon_item.sell_price = 0 # عند الحصول على الكوبون من كود فإن سعر شراءه صفر 
+            verfie_copon.copon.save()
+            copon_item.save()
             
+            # تحديث حالة الكود إلى "مستخدم"
+            verfie_copon.is_used = True
+            verfie_copon.used_by = user
+            verfie_copon.save()
+            
+            # ارسال رسالة عند اتمام استلام الكوبون
+            message = receive_copon_done_message(user_name=request.user.first_name, copon_name=verfie_copon.copon)
+            request.user.inbox.add_message(message)
+            
+            return JsonResponse({"success": True, "message": 'تهانينا! تم استلام الكوبون بنجاح.'})
+
         except ReceiveCopon.DoesNotExist:
-            return JsonResponse({"success": False, "message": 'نعتذر حصلت مشكلة اثناء معالجة البيانات!'})
+            return JsonResponse({"success": False, "message": "الكود غير صحيح."})
+        except Exception as e:
+            logger.error(f"خطأ بدالة استرداد كوبون من الرمز الخاص به: {e}", exc_info=True)
+            return JsonResponse({'success': False, 'error': 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا'})
 
     return JsonResponse({"success": False, "message": "حدث خطأ ما."})
 
