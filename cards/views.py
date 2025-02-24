@@ -117,15 +117,26 @@ def buy_copon(request, cid):
     دالة للتحقق من الكوبون المراد شرائه
     """
     # الحصول على الكوبون والمستخدم
-    copon = get_object_or_404(Copon, id=cid)
-    user = request.user
-    profile = get_object_or_404(UserProfile, user=user)
-    inbox = profile.inbox
-    
-    points = profile.points
+    try:
+        copon = get_object_or_404(Copon, id=cid)
+        user = request.user
+        profile = get_object_or_404(UserProfile, user=user)
+        inbox = profile.inbox
+        
+        points = profile.points
+    except UserProfile.DoesNotExist:
+        logger.error(f"ملف المستخدم غير موجود للمستخدم: {user}.", exc_info=True)
+        return JsonResponse({'error': 'حدث خطأ أثناء الحصول على ملف المستخدم'}, status=500)
+    except Copon.DoesNotExist:
+        logger.error(f"الكوبون غير موجود: {cid}.", exc_info=True)
+        return JsonResponse({'error': 'الكوبون غير موجود'}, status=404)
+    except Exception as e:
+        logger.error(f"خطأ غير متوقع: {e}", exc_info=True)
+        return JsonResponse({'error': 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا'}, status=500)
     
     # التحقق من أن المستخدم لديه نقاط كافية
     if copon.price > points:
+        logger.warning(f"المستخدم {user} حاول شراء كوبون {cid} بدون نقاط كافية.")
         return JsonResponse({'error': 'لاتوجد نقاط كافية لإتمام عملية الشراء'}, status=400)
        
     user_copon = CoponItem.objects.create(
@@ -140,6 +151,9 @@ def buy_copon(request, cid):
     # خصم النقاط وحفظ التحديثات
     points -= copon.price
     profile.points = points
+    # لو نقاط المستخدم صارت سالب معناها قدر يتجاوز التحقق السابق بشكل ما واشترى الكوبون بدون ما يدفع
+    if profile.points < 0 :
+        logger.warning(f"نقاط المشتري {user} اصبحت سالبة بعد شرائه للكوبون {copon}")
     profile.save()
     
     # حفظ سجل استخدام الكوبون
@@ -163,6 +177,7 @@ def verfie_code(request):
             verfie_copon = ReceiveCopon.objects.get(code=verfie_code)
 
             if verfie_copon.is_used:
+                logger.info(f"User {user} tried to use an already used code: {verfie_code}")
                 return JsonResponse({"success": False, "message": "الكود الذي ادخلته مستخدم بالفعل"})
 
             # إنشاء CoponItem جديد
@@ -186,15 +201,17 @@ def verfie_code(request):
             # ارسال رسالة عند اتمام استلام الكوبون
             message = receive_copon_done_message(user_name=request.user.first_name, copon_name=verfie_copon.copon)
             request.user.inbox.add_message(message)
-            
+            logger.info(f"User {user.username} successfully received the coupon: {verfie_copon.copon.name}")
             return JsonResponse({"success": True, "message": 'تهانينا! تم استلام الكوبون بنجاح.'})
 
         except ReceiveCopon.DoesNotExist:
+            logger.warning(f"المستخدم {user}يحاول ادخال كود استلام كوبون غير موجود وهو:{verfie_code}")
             return JsonResponse({"success": False, "message": "الكود غير صحيح."})
         except Exception as e:
             logger.error(f"خطأ بدالة استرداد كوبون من الرمز الخاص به: {e}", exc_info=True)
             return JsonResponse({'success': False, 'error': 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا'})
 
-    return JsonResponse({"success": False, "message": "حدث خطأ ما."})
+    logger.warning(f"المستخدم {user} وصل الى دالة verfie_code بطريقة خاطئة.")
+    return JsonResponse({"success": False, "message": "طريقة وصول خاطئة"})
 
 # ===================================================

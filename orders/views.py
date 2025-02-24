@@ -95,6 +95,7 @@ def cancel_order(request):
             # البحث عن الطلب وإلغاؤه
             order = Order.objects.get(id=order_id)
             if order.user != user:
+                logger.error(f"المستخدم {user}يحاول الغاء طلب ليس له ", exc_info=True)
                 return JsonResponse({'success': False, 'error': 'هذا الطلب ليس لك.'})
             else:
                 if order.status == 'canceled' :
@@ -274,6 +275,7 @@ def edit_order(request):
                     
                     # منع استبدال منتج مستبدل بالفعل
                     if item.status == 'replaced': # إذا كان قد تم استبداله بالفعل
+                        logger.error(f"المستخدم  {user} يحاول تعديل عنصر طلب معدل سابقا", exc_info=True)
                         return JsonResponse({'success': False, 'error': "لقد قمت بإستبدال هذا المنتج سابقا"})
                     
                     cart = Cart.objects.get(user=user)
@@ -341,6 +343,7 @@ def edit_order(request):
                             price_difference = price_difference if order.status=='delivered' else 0,
                         )
                     except IntegrityError:
+                        logger.error(f"المستخدم {user} تم انشاء معاملتين تعديل لنفس العنصر ", exc_info=True)
                         return JsonResponse({'success': False, 'error': 'لقد قمت بالفعل بتسجيل هذه المعاملة سابقًا'})
                     except Exception as e:
                         logger.error(f"خطأ أثناء تعديل الطلب: تحديدا عند انشاء عنصر معالجة {e}", exc_info=True)
@@ -429,6 +432,7 @@ def create_order(request):
                     used_discount = copon_value if not copon_value > total_price else old_total
                     
             except CoponItem.DoesNotExist:
+                logger.error(f"المستخدم  {user} يحاول استعمال كوبون خصم غير موجود لديه مع طلبه", exc_info=True)
                 return JsonResponse({'success': False, 'error': 'كود الكوبون الذي ادخلته غير موجود في مخزونك!'})
             except Exception as e:
                 logger.error(f"خطأ أثناء انشاء طلب تحديدا عند جزئية كوبون الخصم: {e}", exc_info=True)

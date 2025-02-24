@@ -309,6 +309,7 @@ def reset_password(request):
         password2 = request.POST.get('password2')
         # تحقق من رقم الهاتف
         if not phone_number:
+            logger.warning("رقم الهاتف غير موجود في الجلسة.")
             messages.error(request, 'رقم الهاتف يحتوي على خطأ')
             time.sleep(1) # اخر تنفيذ التحويل لمدة ثانية
             return redirect('accounts:forget_password') 
@@ -316,6 +317,7 @@ def reset_password(request):
         try:
             user = User.objects.get(phone_number=phone_number)
         except User.DoesNotExist:
+            logger.error(f"لم يتم العثور على المستخدم برقم الهاتف: {phone_number}")
             messages.error(request, 'حدث خطأ يرجى المحاولة مرة أخرى أو التواصل مع الدعم في حال استمرت المشكلة')
             time.sleep(1)  # تأخير التنفيذ لمدة ثانية
             return redirect('accounts:forget_password')

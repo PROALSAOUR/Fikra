@@ -3,6 +3,9 @@ from django.core.exceptions import ValidationError
 import phonenumbers
 
 
+import logging
+logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
+
 # ======================== Sudo Models =========================================
 # نموذج وهمي لعرض اجمالي عدد المستخدمين
 class UserReports(models.Model):
@@ -33,6 +36,9 @@ class Partners(models.Model):
                 raise ValidationError("رقم الهاتف غير صالح.")
         except phonenumbers.NumberParseException:
             raise ValidationError("يرجى إدخال رقم هاتف صحيح.")
+        except Exception as e:
+            logger.error(f"خطأ بنموذج الشركاء : {e}", exc_info=True)
+            raise ValidationError('حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا')
         return phone_number
     
     def clean(self):
@@ -82,6 +88,9 @@ class Investigator(models.Model):
                 raise ValidationError("رقم الهاتف غير صالح.")
         except phonenumbers.NumberParseException:
             raise ValidationError("يرجى إدخال رقم هاتف صحيح.")
+        except Exception as e:
+            logger.error(f"خطأ بنموذج المستثمرين : {e}", exc_info=True)
+            raise ValidationError('حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا')
         return phone_number
     
     def clean(self):

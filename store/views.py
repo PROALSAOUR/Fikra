@@ -681,7 +681,4 @@ def update_cart_item_qty(request):
 
     return JsonResponse({'error': 'طريقة غير صحيحة، يجب أن تكون POST.'}, status=400)
 # ===================================================
-
- 
-    
     

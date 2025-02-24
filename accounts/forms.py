@@ -40,6 +40,7 @@ class UserSignUpForm(UserCreationForm):
         
         # التحقق مما إذا كان الرقم مسجلاً مسبقًا
         if User.objects.filter(phone_number=phone_number).exists():
+            logger.warning(f"رقم الهاتف {phone_number} مستخدم بالفعل.")
             raise ValidationError("رقم الهاتف مستخدم بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.")
         return phone_number
     

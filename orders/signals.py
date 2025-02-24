@@ -57,7 +57,7 @@ def update_sold_and_stock(sender, instance, **kwargs):
         # إذا كان الطلب جديدًا، لا يوجد حالة سابقة، فنخرج من الدالة
         return
     except Exception as e:
-        logger.error(f"خطأ بدالة تحديث المُبا و المُخزن داخل اشارات الطلب: {e}", exc_info=True)
+        logger.error(f"خطأ بدالة تحديث المُباع و المُخزن داخل اشارات الطلب: {e}", exc_info=True)
         return 
     
     # الدالة تعمل فقط عند تعديل حالة المعالجة الى تمت المعالجة

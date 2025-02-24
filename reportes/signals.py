@@ -4,7 +4,8 @@ from settings.models import Settings
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 import decimal
-
+import logging
+logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
 # ترتيب عمل الاشارات الخاصة بالاحصائيات
 # 1 update_monthly_totals 
 # 2 calc_groups_incomes
@@ -313,6 +314,10 @@ def prevent_received_false(sender, instance, **kwargs):
                 instance.received = True  # استعادة القيمة الأصلية
         except PartnersProfit.DoesNotExist:
             pass 
+        except Exception as e:
+            logger.error(f"خطأ بالإشارات : {e}", exc_info=True)
+            
+        
         
 @receiver(pre_save, sender=InvestigatorProfit)
 def prevent_received_false(sender, instance, **kwargs):
@@ -324,4 +329,5 @@ def prevent_received_false(sender, instance, **kwargs):
                 instance.received = True  # استعادة القيمة الأصلية
         except InvestigatorProfit.DoesNotExist:
             pass 
-
+        except Exception as e:
+            logger.error(f"خطأ بالإشارات : {e}", exc_info=True)

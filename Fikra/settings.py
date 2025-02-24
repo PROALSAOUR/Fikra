@@ -85,7 +85,6 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-
 ROOT_URLCONF = 'Fikra.urls'
 
 TEMPLATES = [
@@ -130,7 +129,71 @@ CACHES = {
     }
 }
 
-
+LOGGING = {
+    "version": 1,  # إصدار الإعدادات (يجب أن يكون 1)
+    "disable_existing_loggers": False,  # لا تعطل الـ loggers الافتراضية
+    "formatters": {  # أنماط تنسيق الرسائل
+        "verbose": {
+            "format": "[{levelname}] {asctime} - {name} - {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "[{levelname}] {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {  # وحدات التعامل مع السجلات
+        "file": {  # حفظ السجلات في ملف
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "logs/debug.log"),
+            "formatter": "verbose",
+        },
+        "console": {  # طباعة السجلات في وحدة التحكم
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "loggers": {  # تعريف الـ loggers
+        "django": {  # سجل Django الأساسي
+            "handlers": ["file", "console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+         "django.security": {
+            "handlers": ["file"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        #  سجلات مخصصة لكل تطبيق
+        "store": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "accounts": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "cards": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "orders": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+        "reportes": {
+            "handlers": ["file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
