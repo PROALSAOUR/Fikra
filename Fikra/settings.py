@@ -143,10 +143,22 @@ LOGGING = {
         },
     },
     "handlers": {  # وحدات التعامل مع السجلات
-        "file": {  # حفظ السجلات في ملف
+        "file": {  # حفظ سجلات التطبيقات في ملف
             "level": "DEBUG",
             "class": "logging.FileHandler",
             "filename": os.path.join(BASE_DIR, "logs/debug.log"),
+            "formatter": "verbose",
+        },
+        "db_file": {  # حفظ سجلات قاعدة البيانات في ملف
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "logs/db.log"),
+            "formatter": "verbose",
+        },
+        "security_file": {  # حفظ سجلات الأمان في ملف
+            "level": "WARNING",
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "logs/security.log"),
             "formatter": "verbose",
         },
         "console": {  # طباعة السجلات في وحدة التحكم
@@ -161,8 +173,13 @@ LOGGING = {
             "level": "DEBUG",
             "propagate": True,
         },
+        "django.db.backends": {  # سجل استعلامات قاعدة البيانات
+            "handlers": ["db_file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
          "django.security": {
-            "handlers": ["file"],
+            "handlers": ["security_file"],
             "level": "WARNING",
             "propagate": False,
         },

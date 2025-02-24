@@ -15,6 +15,7 @@ import time
 
 import logging
 logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
+security_logger = logging.getLogger('django.security') # إنشاء logger للأمان
 
 # دالة صفحة الحساب الرئيسية
 @login_required
@@ -58,9 +59,12 @@ def sign(request):
                 
                 user = authenticate(request, phone_number=phone_number, password=password)
                 if user is not None:
+                    # تسجيل الدخول الناجح
                     login(request, user)
                     return redirect('accounts:account_page')
                 else:
+                    # تسجيل محاولة تسجيل دخول فاشلة
+                    security_logger.warning(f'محاولة تسجيل دخول فاشلة الى حساب: : {user}')
                     messages.error(request, "رقم الهاتف أو كلمة المرور غير صحيحة.")
         
         elif form_type == 'sign':

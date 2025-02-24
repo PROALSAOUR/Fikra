@@ -55,14 +55,14 @@
                                         <td>${{ item.discount_price }}</td>
                                         <td class='replace' data-item-id="{{ item.id }}">
                                             {% if item.status == "confirmed" %}
-                                                <i class="fa-solid fa-repeat {% if order.status != 'canceled' %} replace-clicable {% else %}unclicable{% endif %}"></i>
+                                                <i class="fa-solid fa-repeat {% if order.status != 'canceled' and replace_possibility %} replace-clicable {% else %}unclicable{% endif %}"></i>
                                             {% else %}
                                                 {{ item.get_status_display }}
                                             {% endif %}
                                         </td>
                                         <td class='remove' data-remove-id="{{  item.id }}" data-order-id="{{ order.id }}" >
                                             {% if item.status == "confirmed" %}
-                                                <i class="fa-solid fa-trash {% if order.status != 'canceled' and item.status == "confirmed" %} remove-clicable {% else %}unclicable{% endif %}"></i>
+                                                <i class="fa-solid fa-trash {% if order.status != 'canceled' and return_possibility %} remove-clicable {% else %}unclicable{% endif %}"></i>
                                             {% endif %}
                                         </td>
                                     </tr> 

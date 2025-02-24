@@ -43,7 +43,8 @@ def order_details(request, oid):
         logger.error(f"خطأ بالطلب: {e}", exc_info=True)
         order_dealing = None
     
-
+    replace_possibility = Settings.objects.values_list('replace_possibility', flat=True).first()
+    return_possibility = Settings.objects.values_list("return_possibility", flat=True).first()
     
     # إضافة حقل السعر الإجمالي لكل عنصر
     for item in items:
@@ -79,6 +80,8 @@ def order_details(request, oid):
         'items':items,
         'available_items':available_items,
         'order_dealing':order_dealing,
+        'replace_possibility':replace_possibility,
+        'return_possibility':return_possibility,
     }
     
     return render(request, 'orders/order-details.html', context)   
@@ -158,13 +161,17 @@ def remove_order_item(request):
                 days_since_delivery = (timezone.now() - order.deliverey_date).days
                 # تحقق مما إذا كانت المدة أكبر من عدد أيام الاستبدال القصوى
                 
-                max_replace_days = Settings.objects.values_list('max_return_days', flat=True).first()
-
-                if max_replace_days is None:
-                    max_replace_days = 3  # ثلاث أيام كقيمة افتراضية
+                return_possibility = Settings.objects.values_list("return_possibility", flat=True).first()
+                    
+                if return_possibility == False: # لو المتجر مقفل عمليات الارجاع
+                    return JsonResponse({'success': False, 'error': f"المعذرة، خدمات الإرجاع موقفة حالياً من قبل ادارة المتجر."})
                 
-                if days_since_delivery > max_replace_days:
-                    return JsonResponse({'success': False, 'error': F"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإرجاع و هي {max_replace_days}"})
+                max_return_days = Settings.objects.values_list('max_return_days', flat=True).first()
+                if max_return_days is None:
+                    max_return_days = 3  # ثلاث أيام كقيمة افتراضية
+                
+                if days_since_delivery > max_return_days:
+                    return JsonResponse({'success': False, 'error': F"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإرجاع و هي {max_return_days}"})
                 
             
             order_item = order.order_items.get(id=remove_id)
@@ -262,6 +269,11 @@ def edit_order(request):
                     days_since_delivery = (timezone.now() - order.deliverey_date).days
                     # تحقق مما إذا كانت المدة أكبر من عدد أيام الاستبدال القصوى
                     
+                    replace_possibility = Settings.objects.values_list("replace_possibility", flat=True).first()
+                    
+                    if replace_possibility == False: # لو المتجر مقفل عمليات الاستبدال
+                        return JsonResponse({'success': False, 'error': f"المعذرة، خدمات الاستبدال موقفة حالياً من قبل ادارة المتجر."})
+
                     max_replace_days = Settings.objects.values_list('max_replace_days', flat=True).first()
                     if max_replace_days is None:
                         max_replace_days = 3  # ثلاث أيام كقيمة افتراضية
