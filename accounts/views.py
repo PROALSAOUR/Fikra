@@ -7,11 +7,10 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib.auth.hashers import check_password
 from django.contrib import messages
 from store.models import Product
-from accounts.models import User, Inbox, Message, OTPVerification
+from accounts.models import *
 from accounts.utils import send_otp_via_whatsapp, format_phone_number
 from django.core.exceptions import ValidationError
 import phonenumbers
-import time
 
 import logging
 logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
@@ -128,7 +127,7 @@ def verify_otp(request):
                     otp_instance.delete()# حذف الكود من قاعدة البيانات
                     del request.session['otp_id']  # حذف الكود من الجلسة
                     messages.success(request, "تم التحقق بنجاح!")
-                    return redirect("store:home")
+                    return redirect("accounts:choose-city")
                 else:
                     otp_instance.attempts += 1
                     otp_instance.save()
@@ -144,7 +143,6 @@ def verify_otp(request):
                 return redirect("accounts:sign")
         else:
             messages.error(request, "المعذرة يبدو انه قد حصل خطأ اثناء توليد رمز التحقق الخاص بك , حاول مرة اخرى لاحقا")
-            time.sleep(1)
             return redirect("accounts:sign")
 
     return render(request, "accounts/verify_otp.html")
@@ -154,6 +152,7 @@ def account_info(request):
     user = request.user
     user_name = str(user.first_name + ' ' + user.last_name)
     phone_number = user.phone_number
+    city = user.profile.city
     
     inbox = get_object_or_404(Inbox, user=user)
     messages = inbox.messages.all().order_by('is_read', '-timestamp')[:15]
@@ -161,6 +160,7 @@ def account_info(request):
     context  = {
         'user_name': user_name,
         'phone_number': phone_number,
+        'city': city,
         'messages': messages,
     }
     return render(request, 'accounts/account-info.html', context)
@@ -268,7 +268,6 @@ def verify_forget_password(request):
                     otp_instance.save()
                     if otp_instance.attempts >= 3:
                         messages.error(request, "لقد تجاوزت الحد الأقصى للمحاولات.")
-                        time.sleep(1)
                         return redirect("accounts:edit-password")
                     else:
                         messages.error(request, "رمز التحقق غير صحيح، حاول مرة أخرى.")
@@ -276,11 +275,9 @@ def verify_forget_password(request):
                 otp_instance.delete()  # حذف الكود إذا لم يكن صالحًا
                 del request.session['otp_id']  # حذف الـ OTP المخزن بالجلسة
                 messages.error(request, "رمز التحقق انتهت صلاحيته. حاول من جديد.")
-                time.sleep(1)
                 return redirect("accounts:edit-password")
         else:
             messages.error(request, "المعذرة يبدو انه قد حصل خطأ اثناء توليد رمز التحقق الخاص بك , حاول مرة اخرى لاحقا")
-            time.sleep(1)
             return redirect("accounts:edit-password")
 
     return render(request, 'accounts/verify_forget_password.html')
@@ -315,7 +312,6 @@ def reset_password(request):
         if not phone_number:
             logger.warning("رقم الهاتف غير موجود في الجلسة.")
             messages.error(request, 'رقم الهاتف يحتوي على خطأ')
-            time.sleep(1) # اخر تنفيذ التحويل لمدة ثانية
             return redirect('accounts:forget_password') 
         
         try:
@@ -323,7 +319,6 @@ def reset_password(request):
         except User.DoesNotExist:
             logger.error(f"لم يتم العثور على المستخدم برقم الهاتف: {phone_number}")
             messages.error(request, 'حدث خطأ يرجى المحاولة مرة أخرى أو التواصل مع الدعم في حال استمرت المشكلة')
-            time.sleep(1)  # تأخير التنفيذ لمدة ثانية
             return redirect('accounts:forget_password')
         except Exception as e:
             logger.error(f"خطأ ب: {e}", exc_info=True)
@@ -341,7 +336,6 @@ def reset_password(request):
                 update_session_auth_hash(request, request.user)  # الحفاظ على الجلسة
                 request.user.save()
                 messages.success(request, 'تم تحديث كلمة المرور بنجاح.')
-                time.sleep(1) # اخر تنفيذ التحويل لمدة ثانية
                 return redirect('accounts:account_info')
             else: # لو المستخدم عم يغير كلمة السر وهو مو مسجل, غيرها بعدين خليه يسجل دخول على حسابه
                 user.set_password(password1)
@@ -386,10 +380,36 @@ def edit_name(request):
 
     return render(request, 'accounts/edit-name.html', context)
 # =============================================================
-
-
-
-
-
+# دالة اختيار المدينة
+@login_required
+def choose_city(request):
+    context = {}
+    user = request.user
+    user_city = user.profile.city if user.profile.city else None
+    
+    if request.method == 'POST':
+        selected_city_name = request.POST.get('city')  # الحصول على المدينة المختارة
+        if selected_city_name:
+            try:
+                # البحث عن المدينة باستخدام الاسم
+                selected_city = City.objects.get(name=selected_city_name)
+                user.profile.city = selected_city  # تعيين كائن City
+                user.profile.save()
+                messages.success(request, 'تم تحديث المدينة الحالية بنجاح')
+                return redirect('accounts:account_info')
+            except City.DoesNotExist:
+                messages.error(request, 'المدينة غير موجودة.')
+            except Exception as e :
+                logger.error(f"خطأ بالبحث عن المدينة: {e}", exc_info=True)
+                messages.error(request, 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقاً')
+                return redirect('accounts:choose_city') 
+    else:
+        cites = City.objects.all()
+        context = {
+            'user_city': user_city,
+            'cites': cites,
+        }
+        
+    return render(request, 'accounts/choose-city.html', context)
 
 

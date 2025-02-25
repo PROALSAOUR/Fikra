@@ -40,7 +40,10 @@
                         <div class="title"><p>رقم الهاتف</p></div>
                         <div class="content">{{ phone_number }}</div>
                     </div>
-                    
+                    <div class="details-item">
+                        <div class="title"><p>المدينة</p><a href="{% url "accounts:choose-city" %}"><i class="fa-solid fa-pen"></i></a></div>
+                        <div class="content">{% if city %}{{ city }}{% else %}---{% endif %}</div>
+                    </div>
                 </div>
                 <div class="notfication-section" id="notfications">
                     <h2>التنبيهات</h2>

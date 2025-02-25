@@ -14,7 +14,7 @@ class Order(models.Model):
         ('canceled', 'تم الإلغاء'),
     ]
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders' , verbose_name='المستخدم')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders' , verbose_name='المستخدم')
     serial_number = models.IntegerField(unique=True, verbose_name='الرقم التسلسلي')
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending' , verbose_name='الحالة')
     old_total = models.IntegerField(verbose_name='الإجمالي القديم')
@@ -51,7 +51,8 @@ class Order(models.Model):
         super().save(*args, **kwargs)  # استدعاء دالة الحفظ الأساسية
 
     def __str__(self):
-        return f"طلب رقم [{self.serial_number}] من [{self.user.phone_number}]"
+        user_display = self.user.phone_number if self.user else "مستخدم محذوف"
+        return f"طلب رقم [{self.serial_number}] من [{user_display}]"
 
     class Meta:
         verbose_name = 'طلب '

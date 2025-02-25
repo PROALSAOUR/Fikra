@@ -51,7 +51,7 @@ class OrderDealingInline(admin.TabularInline):
     get_not_dealt_items_number.short_description = "المتبقية"
     
 class MyOrdersAdmin(admin.ModelAdmin):
-    list_display = ('serial_number', 'user', 'total_price', 'colored_status',  'order_date',)
+    list_display = ('serial_number', 'get_user', 'total_price', 'colored_status',  'order_date',)
     search_fields = ('serial_number', 'user__phone_number',)
     list_filter = ('status', 'user__phone_number',)
     ordering = ('-order_date', '-updated_at',)
@@ -64,6 +64,10 @@ class MyOrdersAdmin(admin.ModelAdmin):
         if obj and obj.status == 'canceled':
             return self.readonly_fields + ('status',)
         return self.readonly_fields
+    
+    def get_user(self,obj):
+        return obj.user if obj.user else "مستخدم محذوف"
+    get_user.short_description = "المستخدم"
     
     def colored_status(self, obj):
         """إرجاع الحالة مع تلوين خاص بناءً على القيمة."""

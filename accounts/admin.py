@@ -41,7 +41,7 @@ class MessageAdmin(admin.ModelAdmin):
         return qs.filter(sent_to_all=True)
     
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'points')
+    list_display = ('user', 'city', 'points')
     search_fields = ('user__phone_number','user__first_name','user__last_name',)
 
 class PointsUsageAdmin(admin.ModelAdmin):
@@ -50,7 +50,6 @@ class PointsUsageAdmin(admin.ModelAdmin):
     list_filter = ('user_profile__user',)
     exclude = ['created_at', 'old_points',]
     readonly_fields = ['user_profile', 'old_points', 'new_points', 'created_at',]    # تحديد الحقول التي لا يمكن تعديلها
-    
     
     def get_difference(self, obj):
         '''
@@ -63,17 +62,21 @@ class PointsUsageAdmin(admin.ModelAdmin):
             return format_html('<span style="color: red;">{}</span>', difference)
     get_difference.short_description = 'الفارق' 
     
-    def has_delete_permission(self, request, obj=None):
-        """منع حذف سجلات النقاط من لوحة الإدارة"""
-        return False
     
     def has_add_permission(self, request):
         return False  # يمنع إضافة كائنات جديدة من لوحة الإدارة
 
-
+class CityAdmin(admin.ModelAdmin):
+    list_display = ('name', 'get_user_counts')
+    search_fields = ('name', )
+    
+    def get_user_counts(self, obj):
+        return obj.calc_accounts()
+    get_user_counts.short_description = 'عدد المستخدمين بالمدينة' 
 
 admin.site.register(User, UserAdmin)
 admin.site.register(UserProfile, ProfileAdmin)
 admin.site.register(Message, MessageAdmin)
 admin.site.register(Inbox, InboxAdmin)
+admin.site.register(City, CityAdmin)
 admin.site.register(PointsUsage, PointsUsageAdmin)

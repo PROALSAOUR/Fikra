@@ -1,0 +1,43 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div style="position: relative; padding-top:20px;">
+    <div class="choose-city-card">
+
+        <form method="POST">
+            {% csrf_token %}
+            {% if messages %}
+                {% for message in messages %}
+                    {% if 'success' in message.tags %}
+                        <div class="error-messages" style="background-color: #74a432 !important;">
+                            {{ message }} 
+                        </div>
+                    {% else %}
+                        <div class="error-messages">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <label for="city">يرجى اختيار المدينة:</label>
+        
+            <select name="city" id="city" required>
+                {% if user_city %}
+                    <option value="{{user_city}}">{{user_city}}</option> <!-- خيار افتراضي مدينة المستخدم المختارة سابقا -->
+                {% else %}
+                    <option value="">اختر مدينة</option> <!-- خيار افتراضي فارغ -->
+                {% endif %}
+                {% for city in cites %}
+                    <option value={{ city.name }}>{{ city.name }}</option>
+                {% endfor %}
+            </select>  
+            <button type="submit">إرسال</button>    
+        </form>
+        
+
+    </div>           
+</div>         
+
+{% endblock content %}

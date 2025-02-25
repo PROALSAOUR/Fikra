@@ -109,11 +109,25 @@ class Inbox(models.Model):
     class Meta:
         verbose_name = 'البريد'
         verbose_name_plural = 'البريد'
+            
+class City(models.Model):
+    name = models.CharField(max_length=100, verbose_name='اسم المدينة')
+    
+    def __str__(self):
+        return f"{self.name}"
+    
+    def calc_accounts(self):
+        return self.profile_city.count()
+    
+    class Meta:
+        verbose_name = 'مدينة'
+        verbose_name_plural = 'مدن'
     
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile' , verbose_name='المستخدم')
     points = models.IntegerField(default=0, verbose_name='الرصيد')
     inbox = models.OneToOneField(Inbox, on_delete=models.CASCADE, verbose_name='البريد')
+    city = models.ForeignKey(City, on_delete=models.SET_NULL,  related_name='profile_city', blank=True, null=True, verbose_name='المدينة')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الإنشاء')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')
 
@@ -138,4 +152,3 @@ class PointsUsage(models.Model): # تتبع النقاط
     class Meta:
         verbose_name = 'سجل نقاط'
         verbose_name_plural = 'سجلات النقاط'
-        
