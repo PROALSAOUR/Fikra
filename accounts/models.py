@@ -139,5 +139,3 @@ class PointsUsage(models.Model): # تتبع النقاط
         verbose_name = 'سجل نقاط'
         verbose_name_plural = 'سجلات النقاط'
         
-
-           

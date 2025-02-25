@@ -77,6 +77,24 @@
             </div> 
     </section>
     <!-- End Offer Products Section -->
+    <!-- Start Best sales Products Section -->
+    <hr class="sep">
+    <section  id="products">
+            <a href="{% url "store:best-sales" %}" aria-label="استعرض المنتجات الأعلى مبيعاً">
+                <div class="title">
+                    <h2>المنتجات الأعلى مبيعاً</h2>
+                    <i class="fa-solid fa-angles-left"></i>
+                </div>
+            </a>  
+            <div class="swiper products-slider">
+                <div class="swiper-wrapper">
+                    {% for product in best_sales_products %}
+                        {% include "common/product-card.html" %}
+                    {% endfor %}
+                </div>
+            </div> 
+    </section>
+    <!-- End Best sales Products Section -->
     {% for category in categories %}
     <!-- Start Products Section -->
         <hr class="sep">

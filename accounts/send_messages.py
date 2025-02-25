@@ -1,6 +1,6 @@
 from django.utils import timezone
 from accounts.models import Message
-
+from settings.models import Settings
 
 def copon_expire_after_3_dayes(user_name, copon_name):
     """ نص رسالة متبقي 3 ايام على انتهاء صلاحية الكوبون"""
@@ -117,7 +117,7 @@ def create_order_message(user_name, order):
         content= 
         f"""
         مرحبا {user_name} 
-        لقد تم انشاء الطلب ({str(order).zfill(6)}) بنجاح, سوف نقوم بإرساله اليك خلال مدة لا تتجاوز ال 3 أيام.\n 
+        لقد تم انشاء الطلب ({str(order).zfill(6)}) بنجاح, سوف نقوم بإرساله اليك خلال مدة لا تتجاوز ال {Settings.expected_days} أيام.\n 
         في حال كان لديك اي استفسار يرجى التواصل مع خدمة العملاء وسوف يتم الرد عليك بأسرع وقت ممكن\n
         نرجو لك وقتا سعيداً.
         """,

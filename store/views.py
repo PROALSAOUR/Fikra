@@ -42,7 +42,9 @@ def index(request):
         products__ready_to_sale=True,
     ).distinct()[:8]
     
-    offered_products = Product.objects.filter(offer=True)[:8].prefetch_related('items__variations') # تحميل العناصر ومتغيراتها دفعة واحدة
+    offered_products = Product.objects.filter(ready_to_sale=True, offer=True).prefetch_related('items__variations')[:8] # تحميل العناصر ومتغيراتها دفعة واحدة
+    
+    best_sales_products = Product.objects.filter(ready_to_sale=True, total_sales__gt=0).prefetch_related('items__variations').order_by('-total_sales')[:8]
     
     context = {
         'ads': ads,
@@ -50,6 +52,7 @@ def index(request):
         'user_name': user_name,
         'categories': categories,
         'offered_products':offered_products,
+        'best_sales_products':best_sales_products,
     }
     
     return render(request, 'store/index.html', context)
@@ -297,7 +300,6 @@ def best_sales(request):
         'products_count': products_count,
     }
     return render(request, 'store/best-sales.html', context)
-
 # ===================================================
 # صفحة البحث
 def search_page(request):

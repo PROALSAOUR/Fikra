@@ -103,6 +103,9 @@ def cancel_order(request):
             else:
                 if order.status == 'canceled' :
                     return JsonResponse({'success': False, 'error': 'هذا الطلب تم إلغائه مسبقا بالفعل'})
+                # سوف يتم اقفال امكانية تعديل الطلب مؤقتا عندما يكون جاري شحنه
+                elif order.status == 'shipped':
+                    return JsonResponse({'success': False, 'error': "نعتذر لا يمكن إلغاء الطلب من الموقع بعد قيامنا بشحنه إليك، اذا كنت مصراً على إلغاء الطلب رجاءً قم بالتواصل مع خدمة الدعم"})
                 elif order.status == 'delivered' :
                     return JsonResponse({'success': False, 'error': 'هذا الطلب تم تسليمه اليك بالفعل ولا يمكن إلغائه الأن'})
                 else:
@@ -156,6 +159,9 @@ def remove_order_item(request):
             order = Order.objects.get(id=order_id, user=user)
             if order.status == 'canceled':
                 return JsonResponse({'success': False, 'error': "نعتذر. لا يمكن تعديل الطلبات التي تم إلغاؤها"})
+            # سوف يتم اقفال امكانية تعديل الطلب مؤقتا عندما يكون جاري شحنه
+            if order.status == 'shipped':
+                return JsonResponse({'success': False, 'error': "نعتذر لا يمكن تعديل الطلب أثناء قيامنا بشحنه إليك، رجاء قم بإعادة محاولة التعديل بعد استلامك للطلب"})
             if order.status == 'delivered' and order.deliverey_date:
                 # احسب الفرق بين التاريخ الحالي وتاريخ التسليم
                 days_since_delivery = (timezone.now() - order.deliverey_date).days
@@ -219,9 +225,9 @@ def remove_order_item(request):
             inbox.save()            
                 
             # تعديل حالة الطلب الى ملغي ان لم يتبقى عناصر داخله 
-            #  يعمل فقط اذا كانت حالة الطلب جاري المعالجة او التجهيز او الشحن
+            #  يعمل فقط اذا كانت حالة الطلب جاري المعالجة او التجهيز 
             # ان كانت الحالة مسلم  يتم التعامل منها عبر السيجنال وليس من هنا
-            if not order.order_items.exists() and (order.status == 'pending' or order.status == 'checking' or order.status == 'shipped' ):
+            if not order.order_items.exists() and (order.status == 'pending' or order.status == 'checking' ):
                 order.status = 'canceled'
                 order.save()
 
@@ -264,6 +270,9 @@ def edit_order(request):
                 order = Order.objects.get(id=order_id, user=user)
                 if order.status == 'canceled':
                     return JsonResponse({'success': False, 'error': "نعتذر. لا يمكن تعديل الطلبات التي تم إلغاؤها"})
+                # سوف يتم اقفال امكانية تعديل الطلب مؤقتا عندما يكون جاري شحنه
+                if order.status == 'shipped':
+                    return JsonResponse({'success': False, 'error': "نعتذر لا يمكن تعديل الطلب أثناء شحنه إليك، رجاء قم بإعادة محاولة التعديل بعد استلام الطلب"})
                 if order.status == 'delivered' and order.deliverey_date:
                     # احسب الفرق بين التاريخ الحالي وتاريخ التسليم
                     days_since_delivery = (timezone.now() - order.deliverey_date).days
@@ -280,7 +289,7 @@ def edit_order(request):
                     
                     if days_since_delivery > max_replace_days:
                         return JsonResponse({'success': False, 'error': f"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإستبدال و هي {max_replace_days}"})
-               
+                    
                 try:
                     # الحصول على عنصر الطلب المراد استبداله
                     item = order.order_items.get(id=replace_item_id)
@@ -449,6 +458,8 @@ def create_order(request):
             except Exception as e:
                 logger.error(f"خطأ أثناء انشاء طلب تحديدا عند جزئية كوبون الخصم: {e}", exc_info=True)
                 return JsonResponse({'success': False, 'error': 'حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا'})
+        else:
+            used_discount = 0 # عند عدم استعمال خصم فإن قيمة الخصم المستعمل تساوي صفر
 
         # ========  الاستعلام عما ان كان التوصيل مجاني ==========
         
