@@ -465,6 +465,7 @@ def create_order(request):
         
         settings =  Settings.get_settings()
         delivery = settings.free_delivery
+        city = user.profile.city.name if user.profile.city  else 'غير محددة'
         
         # إنشاء الطلب
         order = Order.objects.create(
@@ -474,6 +475,7 @@ def create_order(request):
             total_points=total_bonus,
             copon_value=copon_value,
             free_delivery = delivery,
+            city=city,
         )
         
         # إنشاء عناصر الطلب

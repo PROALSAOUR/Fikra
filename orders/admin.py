@@ -53,10 +53,10 @@ class OrderDealingInline(admin.TabularInline):
 class MyOrdersAdmin(admin.ModelAdmin):
     list_display = ('serial_number', 'get_user', 'total_price', 'colored_status',  'order_date',)
     search_fields = ('serial_number', 'user__phone_number',)
-    list_filter = ('status', 'user__phone_number',)
+    list_filter = ('status', 'user__phone_number', 'city',)
     ordering = ('-order_date', '-updated_at',)
-    readonly_fields = ( 'user', 'serial_number', 'old_total', 'used_discount', 'copon_value', 'total_price', 'total_points', 'free_delivery', 'order_date', 'deliverey_date', )
-    exclude = ('with_message',)
+    fields = ( 'user', 'serial_number',  'old_total', 'used_discount', 'total_price', 'copon_value', 'total_points', 'free_delivery', 'city', 'neighborhood', 'order_date', 'deliverey_date', )
+    readonly_fields = ( 'user', 'serial_number',  'old_total', 'used_discount', 'total_price', 'copon_value', 'total_points', 'free_delivery', 'order_date', 'deliverey_date', )
     inlines = [OrderItemInline, OrderDealingInline] 
     
     def get_readonly_fields(self, request, obj=None):

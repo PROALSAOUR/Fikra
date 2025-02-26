@@ -23,6 +23,8 @@ class Order(models.Model):
     copon_value = models.IntegerField(default=0, verbose_name='قيمة الكوبون')
     used_discount = models.IntegerField(default=0, verbose_name='الخصم المستعمل')
     free_delivery =  models.BooleanField(default=False, verbose_name='توصيل مجاني؟' )
+    city = models.CharField(max_length=100, verbose_name='المدينة', blank=True, null=True)
+    neighborhood = models.CharField(max_length=100, verbose_name=' الحي', blank=True, null=True)
     order_date = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الطلب')
     deliverey_date = models.DateTimeField(null=True, blank=True, verbose_name='تاريخ التسليم')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')
