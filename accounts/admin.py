@@ -74,9 +74,18 @@ class CityAdmin(admin.ModelAdmin):
         return obj.calc_accounts()
     get_user_counts.short_description = 'عدد المستخدمين بالمدينة' 
 
+class BannedAdmin(admin.ModelAdmin):
+    list_display = ('get_user', 'phone_number', 'updated_at')
+    search_fields = ('user__phone_number','user__first_name', 'user__last_name',)
+    
+    def get_user(self, obj):         
+        return obj.user if obj.user else "مستخدم محذوف"
+    get_user.short_description = 'المستخدم'  
+
 admin.site.register(User, UserAdmin)
 admin.site.register(UserProfile, ProfileAdmin)
 admin.site.register(Message, MessageAdmin)
 admin.site.register(Inbox, InboxAdmin)
 admin.site.register(City, CityAdmin)
 admin.site.register(PointsUsage, PointsUsageAdmin)
+admin.site.register(Banned_users, BannedAdmin)

@@ -8,7 +8,7 @@ from orders.models import *
 from cards.models import CoponItem
 from settings.models import Settings
 from store.models import Cart
-from accounts.models import UserProfile
+from accounts.models import UserProfile, Banned_users
 from django.utils import timezone
 from accounts.send_messages import create_order_message, cancel_order_message, edit_order_message, return_order_item_message
 import logging
@@ -412,8 +412,16 @@ def create_order(request):
         total_price = 0
         total_bonus = 0
         available_items = []
+        
+        # التحقق مما إذا كان المستخدم محظورًا عبر حسابه أو رقم هاتفه
+        is_banned = Banned_users.objects.filter(user=user).exists() or \
+                    Banned_users.objects.filter(phone_number=user.phone_number).exists()
+        
+        if is_banned:
+            return JsonResponse({'error': 'المعذرة لا يمكنك اجراء اي طلبات، حسابك أو رقم هاتفك محظور'}, status=403)
 
         try:
+            
             cart = Cart.objects.get(user=user)
             cart_items = cart.items.prefetch_related('cart_item__product_item__variations').select_related('cart_item__product_item__product')
 

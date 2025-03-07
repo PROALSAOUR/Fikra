@@ -19,8 +19,8 @@ def distribute_profits():
         previous_month = 12  # في حال كان الشهر الحالي يناير
         year = datetime.now().year - 1
         
-    # التأكد من مضي 7 أيام على الشهر الجديد
-    if datetime.now().day >= 7:
+    # التأكد من مضي 15 أيام على الشهر الجديد
+    if datetime.now().day >= 15:
         # منطق توزيع الأرباح
 
         month_statis = MonthlyTotal.objects.get(month=previous_month, year=year)

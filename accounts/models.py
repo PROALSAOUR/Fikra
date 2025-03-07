@@ -152,3 +152,19 @@ class PointsUsage(models.Model): # تتبع النقاط
     class Meta:
         verbose_name = 'سجل نقاط'
         verbose_name_plural = 'سجلات النقاط'
+
+class Banned_users(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='banned_users', null=True, verbose_name='المستخدم')
+    phone_number = models.CharField(max_length=20, verbose_name='رقم الهاتف' )
+    details = models.TextField(verbose_name='سبب الحظر')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الإنشاء')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')
+    
+    def __str__(self):
+        return f"سجل الحظر الخاص ب{self.user}"
+         
+    class Meta:
+        verbose_name = 'سجل حظر'
+        verbose_name_plural = 'سجلات الحظر'
+
+    

@@ -23,7 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-1beap&sr&$u*8tst9amg9)4o6*^&3_rlo-l-==nnb$azpv6p5&'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', ]
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '82.29.180.27', 'fikra-store.shop', 'www.fikra-store.shop']
+
 
 
 # Application definition
@@ -66,7 +67,7 @@ MIDDLEWARE = [
 ]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # اجعل هذا False في بيئة الإنتاج
+DEBUG = False  # اجعل هذا False في بيئة الإنتاج
 
 if DEBUG:
     INSTALLED_APPS += ['debug_toolbar']
@@ -114,11 +115,11 @@ WSGI_APPLICATION = 'Fikra.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'FikraDatabase',
-        "USER": "postgres",
-        "PASSWORD": "saour",
-        "HOST": "localhost",
-        "PORT": "",
+        'NAME': 'fikra_store_db',
+        "USER": "store_user",
+        "PASSWORD": "Fikradb123store",
+        "HOST": "82.29.180.27",
+        "PORT": "5432",
     }
 }
 
@@ -246,11 +247,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
@@ -259,7 +260,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'accounts:sign'  #  تخصيص صفحة تسجيل الدخول
-
 
 
 
@@ -324,7 +324,7 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'distribute-profits-every-7th-day-of-month': {
         'task': 'reportes.tasks.distribute_profits',
-        'schedule': crontab(day_of_month='7'),  # في اليوم السابع من كل شهر
+        'schedule': crontab(day_of_month='15'),  # في اليوم 15 من كل شهر
     },
     'check-copon-expire-every-day': {
         'task': 'cards.tasks.check_expire',
@@ -381,8 +381,7 @@ PWA_APP_SPLASH_SCREEN = [
 # ===================================================================
 # الية ارسال رسائل التحقق 
 
-TWILIO_ACCOUNT_SID = "AC94270af676cdd6ff11e65657828c7cb4"
-TWILIO_AUTH_TOKEN = "f4232d996d7ac6d7e5ebe83123f01691"
-TWILIO_WHATSAPP_NUMBER = "whatsapp:+14155238886" # الرقم المقدم من Twilio
-
-
+TWILIO_ACCOUNT_SID = "AC200e05d17d57d421bb92749b61f6b066"
+TWILIO_AUTH_TOKEN = "8008619ef764a8fe2642dcdb93dd4f51"
+TWILIO_TEMPLATE_SID = "HX733e19494218efb70a37264db95cb199"
+TWILIO_WHATSAPP_NUMBER = "+218923898325" 

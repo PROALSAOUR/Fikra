@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from accounts.models import *
-from accounts.send_messages import wellcome_new_user
+from accounts.send_messages import wellcome_new_user, user_got_blocked
 
 
 @receiver(post_save, sender=User)
@@ -37,3 +37,17 @@ def track_user_profile_points_change(sender, instance,  **kwargs):
             )
 
 
+@receiver(post_save, sender=Banned_users)
+def tell_user_he_is_blocked(sender, instance, created, **kwargs):
+    if created:  # يتم تنفيذ الكود فقط إذا تم إنشاء سجل حظر جديد
+       
+        user = instance.user
+        
+        user_profile = UserProfile.objects.get(user=instance.user)
+        user_inbox = user_profile.inbox  # الحصول على صندوق الوارد الخاص بالمستخدم
+
+        # إنشاء رسالة جديدة وإضافتها إلى صندوق الوارد
+        message = user_got_blocked(user_name=user.first_name)
+        message.save()
+        user_inbox.add_message(message)
+        user_inbox.save()  # حفظ تحديثات صندوق الوارد

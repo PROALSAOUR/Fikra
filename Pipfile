@@ -15,6 +15,7 @@ celery = "*"
 redis = "*"
 django-pwa = "*"
 twilio = "*"
+gunicorn = "*"
 
 [dev-packages]
 

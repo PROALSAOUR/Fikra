@@ -17,7 +17,7 @@ def copon_expire_after_3_dayes(user_name, copon_name):
     message.save()
     return message 
 
-def copon_expire_today(user_name, copon_name):
+def copon_expired_today(user_name, copon_name):
     """نص رسالة انتهاء صلاحية الكوبون"""
     
     message = Message(
@@ -174,8 +174,22 @@ def return_order_item_message(user_name, order):
     message.save()
     return message
     
-
-
+def user_got_blocked(user_name):
+    """الرسالة التي ترسل عند حظر مستخدم """
+    message = Message(
+        subject= f'تم حظر حسابك!',
+        content= 
+        f"""
+        مرحبا {user_name} 
+        لقد لاحظنا قيامك ببعض النشاطات المخالفة لسياسات متجرنا لذا اضطررنا لتقييد حسابك،
+        في حال كنت تعتقد انك لم تقم بأي مخالفات يرجى التواصل مع خدمة العملاء وسوف يتم مراجعة نشاطات حسابك \n
+        نرجو لك وقتا سعيداً.
+        """,
+        timestamp=timezone.now()
+    )
+    message.save()
+    return message
+    
 
 
 
