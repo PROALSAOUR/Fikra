@@ -14,7 +14,7 @@ class CoponAdmin(admin.ModelAdmin):
     get_value_display.short_description = 'القيمة' # عنوان العمود في الواجهة
     
     def get_price_display(self, obj):
-        return f"{obj.value} points"
+        return f"{obj.price} points"
     get_price_display.short_description = 'السعر' # عنوان العمود في الواجهة
         
 class CoponItemAdmin(admin.ModelAdmin):

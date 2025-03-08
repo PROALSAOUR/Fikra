@@ -20,11 +20,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1beap&sr&$u*8tst9amg9)4o6*^&3_rlo-l-==nnb$azpv6p5&'
+with open(os.path.join(BASE_DIR, 'secret_key.txt')) as f:
+    SECRET_KEY = f.read().strip()
+    
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '82.29.180.27', 'fikra-store.shop', 'www.fikra-store.shop']
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','82.29.180.27', 'fikra-store.shop', 'www.fikra-store.shop']
 
 
 # Application definition
@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-        
     # مهام مجدولة
     'django_celery_beat',
     
@@ -67,10 +66,10 @@ MIDDLEWARE = [
 ]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  # اجعل هذا False في بيئة الإنتاج
+DEBUG = True  # اجعل هذا False في بيئة الإنتاج
 
 if DEBUG:
-    INSTALLED_APPS += ['debug_toolbar']
+    INSTALLED_APPS += ['debug_toolbar', ]
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
     DEBUG_TOOLBAR_CONFIG = {
@@ -385,3 +384,14 @@ TWILIO_ACCOUNT_SID = "AC200e05d17d57d421bb92749b61f6b066"
 TWILIO_AUTH_TOKEN = "8008619ef764a8fe2642dcdb93dd4f51"
 TWILIO_TEMPLATE_SID = "HX733e19494218efb70a37264db95cb199"
 TWILIO_WHATSAPP_NUMBER = "+218923898325" 
+
+
+#  HTTPS SETTINGS
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
+# SECURE_SSL_REDIRECT = True
+
+# # HSTS SETTINGS 
+# SECURE_HSTS_SECONDS = 31536000 # 1 YEAR
+# SECURE_HSTS_PRELOAD = True
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True

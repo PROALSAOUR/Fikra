@@ -15,5 +15,4 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # اكتشاف المهام (tasks) تلقائيًا من جميع التطبيقات المسجلة
 app.autodiscover_tasks()
 
-# إضافة هذا الإعداد ضمن إعدادات Celery
 app.conf.broker_connection_retry_on_startup = True

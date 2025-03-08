@@ -53,6 +53,9 @@ def globals(request):
         except Category.DoesNotExist:
             men_category = None
             men_categories = None
+    else:
+        men_categories = cache.get('men_categories')
+        
     # تحقق من وجود women_category في الكاش
     women_category = cache.get('women_category')
     if not women_category:
@@ -69,7 +72,8 @@ def globals(request):
         except Category.DoesNotExist:
             women_category = None
             women_categories = None
-    
+    else:
+        women_categories = cache.get('women_categories')
     
     if user.is_authenticated:
         
