@@ -77,18 +77,21 @@ def brand_page(request, slug):
     # تطبيق Paginator على جميع منتجات العلامة التجارية
     all_brand_products_list = Product.objects.filter(brand=brand).prefetch_related('items__variations')
     
-    paginator_all = Paginator(all_brand_products_list, 12)  # 12 منتجًا لكل صفحة
+    if all_brand_products_list.exists():
+        paginator_all = Paginator(all_brand_products_list, 12)  # 12 منتجًا لكل صفحة
 
-    page_all = request.GET.get('page_all', 1)
-    try:
-        all_brand_products = paginator_all.page(page_all)
-    except PageNotAnInteger:
-        all_brand_products = paginator_all.page(1)
-    except EmptyPage:
-        all_brand_products = paginator_all.page(paginator_all.num_pages)
-    except Exception as e:
-        logger.error(f"خطأ بدالة البراند داخل المتجر: {e}", exc_info=True)
-                
+        page_all = request.GET.get('page_all', 1)
+        try:
+            all_brand_products = paginator_all.page(page_all)
+        except (PageNotAnInteger, ValueError):
+            all_brand_products = paginator_all.page(1)
+        except EmptyPage:
+            all_brand_products = paginator_all.page(paginator_all.num_pages)
+        except Exception as e:
+            logger.error(f"خطأ بدالة البراند داخل المتجر: {e}", exc_info=True)
+            all_brand_products = paginator_all.page(1)  # توفير قيمة افتراضية عند أي خطأ غير متوقع
+    else:
+        all_brand_products = []    
     # ===========================================================
     # إضافة فلترة أخرى بناءً على معايير المستخدم (البحث، السعر، العلامة التجارية)
     query = request.GET.get('q', '')
@@ -128,17 +131,20 @@ def brand_page(request, slug):
     results = Product.objects.filter(filters).prefetch_related('items__variations').distinct()
     
     # إعداد التصفح المرقم
-    paginator = Paginator(results, 20)  # عرض 20 منتجًا في كل صفحة
-    page = request.GET.get('page', 1)
-
-    try:
-        products = paginator.page(page)
-    except PageNotAnInteger:
-        products = paginator.page(1)
-    except EmptyPage:
-        products = paginator.page(paginator.num_pages)
-    except Exception as e:
-        logger.error(f"خطأ بدالة البراند داخل المتجر: {e}", exc_info=True)
+    if results.exists():
+        paginator = Paginator(results, 20)  # عرض 20 منتجًا في كل صفحة
+        page = request.GET.get('page', 1)
+        try:
+            products = paginator.page(page)
+        except (PageNotAnInteger, ValueError):
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
+        except Exception as e:
+            logger.error(f"خطأ بدالة البراند داخل المتجر: {e}", exc_info=True)
+            products = paginator.page(1)        
+    else:
+        products = []
 
     # البيانات الإضافية للعرض
     
@@ -218,17 +224,21 @@ def category_page(request, slug):
     results = Product.objects.filter(filters).prefetch_related('items__variations').distinct()
     
     # إعداد التصفح المرقم
-    paginator = Paginator(results, 20)  # عرض 20 منتجًا في كل صفحة
-    page = request.GET.get('page', 1)
+    if results.exists():
+        paginator = Paginator(results, 20)  # عرض 20 منتجًا في كل صفحة
+        page = request.GET.get('page', 1)
 
-    try:
-        products = paginator.page(page)
-    except PageNotAnInteger:
-        products = paginator.page(1)
-    except EmptyPage:
-        products = paginator.page(paginator.num_pages)
-    except Exception as e:
-        logger.error(f"خطأ بدالة التصنيف داخل المتجر: {e}", exc_info=True)
+        try:
+            products = paginator.page(page)
+        except (PageNotAnInteger, ValueError):
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
+        except Exception as e:
+            logger.error(f"خطأ بدالة التصنيف داخل المتجر: {e}", exc_info=True)
+            products = paginator.page(1)
+    else:
+        products = []
 
     # البيانات الإضافية للعرض
     brands = Brand.objects.all()
@@ -250,17 +260,21 @@ def offer_page(request):
     products = Product.objects.filter(offer=True, ready_to_sale=True).prefetch_related( 'items__variations').order_by('-new_price')
     products_count = products.count()
     
-    paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
-    page = request.GET.get('page', 1)
+    if products.exists():
+        paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
+        page = request.GET.get('page', 1)
 
-    try:
-        offerd_products = paginator.page(page)
-    except PageNotAnInteger:
-        offerd_products = paginator.page(1)
-    except EmptyPage:
-        offerd_products = paginator.page(paginator.num_pages)
-    except Exception as e:
-        logger.error(f"خطأ بدالة العروض داخل المتجر: {e}", exc_info=True)
+        try:
+            offerd_products = paginator.page(page)
+        except (PageNotAnInteger, ValueError):
+            offerd_products = paginator.page(1)
+        except EmptyPage:
+            offerd_products = paginator.page(paginator.num_pages)
+        except Exception as e:
+            logger.error(f"خطأ بدالة العروض داخل المتجر: {e}", exc_info=True)
+            offerd_products = paginator.page(1)
+    else:
+        offerd_products = []
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         results_data = list(offerd_products.object_list.values())
@@ -278,17 +292,21 @@ def best_sales(request):
     products = Product.objects.filter(ready_to_sale=True, total_sales__gt=0).prefetch_related('items__variations').order_by('-total_sales')
     products_count = products.count()
     
-    paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
-    page = request.GET.get('page', 1)
+    if products.exists():
+        paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
+        page = request.GET.get('page', 1)
 
-    try:
-        best_products = paginator.page(page)
-    except PageNotAnInteger:
-        best_products = paginator.page(1)
-    except EmptyPage:
-        best_products = paginator.page(paginator.num_pages)
-    except Exception as e:
-        logger.error(f"خطأ بدالة اعلى المبيعات داخل المتجر: {e}", exc_info=True)
+        try:
+            best_products = paginator.page(page)
+        except (PageNotAnInteger, ValueError):
+            best_products = paginator.page(1)
+        except EmptyPage:
+            best_products = paginator.page(paginator.num_pages)
+        except Exception as e:
+            logger.error(f"خطأ بدالة اعلى المبيعات داخل المتجر: {e}", exc_info=True)
+            best_products = paginator.page(1)
+    else:
+        best_products = []
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         results_data = list(best_products.object_list.values())
@@ -341,18 +359,22 @@ def search_page(request):
 
     results = Product.objects.filter(filters).prefetch_related('items__variations').distinct()
     
- # إعداد التصفح المرقم
-    paginator = Paginator(results, 20)  # عرض 20 منتجًا في كل صفحة
-    page = request.GET.get('page', 1)
+    if results.exists():
+        # إعداد التصفح المرقم
+        paginator = Paginator(results, 20)  # عرض 20 منتجًا في كل صفحة
+        page = request.GET.get('page', 1)
 
-    try:
-        products = paginator.page(page)
-    except PageNotAnInteger:
-        products = paginator.page(1)
-    except EmptyPage:
-        products = paginator.page(paginator.num_pages)
-    except Exception as e:
-        logger.error(f"خطأ بدالة البحث داخل المتجر: {e}", exc_info=True)
+        try:
+            products = paginator.page(page)
+        except (PageNotAnInteger, ValueError):
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
+        except Exception as e:
+            logger.error(f"خطأ بدالة البحث داخل المتجر: {e}", exc_info=True)
+            products = paginator.page(1)
+    else:
+        products = []
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         results_data = list(products.object_list.values())

@@ -123,7 +123,7 @@
                     {% endif %}
                     <!-- End Offer Products  -->
                     <!-- Start Last Products  -->
-                    {% if all_brand_products %}
+                    {% if all_brand_products and products_count > 0 %}
                         <hr class="sep">
                         <section  id="products" style="margin-bottom:50px;">               
                             <div class="title" style="justify-content:center;">
@@ -186,6 +186,14 @@
                             </div>
                         {% endif %}
                         <!-- End Pagination -->
+                    {% else %}
+                        <div class="searched-products">
+                            <div class="container">
+                                <div class="products-cards">
+                                    {% include "common/no-result.html" %}
+                                </div>
+                            </div>
+                        </div>
                     {% endif %}
                     <!-- End Last Products  -->
             {% endif %}
