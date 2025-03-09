@@ -18,7 +18,7 @@
             <div class="name-price">
                 <h3> {{ copon.name }}</h3>                   
                 <div class="description">
-                    <div><p>قيمة الخصم </p><span> {{ copon.value }} دينار </span></div>
+                    <div><p>قيمة الخصم </p><span> {{ copon.value }} %</span></div>
                     <div><p class='expiration'>تنتهي صلاحية هذا الكوبون بعد <strong style='color:var(--main-color);'>{{ copon.expiration_days }}</strong> يوم من تاريخ شراءه</p></div>
                 </div>
                 {% if copon.price != 0 %}
