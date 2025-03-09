@@ -75,7 +75,7 @@ def brand_page(request, slug):
     offerd_products = Product.objects.filter(brand=brand, offer=True).prefetch_related('items__variations')[:12]
 
     # تطبيق Paginator على جميع منتجات العلامة التجارية
-    all_brand_products_list = Product.objects.filter(brand=brand).prefetch_related('items__variations')
+    all_brand_products_list = Product.objects.filter(brand=brand, ready_to_sale=True).prefetch_related('items__variations')
     
     if all_brand_products_list.exists():
         paginator_all = Paginator(all_brand_products_list, 12)  # 12 منتجًا لكل صفحة
@@ -120,15 +120,15 @@ def brand_page(request, slug):
     
     if category_id:
         # جلب التصنيف الأب
-        parent_category = get_object_or_404(Category, id=category_id)
+        parent_category = get_object_or_404(Category, id=category_id, )
         # جلب التصنيفات الفرعية
-        subcategories = Category.objects.filter(parent_category=parent_category)
+        subcategories = Category.objects.filter(parent_category=parent_category, status="visible")
         # دمج التصنيف الأب والتصنيفات الفرعية
         category_ids = [parent_category.id] + list(subcategories.values_list('id', flat=True))
         filters &= Q(category_id__in=category_ids)
 
     # جلب المنتجات بناءً على الفلاتر
-    results = Product.objects.filter(filters).prefetch_related('items__variations').distinct()
+    results = Product.objects.filter(filters,  ready_to_sale=True).prefetch_related('items__variations').distinct()
     
     # إعداد التصفح المرقم
     if results.exists():
@@ -162,7 +162,7 @@ def brand_page(request, slug):
         'products': products, # المنتجات المفلترة
         'last_products': last_products,
         'offerd_products':offerd_products,
-        'categories': categories, # قائمة التصنيفا التي داخل مربع الفلترة
+        'categories': categories, # قائمة التصنيفات التي داخل مربع الفلترة
         'products_count': products_count,
     }
     
@@ -171,16 +171,16 @@ def brand_page(request, slug):
 # صفحة التصنيف
 def category_page(request, slug):
     
-    category = get_object_or_404(Category, slug=slug)
+    category = get_object_or_404(Category, slug=slug, status='visible')
     
     # استرجاع التصنيفات الفرعية التي تنتمي للتصنيف الأب
-    subcategories = Category.objects.filter(parent_category=category)
+    subcategories = Category.objects.filter(parent_category=category, status='visible')
     
     # استرجاع المنتجات التي تنتمي للتصنيفات الفرعية
     subcategory_products = Product.objects.filter(category__in=subcategories).prefetch_related('items__variations')
     
     # استرجاع المنتجات التي تنتمي للتصنيف الأب مباشرة
-    parent_category_products = Product.objects.filter(category=category).prefetch_related('items__variations')
+    parent_category_products = Product.objects.filter(category=category, ready_to_sale=True).prefetch_related('items__variations')
     
     # دمج المنتجات من التصنيف الأب والتصنيفات الفرعية
     combined_products = parent_category_products | subcategory_products
@@ -221,7 +221,7 @@ def category_page(request, slug):
         filters &= Q(brand_id=brand_id)
 
     # جلب المنتجات بناءً على الفلاتر
-    results = Product.objects.filter(filters).prefetch_related('items__variations').distinct()
+    results = Product.objects.filter(filters, ready_to_sale=True).prefetch_related('items__variations').distinct()
     
     # إعداد التصفح المرقم
     if results.exists():
@@ -393,12 +393,12 @@ def search_page(request):
 # ===================================================
 # صفحة تفاصيل المنتج 
 def product_details(request, pid):
-    product = get_object_or_404(Product.objects.select_related('category', 'brand'), id=pid)
+    product = get_object_or_404(Product.objects.select_related('category', 'brand'), id=pid, ready_to_sale=True)
     category = product.category
     brand = product.brand
 
-    related_category_products = Product.objects.filter(category=category).exclude(pk=pid).prefetch_related('items__variations')[:8]
-    related_brand_products = Product.objects.filter(brand=brand).exclude(pk=pid).prefetch_related('items__variations')[:8]
+    related_category_products = Product.objects.filter(category=category,  ready_to_sale=True).exclude(pk=pid).prefetch_related('items__variations')[:8]
+    related_brand_products = Product.objects.filter(brand=brand,  ready_to_sale=True).exclude(pk=pid).prefetch_related('items__variations')[:8]
 
     product_images = product.images.all()
     variants = ProductVariation.objects.filter(product_item__product_id=pid, stock__gt=0).select_related('size', 'product_item')
