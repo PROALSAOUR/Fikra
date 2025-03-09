@@ -30,4 +30,11 @@
     "form_factor": "narrow"
   }
 ],
+"splash_screens": [
+  {
+    "src": "/static/images/screenshots/splach.jpg",
+    "sizes": "720x1280",
+    "type": "image/jpg"
+  }
+],
 "shortcuts": []}

@@ -373,7 +373,7 @@ PWA_APP_SCREENSHOTS = [
 PWA_APP_SPLASH_SCREEN = [
     {
         "src": "/static/images/screenshots/splach.jpg",
-        "sizes": '720x1280',
+        "sizes": "720x1280",
         "type": "image/jpg"
     }
 ]

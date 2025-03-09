@@ -491,11 +491,11 @@ select option::selection {
 /* End main product box  */
 /* Start specific product box  */
 /* Tab media  */
+/* اضفت كلاس بيج لاستهداف صفحة المفضلة والسلة والاعلانات فقط دون البحث حيث سيتم تعديله بمفرد بالميديا*/
 .page:not(.search-page) .specific .product-box.offer .product-image .off-holder {
   justify-content: start;
 }
-/* اضفت كلاس بيج لاستهداف صفحة المفضلة والسلة فقط دون البحث حيث سيتم تعديله بمفرد بالميديا*/
-.page:not(.search-page) .specific .product-box.offer .off-holder span{
+.page:not(.search-page) .specific .product-box.offer .off-holder span {
   padding: 5px 8px;
   border-radius: 0px 7px 0px 7px;
   -webkit-border-radius: 0px 7px 0px 7px;
@@ -507,6 +507,17 @@ select option::selection {
   font-size: 14px !important;
 }
 @media (max-width: 792px){
+  .ads-page .specific .product-box.offer .off-holder {
+    justify-content: start;
+  }
+  .ads-page .specific .product-box.offer .off-holder span  {
+    padding: 5px 8px;
+    border-radius: 0px 7px 0px 7px;
+    -webkit-border-radius: 0px 7px 0px 7px;
+    -moz-border-radius: 0px 7px 0px 7px;
+    -ms-border-radius: 0px 7px 0px 7px;
+    -o-border-radius: 0px 7px 0px 7px;
+  }
   .specific .currency {
     font-size: 11px !important;
   }
@@ -5220,19 +5231,19 @@ input[type="number"] {
 /* mobile media */
 @media (max-width: 597px) {
   .blog .title {
-    font-size: var(--mob-xl-size);
+    font-size:calc(var(--mob-l-size) - 2px );
   }
 }
 /* small mobile media */
 @media (max-width: 394px) {
   .blog .title {
-    font-size: var(--mob-l-size);
+    font-size:calc(var(--mob-m-size) - 2px );
   }
 }
 /* ver small mobile media */
-@media (max-width: 354px) {
+@media (max-width: 358px) {
   .blog .title {
-    font-size: var(--mob-m-size);
+    font-size: calc(var(--mob-xs-size) - 2px );
   }
 }
 .blog .sections {

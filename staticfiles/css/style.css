@@ -1937,10 +1937,10 @@ hr.sep {
     margin-bottom: 30px;
   }
   #products .title h2{
-    font-size: var(--mob-xxl-size);
+    font-size: var(--mob-xl-size);
   }
   #products .title i {
-    font-size: var(--mob-xxl-size);
+    font-size: var(--mob-xl-size);
   }
 }
 #products .products-slider{
@@ -2793,11 +2793,11 @@ hr.sep {
     height: 80px; 
   }
   .search .search-title h2{
-    font-size: var(--mob-xl-size);
+    font-size: var(--mob-l-size);
     margin-right: 10px;
   }
   .search .search-title h2 span{
-    font-size: var(--mob-xl-size);
+    font-size: var(--mob-l-size);
   }
 }
 /* phone */
@@ -2810,15 +2810,15 @@ hr.sep {
     height: 75px; 
   }
   .search .search-title h2{
-    font-size: var(--mob-l-size);
+    font-size: var(--mob-m-size);
   }
   .search .search-title h2 span{
-    font-size: var(--mob-l-size);
+    font-size: var(--mob-m-size);
   }
 }
-@media (max-width: 352px) {
+@media (max-width: 358px) {
   .search .search-title h2{
-    font-size: var(--mob-m-size);
+    font-size: var(--mob-xs-size);
   }
 }
 /* End Search title  */
