@@ -5,7 +5,6 @@
 "display": "standalone",
 "scope": "/",
 "orientation": "any",
-"background_color": "#232323",
 "theme_color": "#292929",
 "status_bar": "default",
 "icons": [

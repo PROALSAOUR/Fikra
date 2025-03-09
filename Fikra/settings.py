@@ -124,8 +124,8 @@ DATABASES = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://localhost:6379/1',  # استخدم قاعدة بيانات Redis رقم 1 للكاش
     }
 }
 
@@ -320,6 +320,13 @@ JAZZMIN_UI_TWEAKS = {
 # جدولة المهام
 from celery.schedules import crontab
 
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  # قاعدة بيانات Redis رقم 0 للبروكر
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # قاعدة بيانات Redis رقم 0 لحفظ النتائج
+
+# إعدادات Celery الأخرى
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
 CELERY_BEAT_SCHEDULE = {
     'distribute-profits-every-7th-day-of-month': {
         'task': 'reportes.tasks.distribute_profits',
@@ -330,14 +337,6 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(hour=0, minute=0), # كل يوم الساعة 12 صباحا
     },
 }
-
-# Broker URL لربط Celery مع Redis
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-
-# إعدادات Celery الأخرى
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 # ===================================================================
 
