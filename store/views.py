@@ -176,14 +176,20 @@ def category_page(request, slug):
     # استرجاع التصنيفات الفرعية التي تنتمي للتصنيف الأب
     subcategories = Category.objects.filter(parent_category=category, status='visible')
     
-    # استرجاع المنتجات التي تنتمي للتصنيفات الفرعية
-    subcategory_products = Product.objects.filter(category__in=subcategories).prefetch_related('items__variations')
+    # استرجاع التصنيفات الفرعية التي تنتمي للتصنيف الأب الفرعي
+    sub_subcategories = Category.objects.filter(parent_category__in=subcategories, status='visible')
     
     # استرجاع المنتجات التي تنتمي للتصنيف الأب مباشرة
     parent_category_products = Product.objects.filter(category=category, ready_to_sale=True).prefetch_related('items__variations')
     
+    # استرجاع المنتجات التي تنتمي للتصنيفات الفرعية
+    subcategory_products = Product.objects.filter(category__in=subcategories, ready_to_sale=True).prefetch_related('items__variations')
+    
+    # استرجاع المنتجات التي تنتمي للتصنيفات الفرع فرعية
+    sub_subcategories_products = Product.objects.filter(category__in=sub_subcategories, ready_to_sale=True).prefetch_related('items__variations')
+    
     # دمج المنتجات من التصنيف الأب والتصنيفات الفرعية
-    combined_products = parent_category_products | subcategory_products
+    combined_products = parent_category_products | subcategory_products | sub_subcategories_products
     
     # حساب العدد الكلي للمنتجات
     total_products_count = combined_products.count()
