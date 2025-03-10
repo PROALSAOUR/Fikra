@@ -462,32 +462,18 @@ select option::selection {
     padding: 5px 8px;
   }
   .product-box .add-to-cart span {
-    font-size: var(--mob-s-size);
-  }
-  .product-box .add-to-cart i {
-    font-size: var(--mob-s-size);
-  }
-}
-/* very small mobile media */
-@media (max-width: 396px)  {
-  .product-box .add-to-cart i {
     visibility: hidden;
     display: none;
   }
-}
-/* very small mobile media */
-@media (max-width: 376px)  {
   .product-box .add-to-cart i {
+    font-size: var(--mob-xs-size);
     visibility: visible;
     display: inline-block;
     width: 20px;
     margin: auto;
   }
-  .product-box .add-to-cart span {
-    visibility: hidden;
-    display: none;
-  }
 }
+
 /* End main product box  */
 /* Start specific product box  */
 /* Tab media  */
@@ -744,23 +730,8 @@ select option::selection {
     max-width: 95px;
   }
 }
+products-slider
 /* End specific product box  */
-/* Start mony or point price */
-/* if price money or point */
-.product-price.point .offer-percient {
-  display: none;
-}
-.product-price .buy-by-points {
-  display: none;
-}
-.product-price.point .buy-by-points {
-  display: block;
-}
-.product-price.point .buy-by-money {
-  display: none;
-}
-/* end if */
-/* End mony or point price */
 /* Start Pop-up-page Section  */
 .Pop-up-page {
   visibility: hidden;
@@ -1926,7 +1897,7 @@ hr.sep {
 #products .title i{
   font-size: var(--lab-xl-size);
   color: var(--main-color);
-  margin-right: 25px;
+  margin-right: 5px;
 }
 /* tab media */
 @media (max-width: 868px) {
@@ -1954,6 +1925,18 @@ hr.sep {
     font-size: var(--mob-xl-size);
   }
 }
+/* small mobile media */
+@media (max-width: 376px) {
+  #products .title {
+    margin-right: 5px;
+  }
+  #products .title h2{
+    font-size: var(--mob-l-size);
+  }
+  #products .title i {
+    font-size: var(--mob-l-size);
+  }
+}
 #products .products-slider{
   position: relative;
   display: flex;
@@ -1961,6 +1944,9 @@ hr.sep {
   height: 100%;
   width: 100%;
   margin-right: 20px;
+}
+.brand-bage #products .products-slider{
+  z-index: -1;
 }
 /* tab media */
 @media (max-width: 868px) {
@@ -5768,6 +5754,7 @@ input[type="number"] {
 }
 .product-details-page .product-details .name-price .product-price.offer .old {
   color: var(--disaple-text-color);
+  position: relative;
 }
 .product-details-page .product-details .name-price .product-price.offer .new {
   visibility: visible;
@@ -5778,7 +5765,7 @@ input[type="number"] {
   position: absolute;
   top: 45%;
   right: 0%;
-  width: 20%;
+  width: 100%;
   height: 2px;
   background-color: var(--disaple-text-color);
   transform: rotate(150deg);

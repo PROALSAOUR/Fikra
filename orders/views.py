@@ -219,10 +219,11 @@ def remove_order_item(request):
             # =================================================================
                                          
             #  ارسال رسالة الى المستخدم عند ارجاع منتج من الطلب
-            message = return_order_item_message(user_name=user.first_name, order=order.serial_number)
-            inbox = user.profile.inbox
-            inbox.add_message(message)
-            inbox.save()            
+            if  order.status == 'delivered':
+                message = return_order_item_message(user_name=user.first_name, order=order.serial_number)
+                inbox = user.profile.inbox
+                inbox.add_message(message)
+                inbox.save()            
                 
             # تعديل حالة الطلب الى ملغي ان لم يتبقى عناصر داخله 
             #  يعمل فقط اذا كانت حالة الطلب جاري المعالجة او التجهيز 
@@ -373,11 +374,12 @@ def edit_order(request):
                     dealing.save()
                     
                     # =================================================================
-                    #  ارسال رسالة الى المستخدم عند تعديل الطلب
-                    message = edit_order_message(user_name=user.first_name, order=order.serial_number)
-                    inbox = user.profile.inbox
-                    inbox.add_message(message)
-                    inbox.save() 
+                    if  order.status == 'delivered':
+                        #  ارسال رسالة الى المستخدم عند تعديل الطلب
+                        message = edit_order_message(user_name=user.first_name, order=order.serial_number)
+                        inbox = user.profile.inbox
+                        inbox.add_message(message)
+                        inbox.save() 
                             
                     return JsonResponse({'success': True, 'message': 'تم تعديل المنتج بنجاح'})
 
@@ -458,7 +460,7 @@ def create_order(request):
                 else:
                     copon.has_used = True
                     copon_value = copon.copon_code.value
-                    used_discount = copon_value if not copon_value > total_price else old_total
+                    used_discount = copon_value if copon_value < old_total else old_total
                     
             except CoponItem.DoesNotExist:
                 logger.error(f"المستخدم  {user} يحاول استعمال كوبون خصم غير موجود لديه مع طلبه", exc_info=True)

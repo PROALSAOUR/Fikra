@@ -55,7 +55,7 @@ class MyOrdersAdmin(admin.ModelAdmin):
     search_fields = ('serial_number', 'user__phone_number',)
     list_filter = ('status', 'user__phone_number', 'city',)
     ordering = ('-order_date', '-updated_at',)
-    fields = ( 'user', 'serial_number',  'old_total', 'used_discount', 'total_price', 'copon_value', 'total_points', 'free_delivery', 'city', 'neighborhood', 'order_date', 'deliverey_date', )
+    fields = ( 'user', 'status', 'serial_number',  'old_total', 'used_discount', 'total_price', 'copon_value', 'total_points', 'free_delivery', 'city', 'neighborhood', 'order_date', 'deliverey_date', )
     readonly_fields = ( 'user', 'serial_number',  'old_total', 'used_discount', 'total_price', 'copon_value', 'total_points', 'free_delivery', 'order_date', 'deliverey_date', )
     inlines = [OrderItemInline, OrderDealingInline] 
     
