@@ -117,7 +117,7 @@ def create_order_message(user_name, order):
         content= 
         f"""
         مرحبا {user_name} 
-        لقد تم انشاء الطلب ({str(order).zfill(6)}) بنجاح, سوف نقوم بإرساله اليك خلال مدة لا تتجاوز ال {Settings.expected_days} أيام.\n 
+        لقد تم انشاء الطلب ({str(order).zfill(6)}) بنجاح, سوف نقوم بإرساله اليك خلال مدة لا تتجاوز ال {Settings.objects.first().expected_days} أيام.\n 
         في حال كان لديك اي استفسار يرجى التواصل مع خدمة العملاء وسوف يتم الرد عليك بأسرع وقت ممكن\n
         نرجو لك وقتا سعيداً.
         """,
