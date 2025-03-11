@@ -27,41 +27,42 @@
         </div>
     </a> 
 
-{% comment %} الكود الخاص  بزر اضافة الى المفضلة {% endcomment %}
-{% if user.is_authenticated %}
-    <span class="add-to-fav">
-            <a href="{% url 'store:add_to_favourites' product.id %}" aria-label="اذهب الى المفضلة" class="add-to-fav-link" data-product-id="{{ product.id }}">
-                {% if request.path == '/favourite/' %}
-                        <i class="fa-regular fa-trash-can"></i>
-                {% else %}
-                    {% if product.id in favourite_products %}
-                        <i class="fa-solid fa-heart"></i>
+    {% comment %} الكود الخاص  بزر اضافة الى المفضلة {% endcomment %}
+    {% if user.is_authenticated %}
+        <span class="add-to-fav">
+                <a href="{% url 'store:add_to_favourites' product.id %}" aria-label="اذهب الى المفضلة" class="add-to-fav-link" data-product-id="{{ product.id }}">
+                    {% if request.path == '/favourite/' %}
+                            <i class="fa-regular fa-trash-can"></i>
                     {% else %}
-                        <i class="fa-regular fa-heart"></i>
+                        {% if product.id in favourite_products %}
+                            <i class="fa-solid fa-heart"></i>
+                        {% else %}
+                            <i class="fa-regular fa-heart"></i>
+                        {% endif %}
                     {% endif %}
-                {% endif %}
-            </a>
-    </span>
-{% else %}
-    <span class="add-to-fav">
-        <a href="{% url 'accounts:sign' %}" class="add-to-fav-link" >
-                <i class="fa-regular fa-heart"></i>
-        </a>
-    </span>
-{% endif %}
-
-{% comment %} الكود الخاص  بزر اضافة الى السلة {% endcomment %}
-{% if request.path == '/search/' or  request.path == '/favourite/'%} {% comment %} لتحسين الاداء وتقليل الاستعلامات الغير ضرورية {% endcomment %}
-    {% if product.get_total_stock > 0 %}
-
-        <span class="add-to-cart">
-            <a href="{% url 'store:add_to_cart2' product.pid %}" class="add-to-cart-link" aria-label="اضف الى السلة">
-                <span> إضافة الى السلة </span><i class="fa-solid fa-cart-shopping"></i> 
+                </a>
+        </span>
+    {% else %}
+        <span class="add-to-fav">
+            <a href="{% url 'accounts:sign' %}" class="add-to-fav-link" >
+                    <i class="fa-regular fa-heart"></i>
             </a>
         </span>
-
     {% endif %}
-{% endif %}
+
+    {% comment %} الكود الخاص  بزر اضافة الى السلة {% endcomment %}
+    {% if user.is_authenticated %}
+        {% if product.get_total_stock > 0 %}
+
+            <span class="add-to-cart">
+                <a href="{% url 'store:add_to_cart2' product.pid %}" class="add-to-cart-link" aria-label="اضف الى السلة">
+                    <span> إضافة الى السلة </span><i class="fa-solid fa-cart-shopping"></i> 
+                </a>
+            </span>
+
+        {% endif %}
+    {% endif %}
+
 
 </div>
 <!-- product-end -->

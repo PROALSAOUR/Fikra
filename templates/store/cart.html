@@ -30,7 +30,7 @@
                                                     <div class="product-image">
                                                         <div class="off-holder">
                                                             {% if item.product.get_total_stock > 0 %}
-                                                                <span>تخفيض</span>
+                                                                <span>{{item.product.get_offer_percentage|floatformat:0}}% </span>
                                                             {% endif %}
                                                         </div>
                                                         <img src="{{ item.product_item.image.url }}" alt="{{ item.product.name }}">
@@ -118,7 +118,7 @@
                                                 <a href="{% url "store:product_details" item.product.id  %}" aria-label="استعرض {{item.product.name}}" style='opacity: 0.6;'>
                                                     <div class="product-image">
                                                         <div class="off-holder">
-                                                                <span>تخفيض</span>
+                                                            <span>{{item.product.get_offer_percentage|floatformat:0}}% </span>
                                                         </div>
                                                         <img src="{{ item.product_item.image.url }}" alt="{{ item.product.name }}"  style='opacity: 0.5;'>
                                                     </div>

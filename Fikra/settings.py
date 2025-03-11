@@ -349,6 +349,7 @@ PWA_APP_BACKGROUND_COLOR = "#232323"
 PWA_APP_DISPLAY = "standalone"
 PWA_APP_SCOPE = "/"
 PWA_APP_START_URL = "/"
+PWA_SERVICE_WORKER_PATH = None
 PWA_APP_ICONS = [
     {
         "src": "/static/images/icons/small-logo.png",
