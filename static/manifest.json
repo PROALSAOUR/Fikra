@@ -6,6 +6,7 @@
 "scope": "/",
 "orientation": "any",
 "theme_color": "#292929",
+"background_color": "#232323",
 "status_bar": "default",
 "icons": [
   {

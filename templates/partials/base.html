@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{% static "/css/all.css" %}" onload="this.media='all'">   <!-- Font Awesome Icons File     -->
     <link rel="stylesheet" href="{% static "/css/all.min.css" %}" onload="this.media='all'">  <!-- Font Awesome Icons File     -->
     <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />   <!-- Slider Style CSS File       -->       
+    <link rel="stylesheet" href="{% static "/css/loader.css" %}" onload="this.media='all'">  <!-- Loader  CSS File     -->
     <link rel="stylesheet" href="{% static "/css/style.css" %}" onload="this.media='all'">   <!-- Main Template CSS File      -->
     <!-- import font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,6 +31,12 @@
 
 </head>
 <body dir="rtl" class="" >
+
+    <!-- لودر التحميل -->
+    <div class="loader-container" id="loader">
+        <div class="loader"></div>
+    </div>
+
     {% comment %} لايوجد هيدر او ناف او فوتر بصفحة التسجيل والتحقق {% endcomment %}
     {% if request.path != '/accounts/sign/' and  request.path != '/accounts/verify-otp/' %} 
         {% include "partials/header.html" %}
@@ -56,8 +63,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"  onload="this.media='all'"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"  onload="this.media='all'"></script>
     <script src=" {% static "/javascript/pop-pages.js" %}"  onload="this.media='all'"></script>
-    <script src=" {% static "/javascript/main.js" %}" onload="this.media='all'"></script>
+    <script src=" {% static "/javascript/loader.js" %}"  onload="this.media='all'"></script>
     <script src=" {% static "/javascript/live-search.js" %}" onload="this.media='all'"></script>
+    <script src=" {% static "/javascript/main.js" %}" onload="this.media='all'"></script>
 
     {% comment %} only in debugging remove later {% endcomment %}
     {% include "pop-pages/only-devolpment.html" %}
