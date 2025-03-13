@@ -114,20 +114,20 @@ WSGI_APPLICATION = 'Fikra.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'fikra_store_db',
-        "USER": "store_user",
-        "PASSWORD": "Fikradb123store",
-        "HOST": "82.29.180.27",
-        "PORT": "5432",
+        'NAME': 'FikraDatabase',
+        "USER": "postgres",
+        "PASSWORD": "saour",
+        "HOST": "localhost",
+        "PORT": "",
     }
 }
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://localhost:6379/1',  # استخدم قاعدة بيانات Redis رقم 1 للكاش
-    }
-}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+#         'LOCATION': 'redis://localhost:6379/1',  # استخدم قاعدة بيانات Redis رقم 1 للكاش
+#     }
+# }
 
 LOGGING = {
     "version": 1,  # إصدار الإعدادات (يجب أن يكون 1)
