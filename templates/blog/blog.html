@@ -5,7 +5,7 @@
     <div class="blog" style="position: relative; padding-top: 80px;">
         <!-- Start blog page   -->
         <div class="image">
-            <img src="{% static '/images/blog-background.jpg' %}" alt="">
+            <img src="{% static '/images/blog-background.webp' %}" alt="fikra store shop tobruk طبرق ليبيا متجر فكرة">
         </div>
         <div class="container">
             <div class="title">
@@ -16,7 +16,7 @@
                     {% if blog_pages %}
                         {% for page in blog_pages %}
                             <li>
-                                <a href="{% url 'blog:page-details' page.slug %}"> {{ page.title }} <i class="fa-solid fa-angles-left"></i></a>
+                                <a href="{% url 'blog:page-details' page.slug %}" > {{ page.title }} <i class="fa-solid fa-angles-left"></i></a>
                             </li>
                         {% endfor %}
                     {% else %}

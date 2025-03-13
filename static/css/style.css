@@ -4998,7 +4998,7 @@ form.choose-to-replace {
 /* End Sign page content  */
 /* Start verify otp page */
 .verify-page  {
-  background-image: url(/static/images/otp-verfiy-background.jpg);
+  background-image: url(/static/images/otp-verfiy-background.webp);
   background-size:cover;
   width: 100%;
   height: 100vh;
