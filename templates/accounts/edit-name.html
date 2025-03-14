@@ -1,6 +1,10 @@
 {% extends "partials/base.html" %}
 {% load static %}
 
+{% block additional_css %}
+    <link rel="stylesheet" href="{% static "/css/accounts.css" %}">   
+{% endblock %}
+
 {% block content %}
 
 <div class="sign-page" style="position: relative; padding-top:20px;">

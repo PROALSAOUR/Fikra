@@ -1,5 +1,10 @@
 {% extends "partials/base.html" %}
 {% load static %}
+
+{% block additional_css %}
+    <link rel="stylesheet" href="{% static "/css/blog.css" %}">  
+{% endblock %}
+
 {% block content %}
     <!-- Start blog page   -->
     <div class="blog" style="position: relative; padding-top: 80px;">

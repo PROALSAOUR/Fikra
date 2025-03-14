@@ -5,8 +5,8 @@
 "display": "standalone",
 "scope": "/",
 "orientation": "any",
-"background_color": "#232323",
 "theme_color": "#292929",
+"background_color": "#232323",
 "status_bar": "default",
 "icons": [
   {
@@ -28,6 +28,13 @@
     "sizes": "720x1280",
     "type": "image/png",
     "form_factor": "narrow"
+  }
+],
+"splash_screens": [
+  {
+    "src": "/static/images/screenshots/splach.jpg",
+    "sizes": "720x1280",
+    "type": "image/jpg"
   }
 ],
 "shortcuts": []}

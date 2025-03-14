@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللو�
 
 # ===================================================
 # مستودع البطاقات
+@login_required
 def cards_repo(request):
     user = request.user
     

@@ -1,6 +1,10 @@
 {% extends "partials/base.html" %}
 {% load static %}
 
+{% block additional_css %}
+    <link rel="stylesheet" href="{% static "/css/main-pages.css" %}"> 
+{% endblock %}
+
 {% block content %}
 
     <div class="cards-store cards-repo">
@@ -68,6 +72,10 @@
     <!-- End use-code-pop-page Section -->
 
 {% endblock content %}
+
+{% block additional_js %}
+    <script src=" {% static "/javascript/cards.js" %}" defer></script>
+{% endblock %}
 
 
 

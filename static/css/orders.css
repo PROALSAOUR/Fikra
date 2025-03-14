@@ -1,0 +1,404 @@
+/* edit order pop-page */
+form.choose-to-replace {
+    display: flex;
+    flex-direction: column;
+}
+/* ====================================  My-orders Page  ======================================================= */
+/* Start orders Table  */
+.my-orders {
+    padding-top: 100px;
+    margin-bottom: 200px;
+  }
+  .my-orders .container {
+    position: relative;
+    padding: 0px 20px 20px;
+    margin-bottom: 50px;
+    max-width: 85%;
+    background-color: var(--background-color-alt);
+    box-shadow: var(--main-shadow);
+    border-radius:var(--main-border-radius) ;
+    -webkit-border-radius:var(--main-border-radius) ;
+    -moz-border-radius:var(--main-border-radius) ;
+    -ms-border-radius:var(--main-border-radius) ;
+    -o-border-radius:var(--main-border-radius) ;
+  }
+  .my-orders .table-header {
+    position: relative;
+    text-align: center;
+    color: var(--main-color);
+    font-size: var(--lab-l-size);
+  }
+  /* Tab media */
+  @media (max-width: 998px) {
+    .my-orders .table-header .exit-button {
+      left:0;
+      top:30px;
+    }
+  }
+  /* Tab media */
+  @media (max-width: 768px) {
+    .my-orders .container {
+      max-width: 95%;
+    }
+    .my-orders .table-header {
+      font-size: var(--tab-l-size);
+    }
+  }
+  /* mobile media */
+  @media (max-width: 597px) {
+    .my-orders .table-header .exit-button {
+      top:20px;
+    }
+    .my-orders .table-header {
+      font-size: var(--mob-m-size);
+    }
+  }
+  @media (max-width: 385px) {
+    .my-orders .table-header .exit-button {
+      top:15px;
+      left: -10px;
+    }
+    .my-orders .table-header {
+      font-size: var(--mob-xs-size);
+    }
+  }
+  .my-orders .table-header h1 {
+    padding-top: 15px;
+  }
+  .my-orders .table-responsive {
+    width: 100%;
+    min-height: 250px;
+  }
+  .my-orders .table-responsive  .table {
+    margin: 0 auto;
+    border-collapse: collapse;
+    width: 95%;
+    overflow-y: auto;
+    border-radius: var(--main-border-radius);
+    -webkit-border-radius: var(--main-border-radius);
+    -moz-border-radius: var(--main-border-radius);
+    -ms-border-radius: var(--main-border-radius);
+    -o-border-radius: var(--main-border-radius);
+  }
+  .my-orders .table thead{
+    background-color: var(--background-color);
+    color: var(--main-color); 
+    font-weight: bold; 
+  }
+  .my-orders .table thead tr{
+    border-bottom: 2px solid var(--seprator-color);
+  }
+  .my-orders .table thead tr th  {
+    min-height: 25px;
+    padding: 10px 7px;
+    font-size:var(--tab-xs-size); 
+  }
+  .my-orders .table tbody{
+    font-size:var(--tab-s-size); 
+    text-align: center; 
+  }
+  .my-orders .table tbody td {
+    border-bottom: 2px solid var(--seprator-color);
+    padding: 15px; /* زيادة المساحة داخل الخلايا */
+    vertical-align: middle;
+  }
+  /* Tab media */
+  @media (max-width: 768px) {
+    .my-orders .table thead tr th  {
+      padding: 10px 5px;
+      font-size:var(--mob-xs-size); 
+    }
+    .my-orders .table tbody{
+      font-size:var(--mob-xs-size); 
+    }
+    .my-orders .table tbody td {
+      padding: 12px;
+    }
+  }
+  /* mobile media */
+  @media (max-width: 597px) {
+    .my-orders .table thead tr th  {
+      padding: 8px 2px;
+      font-size:var(--mob-s-size); 
+    }
+    .my-orders .table tbody{
+      font-size:var(--mob-s-size); 
+    }
+    .my-orders .table tbody td {
+      padding: 10px;
+    }
+  }
+  /* mobile media */
+  @media (max-width: 422px) {
+    .my-orders .table thead tr th  {
+      font-size: calc(var(--mob-s-size) - 1px); 
+    }
+    .my-orders .table tbody{
+      font-size: calc(var(--mob-s-size) - 2px); 
+    }
+    .my-orders .table tbody td {
+      padding: 8px; /* زيادة المساحة داخل الخلايا */
+    }
+  }
+  .my-orders .table tbody td.show a{
+    color: var(--main-text-color);
+    padding-bottom: 2px;
+    border-bottom: 2px dashed var(--seprator-color);
+  }
+  .my-orders .table tbody td.show i{
+    margin-right: 5px;
+    color: var(--main-color);
+  }
+  .my-orders .table tbody td.cancel i{
+    color: #9D2121;
+  }
+  .my-orders .table tbody tr.done td.status {
+    color: #1d9f4d;
+  }
+  .my-orders .table tbody tr.canceled td.status {
+    color: #9D2121;
+  }
+  .my-orders .table tbody tr.canceled td.cancel i ,.my-orders tr.done td.cancel i{
+    color: var(--disaple-text-color);
+    cursor: not-allowed;
+  }
+  /* End orders Table  */
+  /* ====================================  Order Page  ======================================================= */
+  /* Start Order Details  */
+  .Order {
+    padding-top: 150px;
+  }
+  .Order .container {
+    position: relative;
+    padding: 0px 20px 20px;
+    margin-bottom: 50px;
+    max-width: 85%;
+    background-color: var(--background-color-alt);
+    box-shadow: var(--main-shadow);
+    border-radius:var(--main-border-radius) ;
+    -webkit-border-radius:var(--main-border-radius) ;
+    -moz-border-radius:var(--main-border-radius) ;
+    -ms-border-radius:var(--main-border-radius) ;
+    -o-border-radius:var(--main-border-radius) ;
+  }
+  /* Tab media */
+  @media (max-width: 768px) {
+    .my-orders .container {
+      max-width: 95%;
+    }
+  }
+  /* Tab media */
+  @media (max-width: 848px) {
+    .Order .container {
+      max-width: 99%;
+      padding: 10px;
+    }
+  }
+  .Order .order-info {
+    position: relative;
+    padding: 30px 40px;
+  }
+  .Order .order-info .exit-button {
+    left:0 ;
+    top: 50px;
+  }
+  .Order .order-info .order-id-status h3 {
+    color: var(--main-color);
+    font-size: var(--lab-l-size);
+    padding-bottom: 15px; 
+    font-weight: 800;
+  }
+  .Order .order-info .order-id-status span{
+    font-weight: 500;
+    color: var(--main-text-color);
+    font-size: var(--lab-m-size);
+    margin-right: 10px;
+  }
+  .Order .order-info .order-date{
+    position: absolute;
+    left: 0px;
+    top: 10px;
+    color: var(--disaple-text-color);
+    font-size: var(--lab-xs-size);
+  }
+  /* Tab media */
+  @media (max-width: 768px) {
+    .Order .order-info .order-id-status h3 {
+      font-size: var(--tab-l-size);
+    }
+    .Order .order-info .order-id-status span {
+      font-size: var(--tab-m-size);
+    }
+  }
+  /* mobile media */
+  @media (max-width: 597px) {
+    .Order .order-info .order-id-status h3 {
+      padding-top: 10px;
+      text-wrap: nowrap;
+      font-size: var(--mob-l-size);
+    }
+    .Order .order-info .order-id-status span {
+      font-size: var(--mob-m-size);
+    }
+    .Order .order-info .order-date {
+      font-size: var(--tab-s-size);
+    }
+  }
+  .Order .order-products{
+    width: 100%;
+    min-height: 200px;
+    overflow-x: auto;
+    overflow-y: auto;
+  }
+  .Order .order-products .products-table{
+    margin: 0 auto;
+    border-collapse: collapse;
+    width: 95%;
+    overflow-y: auto;
+    border-radius: var(--main-border-radius);
+    -webkit-border-radius: var(--main-border-radius);
+    -moz-border-radius: var(--main-border-radius);
+    -ms-border-radius: var(--main-border-radius);
+    -o-border-radius: var(--main-border-radius);
+  }
+  .Order .products-table thead{
+    background-color: var(--background-color);
+    color: var(--main-color); 
+    font-weight: bold; 
+  }
+  .Order .products-table thead tr {
+    border-bottom: 2px solid var(--seprator-color);
+  }
+  .Order .products-table thead tr th {
+    min-height: 25px;
+    padding: 10px 7px;
+    font-size:var(--tab-s-size); 
+  }
+  .Order .products-table tbody{
+    font-size:var(--tab-s-size); 
+    text-align: center; 
+  }
+  .Order .products-table tbody td {
+    border-bottom: 2px solid var(--seprator-color);
+    padding: 10px; /* زيادة المساحة داخل الخلايا */
+    vertical-align: middle;
+  }
+  @media (max-width: 386px)  {
+    .Order .products-table tbody td {
+      padding: 5px; 
+    }
+  }
+  .Order .products-table tbody td img {
+    max-width: 60px;
+    aspect-ratio: 1/1;
+  }
+  @media (max-width: 668px)  {
+    .Order .products-table tbody td img {
+      max-width: 40px;
+    }
+  }
+  @media (max-width: 496px)  {
+    .Order .products-table tbody td img {
+      max-width: 30px;
+    }
+  }
+  
+  .Order .products-table tbody tr:last-child td{
+    border-bottom: 2px solid var(--disaple-text-color);
+  }
+  .Order .products-table tfoot td {
+    color: var(--main-color);
+    font-weight: 800;
+    background-color: var(--seprator-color);
+    border-bottom: 2px solid var(--disaple-text-color);
+    padding: 15px; /* زيادة المساحة داخل الخلايا */
+    padding-right: 30px;
+    vertical-align: middle;
+  }
+  .Order .products-table tfoot td:not(:first-child) {
+    color: var(--main-text-color);
+    font-weight: 600;
+    text-align: center;
+  }
+  /* Tab media */
+  @media (max-width: 768px) {
+    .Order .products-table thead tr th  {
+      padding: 10px 5px;
+      font-size:var(--mob-s-size); 
+    }
+    .my-orders .products-table tbody{
+      font-size:var(--mob-xs-size); 
+    }
+    .my-orders .products-table tbody td {
+      padding: 12px;
+    }
+  }
+  /* mobile media */
+  @media (max-width: 597px) {
+    .my-orders .products-table thead tr th  {
+      padding: 8px 2px;
+      font-size:var(--mob-s-size); 
+    }
+    .Order .products-table tbody {
+      font-size:var(--mob-s-size); 
+    }
+    .Order .products-table tbody td {
+      padding: 10px;
+    }
+    .Order .products-table tfoot td {
+      font-size:var(--mob-s-size);
+    }
+  }
+  /* small mobile media */
+  @media (max-width: 422px) {
+    .my-orders .products-table thead tr th  {
+      font-size: calc(var(--mob-s-size) - 2px); 
+    }
+    .Order .products-table tbody{
+      font-size: calc(var(--mob-s-size) - 2px); 
+    }
+    .Order .products-table tbody td {
+      padding: 8px; /* زيادة المساحة داخل الخلايا */
+    }
+    .Order .products-table tfoot td {
+      font-size: calc(var(--mob-s-size) - 2px); 
+      padding: 10px;
+    }
+  }
+  .Order .products-table tbody td.replace , .Order .products-table tbody td.remove {
+    cursor: pointer;
+    width: 0;
+    padding: 0;
+    margin: 0;
+  
+  }
+  .Order .products-table tbody td.replace {
+    color: #29569a;
+  }
+  .Order .products-table tbody td.remove {
+    color: #a72121;
+  }
+
+  /* End Order Details  */
+  .exit-button.see-dealing {
+    position: relative;
+    right: 0 !important;
+    font-size: 12px !important;
+    padding: 10px 5px !important;
+    left: 80%  !important;
+    top:18px !important;
+  }
+  .exit-button.see-dealing i {
+    margin-right: 5px;
+    font-size: 10px ;
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
+    -ms-transform: rotateY(180deg);
+    -o-transform: rotateY(180deg);
+  }
+  @media (max-width: 498px) {
+    .exit-button.see-dealing {
+      font-size: 8px !important;
+    }
+  }

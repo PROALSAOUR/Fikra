@@ -1,121 +1,126 @@
 {% extends "partials/base.html" %}
 {% load static %}
-
+{% block additional_css %}
+    <link rel="stylesheet" href="{% static "/css/home.css" %}">   
+{% endblock %}
 {% block content %}
-<div class="home-page">
-    <!-- Start Ads -->
-    <div class="ads">
-        <div class="welcome">
-            <h2>اهلا بك {% if user_name %}{{ user_name  }}{% endif %}</h2>
-            <p> لدينا عروض جديدة  من اجلك! </p>
+    <div class="home-page">
+        <!-- Start Ads -->
+        <div class="ads">
+            <div class="welcome">
+                <h2>اهلا بك {% if user_name %}{{ user_name  }}{% endif %}</h2>
+                <p> لدينا عروض جديدة  من اجلك! </p>
+            </div>
+            <section  id="tranding">
+                    <div class="swiper tranding-slider">
+                        <div class="swiper-wrapper">
+                            {% if ads %} 
+                                {% for ad in ads %}
+                                    <!-- Slide-start -->
+                                    <div class="swiper-slide tranding-slide">
+                                        <div class="tranding-slide-img">
+                                            <a href="{{ ad.get_ad_url }}" aria-label="استعرض {{ad.title}}">
+                                                <img src="{{ ad.img.url }}" alt="{{ ad.title }}">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <!-- Slide-end -->
+                                {% endfor %}
+                            {% else %}
+                                <h2> نعتذر لايوجد اعلانات لعرضها حاليا </h2>
+                            {% endif %}
+                        </div>
+                    </div>     
+            </section>
         </div>
-        <section  id="tranding">
-                <div class="swiper tranding-slider">
+        <!-- End Ads -->
+        <!-- Start Brands -->
+        <div class="brands">
+            <h3>
+                تسوق من افضل الماركات      
+            </h3>
+            <hr class="upper-sep">
+            <section  id="branding">
+                <div class="swiper branding-slider">
                     <div class="swiper-wrapper">
-                        {% if ads %} 
-                            {% for ad in ads %}
-                                <!-- Slide-start -->
-                                <div class="swiper-slide tranding-slide">
-                                    <div class="tranding-slide-img">
-                                        <a href="{{ ad.get_ad_url }}" aria-label="استعرض {{ad.title}}">
-                                            <img src="{{ ad.img.url }}" alt="{{ ad.title }}">
-                                        </a>
+                        {% if brands %} <!-- منع حدوذ خطأ اذا لم يكن هناك ماركات بقاعدة البيانات  -->
+                            {% for brand in brands %}
+                                <!-- brand-logo-start -->
+                                <div class="swiper-slide branding-slide">
+                                    <div class="branding-slide-img">
+                                        <a href="{% url "store:brand" brand.title %}" aria-label="استعرض {{ brand.title}}"><img src="{{ brand.img.url }}" alt="{{ brand.title }}"></a>
                                     </div>
                                 </div>
-                                <!-- Slide-end -->
+                                <!-- brand-logo-end -->
                             {% endfor %}
                         {% else %}
-                            <h2> نعتذر لايوجد اعلانات لعرضها حاليا </h2>
+                            <h4 > لايوجد ماركات لعرضها حاليا </h4>
                         {% endif %}
                     </div>
                 </div>     
-        </section>
-    </div>
-    <!-- End Ads -->
-    <!-- Start Brands -->
-    <div class="brands">
-        <h3>
-            تسوق من افضل الماركات      
-        </h3>
-        <hr class="upper-sep">
-        <section  id="branding">
-            <div class="swiper branding-slider">
-                <div class="swiper-wrapper">
-                    {% if brands %} <!-- منع حدوذ خطأ اذا لم يكن هناك ماركات بقاعدة البيانات  -->
-                        {% for brand in brands %}
-                            <!-- brand-logo-start -->
-                            <div class="swiper-slide branding-slide">
-                                <div class="branding-slide-img">
-                                    <a href="{% url "store:brand" brand.title %}" aria-label="استعرض {{ brand.title}}"><img src="{{ brand.img.url }}" alt="{{ brand.title }}"></a>
-                                </div>
-                            </div>
-                            <!-- brand-logo-end -->
-                        {% endfor %}
-                    {% else %}
-                        <h4 > لايوجد ماركات لعرضها حاليا </h4>
-                    {% endif %}
-                </div>
-            </div>     
-        </section>
-    </div>
-    <!-- End Brands -->
-    <!-- Start Offer Products Section -->
-    <hr class="sep">
-    <section  id="products">
-            <a href="{% url "store:offer_page" %}" aria-label="استعرض اقوى العروض">
-                <div class="title">
-                    <h2> اقوى العروض</h2>
-                    <i class="fa-solid fa-angles-left"></i>
-                </div>
-            </a>  
-            <div class="swiper products-slider">
-                <div class="swiper-wrapper">
-                    {% for product in offered_products %}
-                        {% include "common/product-card.html" %}
-                    {% endfor %}
-                </div>
-            </div> 
-    </section>
-    <!-- End Offer Products Section -->
-    <!-- Start Best sales Products Section -->
-    <hr class="sep">
-    <section  id="products">
-            <a href="{% url "store:best-sales" %}" aria-label="استعرض المنتجات الأعلى مبيعاً">
-                <div class="title">
-                    <h2>المنتجات الأعلى مبيعاً</h2>
-                    <i class="fa-solid fa-angles-left"></i>
-                </div>
-            </a>  
-            <div class="swiper products-slider">
-                <div class="swiper-wrapper">
-                    {% for product in best_sales_products %}
-                        {% include "common/product-card.html" %}
-                    {% endfor %}
-                </div>
-            </div> 
-    </section>
-    <!-- End Best sales Products Section -->
-    {% for category in categories %}
-    <!-- Start Products Section -->
+            </section>
+        </div>
+        <!-- End Brands -->
+        <!-- Start Offer Products Section -->
         <hr class="sep">
         <section  id="products">
-                <a href="{% url "store:category" category.slug %}" aria-label="استعرض {{category.name}}">
+                <a href="{% url "store:offer_page" %}" aria-label="استعرض اقوى العروض">
                     <div class="title">
-                        <h2> {{ category.name }} </h2>
+                        <h2> اقوى العروض</h2>
                         <i class="fa-solid fa-angles-left"></i>
                     </div>
                 </a>  
                 <div class="swiper products-slider">
                     <div class="swiper-wrapper">
-                        {% for product in category.products.all %}
+                        {% for product in offered_products %}
                             {% include "common/product-card.html" %}
                         {% endfor %}
                     </div>
                 </div> 
         </section>
-        <!-- End Products Section -->
-   {% endfor %}
-</div>
-
+        <!-- End Offer Products Section -->
+        <!-- Start Best sales Products Section -->
+        <hr class="sep">
+        <section  id="products">
+                <a href="{% url "store:best-sales" %}" aria-label="استعرض المنتجات الأعلى مبيعاً">
+                    <div class="title">
+                        <h2>المنتجات الأعلى مبيعاً</h2>
+                        <i class="fa-solid fa-angles-left"></i>
+                    </div>
+                </a>  
+                <div class="swiper products-slider">
+                    <div class="swiper-wrapper">
+                        {% for product in best_sales_products %}
+                            {% include "common/product-card.html" %}
+                        {% endfor %}
+                    </div>
+                </div> 
+        </section>
+        <!-- End Best sales Products Section -->
+        {% for category in categories %}
+        <!-- Start Products Section -->
+            <hr class="sep">
+            <section  id="products">
+                    <a href="{% url "store:category" category.slug %}" aria-label="استعرض {{category.name}}">
+                        <div class="title">
+                            <h2> {{ category.name }} </h2>
+                            <i class="fa-solid fa-angles-left"></i>
+                        </div>
+                    </a>  
+                    <div class="swiper products-slider">
+                        <div class="swiper-wrapper">
+                            {% for product in category.products.all %}
+                                {% include "common/product-card.html" %}
+                            {% endfor %}
+                        </div>
+                    </div> 
+            </section>
+            <!-- End Products Section -->
+        {% endfor %}
+    </div>
 
 {% endblock content %}
+
+{% block additional_js %}
+    <script src=" {% static "/javascript/home.js" %}" defer></script>
+{% endblock %}

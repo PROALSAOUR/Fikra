@@ -1,6 +1,8 @@
 {% extends "partials/base.html" %}
 {% load static %}
-
+{% block additional_css %}
+    <link rel="stylesheet" href="{% static "/css/main-pages.css" %}">   
+{% endblock %}
 {% block content %}
     <div class="search-page">
         <div class="search" style='padding-top:100px;'>

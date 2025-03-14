@@ -1,6 +1,10 @@
 {% extends "partials/base.html" %}
 {% load static %}
 
+{% block additional_css %}
+    <link rel="stylesheet" href="{% static "/css/product-details.css" %}">   
+{% endblock %}
+
 {% block content %}
 
     <div class='my-main-content' style='padding-top:100px;'> 
@@ -194,3 +198,7 @@
     </div>
 
 {% endblock content %}
+
+{% block additional_js %}
+    <script src=" {% static "/javascript/product-details.js" %}" defer></script>
+{% endblock %}

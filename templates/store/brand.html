@@ -1,6 +1,10 @@
 {% extends "partials/base.html" %}
 {% load static %}
 
+{% block additional_css %}
+    <link rel="stylesheet" href="{% static "/css/main-pages.css" %}">   
+{% endblock %}
+
 {% block content %}
     <div class="search-page brand-bage">
         <!-- Start Search Bar -->
@@ -244,10 +248,6 @@
     </div>
 {% endblock content %}
 
-
-
-
-
-
-
-
+{% block additional_js %}
+    <script src=" {% static "/javascript/main-pages.js" %}" defer></script>
+{% endblock %}

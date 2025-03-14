@@ -8,9 +8,6 @@
     <meta name="description" content=" الوجهة المثالية لعشاق الأناقة، نقدم ملابس عصرية للرجال والنساء بتصاميم فريدة وجودة عالية، استمتعوا بتجربة تسوق ممتعة لتجديد إطلالتكم بأحدث صيحات الموضة.">
     <meta name="csrf-token" content="{{ csrf_token }}">
     
-    <!-- تحسين تحميل الخطوط -->
-    <link rel="preload" href="https://fonts.gstatic.com/s/almarai/v11/Almarai-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-
     <!-- import css files -->
     <link rel="stylesheet" href="{% static "/css/normalize.css" %}" media="print" onload="this.media='all'">   <!-- Render All Element Normally -->
     <link rel="stylesheet" href="{% static "/css/all.css" %}" media="print" onload="this.media='all'">   <!-- Font Awesome Icons File     -->
@@ -18,10 +15,14 @@
     <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />   <!-- Slider Style CSS File       -->       
     <link rel="stylesheet" href="{% static "/css/loader.css" %}">  <!-- Loader  CSS File -->
     <link rel="stylesheet" href="{% static "/css/style.css" %}">   <!-- Main Template CSS File -->
+
+    {% comment %} ادراج ملفات css الخاصة بصفحة معينة هنا {% endcomment %}
+    {% block additional_css %}{% endblock %}
+    
     <!-- import font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet" as="font" type="font/woff2" crossorigin="anonymous">
     <!-- import PWA  -->
     <link rel="apple-touch-icon" href="{% static "/images/icons/small-logo.png" %}" sizes="192x192">
     <link rel="manifest" href="{% static 'manifest.json' %}">
@@ -51,7 +52,6 @@
 
     
     {% block content %}    
-    
     {% endblock content %}
     
     {% include "pop-pages/added-to-cart.html" %}
@@ -67,12 +67,13 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"  defer></script>
     <script src=" {% static "/javascript/pop-pages.js" %}"  defer></script>
     <script src=" {% static "/javascript/loader.js" %}" defer></script>
-    <script src=" {% static "/javascript/live-search.js" %}" defer></script>
     <script src=" {% static "/javascript/main.js" %}" defer></script>
+
+    {% comment %} ادراج ملفات js الخاصة بصفحة معينة هنا {% endcomment %}
+    {% block additional_js %}{% endblock %}
 
     {% comment %} only in debugging remove later {% endcomment %}
     {% include "pop-pages/only-devolpment.html" %}
-
 
 </body>
 </html>

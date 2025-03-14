@@ -4,6 +4,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const installBtn = document.getElementById('pwa-download');
 
     let deferredPrompt;
+
+    // التحقق مما إذا كان التطبيق مثبتًا بالفعل
+    function isAppInstalled() {
+        return (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone);
+    }
+
+    // إخفاء الزر إذا كان التطبيق مثبتًا
+    if (isAppInstalled()) {
+        hideAfterDownload.style.display = 'none';
+    }
+
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;        
@@ -31,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     downloadMenu.style.visibility = 'visible';
                     downloadMenu.style.opacity = '1';
                     downloadMenu.style.transform = 'translate(-50%, -40%) scale(1)';
-                }, 100);
+                }, 1000);
                 hideDownloadMenu();
             }
     

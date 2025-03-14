@@ -1,6 +1,8 @@
 {% extends "partials/base.html" %}
 {% load static %}
-
+{% block additional_css %}
+    <link rel="stylesheet" href="{% static "/css/orders.css" %}">   
+{% endblock %}
 {% block content %}
 
 <div class="my-orders-page" style="position: relative;">
@@ -74,3 +76,6 @@
 {% endblock content %}
 
 
+{% block additional_js %}
+    <script src=" {% static "/javascript/orders.js" %}" defer></script>
+{% endblock %}

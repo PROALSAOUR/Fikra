@@ -1,6 +1,10 @@
 {% extends "partials/base.html" %}
 {% load static %}
 
+{% block additional_css %}
+    <link rel="stylesheet" href="{% static "/css/accounts.css" %}">   
+{% endblock %}
+
 {% block content %}
 
     <div class="account-page" style="position: relative;">
@@ -148,3 +152,6 @@
     <script src=" {% static "/javascript/install-app.js" %}"></script>
 {% endblock content %}
     
+{% block additional_js %}
+    <script src=" {% static "/javascript/accounts.js" %}" defer></script>
+{% endblock %}
