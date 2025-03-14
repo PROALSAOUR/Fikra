@@ -1,3 +1,7 @@
+window.addEventListener("load", function() {
+    document.getElementById("loader").style.display = "none";
+});
+// ============================================================================
 // الثيم وقائمة الميقا منيو
 document.addEventListener('DOMContentLoaded', function() {
     const toggle = document.getElementById('them');

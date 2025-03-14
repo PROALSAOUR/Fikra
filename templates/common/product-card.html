@@ -7,7 +7,7 @@
                     <span>{{product.get_offer_percentage|floatformat:0}}% </span>
                 {% endif %}
             </div>
-            <img src="{{ product.thumbnail_img.url }}" alt="{{ product.name}}" loading="lazy">
+            <img src="{{ product.thumbnail_img.url }}" alt="{{ product.name}}" loading="lazy" height="168" width="210">
         </div>
         <div class="product-info">
             <div class="product-name"> {{ product.name|slice:":20" }}{% if product.name|length > 20 %}...{% endif %}</div> <!-- اقصى طول 20 حرف -->

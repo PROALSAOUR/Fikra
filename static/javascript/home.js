@@ -1,15 +1,5 @@
 // السلايدرات الخاصة بالاعلانات والعلامات التجارية بالصفحة الرئيسية
-document.addEventListener('DOMContentLoaded', function() {
-
-    // إعداد سلايدر المنتجات
-    if (document.querySelector('.products-slider')) {
-      var ProductSlider = new Swiper('.products-slider', {
-        grabCursor: true,
-        slidesPerView: 'auto',
-        loopAdditionalSlides: 30, // لجعل الحركة أكثر سلاسة
-      });
-    }
-  
+document.addEventListener('DOMContentLoaded', function() {  
     // إعداد سلايدر الترويج
     if (document.querySelector('.tranding-slider')) {
       var TrandingSlider = new Swiper('.tranding-slider', {
