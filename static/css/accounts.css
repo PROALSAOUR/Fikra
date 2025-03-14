@@ -608,11 +608,13 @@
     color: #1877f2;
     text-decoration: underline;
   }
-  .sign-page .sign-card span {
+  .sign-page .sign-card .flip {
     position: absolute;
     left: 10px;
     bottom: 10px;
     color: var(--disaple-text-color);
+    background-color: transparent;
+    border: none;
     font-size: var(--tab-s-size);
     font-weight: 800;
     cursor: pointer;
@@ -681,7 +683,7 @@
     .sign-page .sign-card h1{
       font-size: var(--tab-l-size);
     }
-    .sign-page .sign-card span{
+    .sign-page .sign-card .flip{
       font-size: var(--mob-s-size);
     }
     .sign-page .sign-card .read-policy {
@@ -712,7 +714,7 @@
       font-size: var(--mob-l-size);
       margin-bottom: 15px;
     }
-    .sign-page .sign-card span{
+    .sign-page .sign-card .flip{
       font-size: calc(var(--mob-s-size) - 2px);
     }
     .sign-page .sign-card form label {
