@@ -17,13 +17,18 @@
     {% comment %} ادراج ملفات css الخاصة بصفحة معينة هنا {% endcomment %}
     {% block additional_css %}{% endblock %}
     
-    <!-- import font -->
+    <!-- Preconnect to font servers for faster connection -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Preload font for faster rendering -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+
+    <!-- Load the font stylesheet (fallback for browsers that don't support preload) -->
     <noscript>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap">
     </noscript>
+
     
     <!-- import PWA  -->
     <link rel="apple-touch-icon" href="{% static "/images/icons/small-logo.webp" %}" sizes="192x192">
