@@ -11,7 +11,7 @@ self.addEventListener('install', function(event) {
         '/static/css/all.min.css',
         '/static/css/style.css', 
         '/static/javascript/main.js',  
-        '/static/images/icons/small-logo.png',  
+        '/static/images/icons/small-logo.webp',  
       ]);
     })
   );

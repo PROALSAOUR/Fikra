@@ -10,7 +10,7 @@
 "status_bar": "default",
 "icons": [
   {
-    "src": "/static/images/icons/small-logo.png",
+    "src": "/static/images/icons/small-logo.webp",
     "sizes": "192x192"
   }
 ],

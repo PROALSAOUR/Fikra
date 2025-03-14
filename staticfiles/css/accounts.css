@@ -871,23 +871,7 @@
     left: 0%;
     top: 18%;
   }
-  .exit-button.see-dealing {
-    position: relative;
-    right: 0 !important;
-    font-size: 12px !important;
-    padding: 10px 5px !important;
-    left: 80%  !important;
-    top:18px !important;
-  }
-  .exit-button.see-dealing i {
-    margin-right: 5px;
-    font-size: 10px ;
-    transform: rotateY(180deg);
-    -webkit-transform: rotateY(180deg);
-    -moz-transform: rotateY(180deg);
-    -ms-transform: rotateY(180deg);
-    -o-transform: rotateY(180deg);
-  }
+
   @media (max-width: 890px) {
     .edit-card .edit-exit {
       top: 15%;

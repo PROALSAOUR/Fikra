@@ -269,10 +269,10 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
     
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "images/icons/small-logo.png",
+    "site_logo": "images/icons/small-logo.webp",
 
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
-    "login_logo": 'images/admin-logo.jpg',
+    "login_logo": 'images/admin-logo.webp',
 
     # CSS classes that are applied to the logo above
     "site_logo_classes": "img-circle",
@@ -352,7 +352,7 @@ PWA_APP_START_URL = "/"
 PWA_SERVICE_WORKER_PATH = None
 PWA_APP_ICONS = [
     {
-        "src": "/static/images/icons/small-logo.png",
+        "src": "/static/images/icons/small-logo.webp",
         "sizes": "192x192"
     }
 ]
