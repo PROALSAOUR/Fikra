@@ -7,29 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content=" الوجهة المثالية لعشاق الأناقة، نقدم ملابس عصرية للرجال والنساء بتصاميم فريدة وجودة عالية، استمتعوا بتجربة تسوق ممتعة لتجديد إطلالتكم بأحدث صيحات الموضة.">
     <meta name="csrf-token" content="{{ csrf_token }}">
-    
     <!-- import css files -->
-    <link rel="stylesheet" href="{% static "/css/normalize.css" %}" media="print" onload="this.media='all'">   <!-- Render All Element Normally -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.0.0/swiper-bundle.min.css" media="print" onload="this.media='all'" /> <!-- Slider Style CSS File       -->       
+    <link rel="stylesheet" href="{% static "/css/normalize.css" %}" media="print" onload="this.media='all'"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.0.0/swiper-bundle.min.css" /> 
     <link rel="stylesheet" href="{% static "/css/all.min.css" %}">  <!-- Font Awesome Icons File     -->
-    <link rel="stylesheet" href="{% static "/css/style.css" %}">   <!-- Main Template CSS File -->
-
+    <link rel="stylesheet" href="{% static "/css/style.css" %}"> 
     {% comment %} ادراج ملفات css الخاصة بصفحة معينة هنا {% endcomment %}
     {% block additional_css %}{% endblock %}
-    
     <!-- Preconnect to font servers for faster connection -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     <!-- Preload font for faster rendering -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-
     <!-- Load the font stylesheet (fallback for browsers that don't support preload) -->
-    <noscript>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap">
-    </noscript>
-
-    
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap"></noscript>
     <!-- import PWA  -->
     <link rel="apple-touch-icon" href="{% static "/images/icons/small-logo.webp" %}" sizes="192x192">
     <link rel="manifest" href="{% static 'manifest.json' %}">
@@ -72,7 +63,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.0.0/swiper-bundle.min.js" defer></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" defer></script>
     <script src=" {% static "/javascript/pop-pages.js" %}" defer></script>
-    <script src=" {% static "/javascript/main.js" %}" defer></script>
+    <script src=" {% static "/javascript/main.js" %}"></script>
 
     {% comment %} ادراج ملفات js الخاصة بصفحة معينة هنا {% endcomment %}
     {% block additional_js %}{% endblock %}

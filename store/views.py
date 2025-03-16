@@ -8,9 +8,20 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.timezone import now 
 from django.core.cache import cache
+from django.http import HttpResponse
+import os
+from django.conf import settings
 import logging
 logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
 
+def service_worker(request):
+    service_worker_path = os.path.join(settings.BASE_DIR, 'serviceworker.js')
+    try:
+        with open(service_worker_path, encoding='utf-8') as serviceworker_file:
+            return HttpResponse(serviceworker_file.read(), content_type='application/javascript')
+    except FileNotFoundError:
+        return HttpResponse('Service worker file not found', status=404)
+# ===================================================
 # صفحة الاوف لاين
 def offline(request):
     return render(request, 'store/offline.html')

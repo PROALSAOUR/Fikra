@@ -95,16 +95,23 @@
       margin: 0 25px;
     }
   }
-  #tranding .tranding-slide .tranding-slide-img img {
-    width: 100%;
-    height: 100%;
+
+  #tranding .tranding-slide .tranding-slide-img {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
     cursor: pointer;
-    object-fit: cover;
     border-radius: var(--main-border-radius);
     -webkit-border-radius: var(--main-border-radius);
     -moz-border-radius: var(--main-border-radius);
     -ms-border-radius: var(--main-border-radius);
     -o-border-radius: var(--main-border-radius);
+  }
+  #tranding .tranding-slide .tranding-slide-img img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   .swiper-slide-shadow-left,
   .swiper-slide-shadow-right {
@@ -193,6 +200,9 @@
     }
   }
   #branding .branding-slide .branding-slide-img  {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
     width: 100%;
     height: 100%;
     background-color: var(--background-color);
@@ -201,9 +211,9 @@
     -moz-border-radius: var(--main-border-radius);
     -ms-border-radius: var(--main-border-radius);
     -o-border-radius: var(--main-border-radius);
-    overflow: hidden;
   }
   #branding .branding-slide .branding-slide-img img {
+    display: block;
     width: 100%;
     height: 100%;
     aspect-ratio: 1 / 1;  
@@ -214,5 +224,32 @@
   .swiper-slide-shadow-right {
     display: none;
   }
-  
+  /* طبقة التأثير اللامع */
+  .shimmer-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.7) 20%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.7) 80%);
+    background-size: 200% 200%;
+    animation: shimmer 1s infinite ease-in-out;
+    pointer-events: none; /* لضمان عدم تأثيره على التفاعل */
+}
+
+/* حركة نبضية قوية */
+@keyframes shimmer {
+    0% {
+        transform: scale(1);
+        opacity: 0.4;
+    }
+    50% {
+        transform: scale(1.1); /* تأثير تكبير أقوى */
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.4;
+    }
+}
   /* End Brands */

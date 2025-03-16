@@ -6,6 +6,8 @@ app_name = 'store'
 urlpatterns = [
     path("", index, name="home"),
     
+    path('serviceworker.js', service_worker, name='service_worker'),
+    
     path('offline/', offline, name='offline'),
     
     path("brand/<slug:slug>/", brand_page, name="brand"),

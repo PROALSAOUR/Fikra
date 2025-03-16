@@ -2,35 +2,33 @@ window.addEventListener("load", function() {
     document.getElementById("loader").style.display = "none";
 });
 // ============================================================================
-// الثيم وقائمة الميقا منيو
+const toggle = document.getElementById('them');
+const body = document.body;
+if (toggle && body) {
+    // تحقق من وجود الكلاس في localStorage واضف الكلاس إلى body إذا كان موجودًا
+    if (localStorage.getItem('them') === 'light') {
+        body.classList.add('light-them');
+        toggle.checked = true; // لا حاجة لفحص toggle هنا لأننا تحققنا مسبقًا
+    }
+
+    // حدث عند تغيير حالة التشيك بوكس
+    toggle.addEventListener('change', function() {
+        if (toggle.checked) {
+            body.classList.add('light-them');
+            localStorage.setItem('them', 'light');
+        } else {
+            body.classList.remove('light-them');
+            localStorage.removeItem('them'); // تأكد من حذف المفتاح الصحيح
+        }
+    });
+}
+
+// ============================================================================
+// قائمة الميقا منيو
 document.addEventListener('DOMContentLoaded', function() {
-    const toggle = document.getElementById('them');
     const body = document.body;
     const sideMenu = document.querySelector('.mega-menu');
     const sideMenuCheckbox = document.getElementById('side-menu');
-  
-      
-    // تحقق من وجود الكلاس في localStorage واضف الكلاس إلى body إذا كان موجودًا
-    if (localStorage.getItem('them') === 'light') {
-      body.classList.add('light-them');
-      if (toggle) {
-        toggle.checked = true;
-      }
-    }
-  
-    // حدث عند تغيير حالة التشيك بوكس
-    if (toggle) {
-      toggle.addEventListener('change', function() {
-        if (toggle.checked) {
-          body.classList.add('light-them');
-          localStorage.setItem('them', 'light');
-        } else {
-          body.classList.remove('light-them');
-          localStorage.removeItem('them'); // تأكد من حذف المفتاح الصحيح
-        }
-      });
-    }
-  
     // إغلاق القائمة الجانبية عند النقر على زر الإغلاق
     const exitButton = document.querySelector('.exit');
     if (exitButton && sideMenuCheckbox && sideMenu) {
@@ -39,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
         body.classList.remove('no-scroll'); // إزالة منع التمرير
       });
     }
-  
     // إغلاق القائمة الجانبية عند النقر على أي مكان خارجها
     document.addEventListener('click', function(event) {
       if (
@@ -53,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function() {
         body.classList.remove('no-scroll'); // إزالة منع التمرير
       }
     });
-  
     // تفعيل خاصية التمرير عند فتح القائمة الجانبية
     if (sideMenuCheckbox) {
       sideMenuCheckbox.addEventListener('change', function() {
@@ -64,7 +60,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
     }
-  
 });
 // ========================================================================================================
 // دالة لجلب الـ CSRF token من الكوكيز
@@ -189,33 +184,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 // =============================================================================================
-// دالة اضافة المنتج و ازالته من المفضلة
-$(document).ready(function() {
-    $('.add-to-fav-link').on('click', function(event) {
-        event.preventDefault(); // Prevent the default link behavior
-  
-        var $this = $(this);
-        var url = $this.attr('href');
-        var productId = $this.data('product-id');
-  
-        $.ajax({
-            url: url,
-            method: 'GET',
-            success: function(response) {
-                if (response.added) {
-                    $this.find('i').removeClass('fa-regular fa-heart').addClass('fa-solid fa-heart');
-                } else {
-                    $this.find('i').removeClass('fa-solid fa-heart').addClass('fa-regular fa-heart');
+document.addEventListener('DOMContentLoaded', function() {
+    // دالة اضافة المنتج و ازالته من المفضلة
+    $(document).ready(function() {
+        $('.add-to-fav-link').on('click', function(event) {
+            event.preventDefault(); // Prevent the default link behavior
+    
+            var $this = $(this);
+            var url = $this.attr('href');
+            var productId = $this.data('product-id');
+    
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    if (response.added) {
+                        $this.find('i').removeClass('fa-regular fa-heart').addClass('fa-solid fa-heart');
+                    } else {
+                        $this.find('i').removeClass('fa-solid fa-heart').addClass('fa-regular fa-heart');
+                    }
+    
+                    // Reload the page if the user is on the favourites page
+                    if (window.location.pathname === '/favourite/') {
+                        location.reload();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error adding to favourites:', error);
                 }
-  
-                // Reload the page if the user is on the favourites page
-                if (window.location.pathname === '/favourite/') {
-                    location.reload();
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error adding to favourites:', error);
-            }
+            });
         });
     });
 });

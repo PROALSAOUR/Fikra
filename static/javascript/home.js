@@ -40,5 +40,16 @@ document.addEventListener('DOMContentLoaded', function() {
         freeMode: true, // تفعيل الوضع الحر لضمان الحركة المستمرة
       });
     }
+    const images = document.querySelectorAll(".lazy-load");
+    images.forEach(img => {
+      const tempImg = new Image();
+      tempImg.src = img.getAttribute("data-src");
+
+      tempImg.onload = function () {
+          img.src = tempImg.src; // استبدال الصورة الافتراضية بالأصلية
+          img.nextElementSibling.remove(); // إزالة التأثير عند تحميل الصورة
+      };
+    });
+
 });
 // ========================================================================================================
