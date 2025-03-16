@@ -15,11 +15,28 @@ self.addEventListener('install', function(event) {
   );
 });
 
+self.addEventListener('activate', function(event) {
+  var cacheWhitelist = ['djangopwa-v1.1']; // الكاش الذي ترغب في الاحتفاظ به (الإصدار الجديد)
+
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          // إذا لم يكن الكاش في قائمة الـ whitelist، قم بحذفه
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName); // حذف الكاش القديم
+          }
+        })
+      );
+    })
+  );
+});
+
 self.addEventListener('fetch', function(event) {
   event.respondWith(
     caches.match(event.request).then(function(response) {
-      // إذا كان الطلب هو index.html، لا تقدم الملف من الكاش
-      if (event.request.url.endsWith('index.html')) {
+      // إذا كان الطلب هو ملف HTML، لا يتم تخزينه في الكاش
+      if (event.request.url.endsWith('.html')) {
         return fetch(event.request); // قم بتحميله مباشرة من الشبكة
       }
       return response || fetch(event.request).catch(function() {
@@ -28,3 +45,4 @@ self.addEventListener('fetch', function(event) {
     })
   );
 });
+
