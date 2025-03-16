@@ -11,7 +11,14 @@
                         <span>منتهية</span>
                     {% endif %}
                 </div>
-                <img src="{{ usage_copon.copon_code.img.url }}" alt="خصم {{ usage_copon.copon_code.name }}">
+                <img class="lazy-load" 
+                        src="{% static 'images/square-default.webp' %}" 
+                        data-src="{{ usage_copon.copon_code.img.url }}" 
+                        alt="خصم {{ usage_copon.copon_code.name }}"
+                        loading="lazy" 
+                        height="168" width="210"
+                >
+                <div class="shimmer-effect"></div>
             </div>
             <div class="product-info">
                 <h4 class="product-name">{{ usage_copon.copon_code.name }}</h4>

@@ -44,7 +44,14 @@
                 </div>
             </div>
             <div class="image">
-                <img src="{% static "images/graphic-designer.webp" %}" alt="تعديل بياناتي" loading="lazy">
+                <img class="lazy-load" 
+                    src="{% static 'images/square-default.webp' %}" 
+                    data-src="{% static "images/graphic-designer.webp" %}"
+                    alt="متجر فكرة طبرق"
+                    width="168" height="168" 
+                    loading="lazy"
+                >
+                <div class="shimmer-effect"></div>
             </div>
 
         </form>

@@ -682,8 +682,6 @@
       min-width: 200px;
       max-width: 220px;
       height: 100%;
-    }
-    .favorite .specific .product-box .product-image img {
       border-top-left-radius: 0px ;
       border-top-right-radius: var(--main-border-radius);
       border-bottom-right-radius: var(--main-border-radius);

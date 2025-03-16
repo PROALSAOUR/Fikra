@@ -273,14 +273,15 @@ input[type="number"] {
   }
   .product-box .product-image{
     position: relative;
+    overflow: hidden;
     width: 100%;
     height: 60%;
+    border-top-left-radius: var(--main-border-radius);
+    border-top-right-radius: var(--main-border-radius);
   }
   .product-box .product-image img{
     width: 100%;
     height: 100%;
-    border-top-left-radius: var(--main-border-radius);
-    border-top-right-radius: var(--main-border-radius);
   }
   .product-box .product-image .off-holder {
     display: none;
@@ -556,8 +557,6 @@ input[type="number"] {
       width: 250px;
       max-width: 300px;
       height: 100%;
-    }
-    .specific .product-box .product-image img {
       border-top-left-radius: 0px ;
       border-top-right-radius: var(--main-border-radius);
       border-bottom-right-radius: var(--main-border-radius);
@@ -1919,8 +1918,11 @@ input[type="number"] {
   .footer .social .social-icons li.facebook:hover  {
     background-color:#1877f2;
   }
-  .footer .social .social-icons li.instagram:hover  {
-    background-color: #c13584;
+  .footer .social .social-icons li.tiktok:hover {
+    background:#FE2C55 100% ;
+  }
+  .footer .social .social-icons li.tiktok:hover i {
+    color: #000000;
   }
   .footer .social .social-icons li.whatsapp:hover  {
     background-color:#25d366;
@@ -1972,8 +1974,11 @@ input[type="number"] {
   .footer .social li a i.facebook {
     color: #1877f2;
   }
-  .footer .social li a i.instagram {
-    color: #c13584;
+  .footer .social li a i.tiktok {
+    color: #171616; /* اللون الأساسي للأيقونة */
+    text-shadow: 
+    2px 2px 0px #25F4EE,  /* سماوي */
+    -2px -2px 0px #FE2C55; /* وردي */
   }
   .footer .social li a i.whatsapp {
     color: #25d366;
@@ -2443,3 +2448,29 @@ hr.sep {
   100% { transform: rotate(360deg); }
 }
 /* end loader */
+/* طبقة التأثير اللامع */
+.shimmer-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.7) 20%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.7) 80%);
+  background-size: 200% 200%;
+  animation: shimmer 1s infinite ease-in-out;
+  pointer-events: none;
+}
+@keyframes shimmer {
+  0% {
+      transform: scale(1);
+      opacity: 0.4;
+  }
+  50% {
+      transform: scale(1.1); /* تأثير تكبير أقوى */
+      opacity: 1;
+  }
+  100% {
+      transform: scale(1);
+      opacity: 0.4;
+  }
+}

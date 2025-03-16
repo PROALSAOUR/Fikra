@@ -28,7 +28,7 @@
     max-width: 700px;
     margin: 30px auto 20px;
     text-align: center;
-    overflow: hidden;
+    overflow: hidden !important;
   }
   .product-details-page .main-slider {
     width: 100%;

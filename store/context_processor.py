@@ -15,7 +15,7 @@ def social_data(request):
         else:
             return {
                 'facebook_link': "#",
-                'instagram_link': "#",
+                'tiktok_link': "#",
                 'whatsapp_link':"#",
                 'phone_number1': "#",
                 'phone_number2': "#",
@@ -24,7 +24,7 @@ def social_data(request):
         
     return {
         'facebook_link': social.facebook,
-        'instagram_link': social.instagram,
+        'tiktok_link': social.tiktok,
         'whatsapp_link': social.whatsapp,
         'phone_number1': social.phone_number1,
         'phone_number2': social.phone_number2,

@@ -17,7 +17,14 @@
 
         <div class="upper-part">
             <div class="card-image">
-                <img src="{{ copon.img.url }}" alt="Product Image">
+                <img class="lazy-load" 
+                    src="{% static 'images/square-default.webp' %}" 
+                    data-src="{{ copon.img.url }}"
+                    alt="{{ copon.name }} تخفيض"
+                    loading="lazy" 
+                    height="168" width="210"
+                >
+                <div class="shimmer-effect"></div>
             </div>
             <div class="name-price">
                 <h3> {{ copon.name }}</h3>                   

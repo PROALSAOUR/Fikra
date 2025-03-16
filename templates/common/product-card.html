@@ -1,3 +1,4 @@
+{% load static %}
 <!-- product-start -->
 <div class="swiper-slide product-box {% if product.offer %} offer {% endif %}"> <!-- اضف كلاس اوفر اذا كان هنالك تخفيض- -->
     <a href="{% url "store:product_details" product.id %}" aria-label="استعرض {{product.name}}">
@@ -7,7 +8,14 @@
                     <span>{{product.get_offer_percentage|floatformat:0}}% </span>
                 {% endif %}
             </div>
-            <img src="{{ product.thumbnail_img.url }}" alt="{{ product.name}}" loading="lazy" height="168" width="210">
+            <img class="lazy-load" 
+                    src="{% static 'images/square-default.webp' %}" 
+                    data-src="{{ product.thumbnail_img.url }}" 
+                    alt="{{ product.name}}" 
+                    loading="lazy" 
+                    height="168" width="210"
+            >
+            <div class="shimmer-effect"></div>
         </div>
         <div class="product-info">
             <div class="product-name"> {{ product.name|slice:":20" }}{% if product.name|length > 20 %}...{% endif %}</div> <!-- اقصى طول 20 حرف -->

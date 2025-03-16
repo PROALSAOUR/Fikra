@@ -10,7 +10,13 @@
     <div class="blog" style="position: relative; padding-top: 80px;">
         <!-- Start blog page   -->
         <div class="image">
-            <img src="{% static '/images/blog-background.webp' %}" alt="fikra store shop tobruk طبرق ليبيا متجر فكرة">
+            <img class=" lazy-load" 
+                src="{% static 'images/rectangle-default.webp' %}" 
+                data-src="{% static '/images/blog-background.webp' %}" 
+                alt="fikra store shop tobruk طبرق ليبيا متجر فكرة"
+                width="1600" height="900" 
+            >
+            <div class="shimmer-effect"></div>
         </div>
         <div class="container">
             <div class="title">

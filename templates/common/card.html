@@ -4,7 +4,14 @@
     <div class="product-box ">
         <a href=" {% url "cards:copon-details" card.id %}">
             <div class="product-image">
-                <img src="{{ card.img.url }}" alt="{{ card.name }} تخفيض">
+                <img class="lazy-load" 
+                        src="{% static 'images/square-default.webp' %}" 
+                        data-src="{{ card.img.url }}" 
+                        alt="{{ card.name }} تخفيض"
+                        loading="lazy" 
+                        height="168" width="210"
+                >
+                <div class="shimmer-effect"></div>
             </div>
             <div class="product-info">
                 <h4 class="product-name">{{ card.name }}</h4>

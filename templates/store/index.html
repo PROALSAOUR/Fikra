@@ -23,7 +23,7 @@
                                         <div class="tranding-slide-img">
                                             <a href="{{ ad.get_ad_url }}" aria-label="استعرض {{ad.title}}">
                                                 <img class="ad-img lazy-load" 
-                                                    src="{% static 'images/ad-default.webp' %}" 
+                                                    src="{% static 'images/rectangle-default.webp' %}" 
                                                     data-src="{{ ad.img.url }}" 
                                                     alt="{{ ad.title }}" 
                                                     width="1600" height="900" 
@@ -58,11 +58,11 @@
                                 <div class="swiper-slide branding-slide">
                                     <div class="branding-slide-img">
                                         <a href="{% url "store:brand" brand.title %}" aria-label="استعرض {{ brand.title}}">
-                                            <img class="brand-img lazy-load" 
-                                                    src="{% static 'images/brand-default.webp' %}" 
-                                                    data-src="{{ brand.img.url }}" 
-                                                    alt="{{ brand.title }}" 
-                                                    width="80" height="80"
+                                            <img class="lazy-load" 
+                                                src="{% static 'images/square-default.webp' %}" 
+                                                data-src="{{ brand.img.url }}" 
+                                                alt="{{ brand.title }}" 
+                                                width="80" height="80"
                                             >
                                             <div class="shimmer-effect"></div>
                                         </a>
@@ -97,22 +97,24 @@
         </section>
         <!-- End Offer Products Section -->
         <!-- Start Best sales Products Section -->
-        <hr class="sep">
-        <section  id="products">
+        {% if best_sales_products %}
+            <hr class="sep">
+            <section  id="products">
                 <a href="{% url "store:best-sales" %}" aria-label="استعرض المنتجات الأعلى مبيعاً">
                     <div class="title">
                         <h2>المنتجات الأعلى مبيعاً</h2>
                         <i class="fa-solid fa-angles-left"></i>
-                    </div>
-                </a>  
-                <div class="swiper products-slider">
-                    <div class="swiper-wrapper">
-                        {% for product in best_sales_products %}
-                            {% include "common/product-card.html" %}
-                        {% endfor %}
-                    </div>
-                </div> 
-        </section>
+                        </div>
+                    </a>  
+                    <div class="swiper products-slider">
+                        <div class="swiper-wrapper">
+                            {% for product in best_sales_products %}
+                                {% include "common/product-card.html" %}
+                            {% endfor %}
+                        </div>
+                    </div> 
+                </section>
+        {% endif %}
         <!-- End Best sales Products Section -->
         {% for category in categories %}
         <!-- Start Products Section -->

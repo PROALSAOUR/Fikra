@@ -37,7 +37,14 @@
                                                                 <span>{{item.product.get_offer_percentage|floatformat:0}}% </span>
                                                             {% endif %}
                                                         </div>
-                                                        <img src="{{ item.product_item.image.url }}" alt="{{ item.product.name }}">
+                                                        <img class="lazy-load" 
+                                                                src="{% static 'images/square-default.webp' %}" 
+                                                                data-src="{{ item.product_item.image.url }}" 
+                                                                alt="{{ item.product.name }}"
+                                                                loading="lazy" 
+                                                                height="168" width="210"
+                                                        >
+                                                        <div class="shimmer-effect"></div>
                                                     </div>
                                                     <div class="product-info">
                                                         <div class="product-name"> {{ item.product.name|slice:":20" }}{% if item.product.name|length > 20 %}...{% endif %}</div><!-- اقصى طول 20 حرف -->
@@ -124,7 +131,15 @@
                                                         <div class="off-holder">
                                                             <span>{{item.product.get_offer_percentage|floatformat:0}}% </span>
                                                         </div>
-                                                        <img src="{{ item.product_item.image.url }}" alt="{{ item.product.name }}"  style='opacity: 0.5;'>
+                                                        <img class="lazy-load" 
+                                                                src="{% static 'images/square-default.webp' %}" 
+                                                                data-src="{{ item.product_item.image.url }}" 
+                                                                alt="{{ item.product.name }}"
+                                                                loading="lazy" 
+                                                                height="168" width="210"
+                                                                 style='opacity: 0.5;'
+                                                        >
+                                                        <div class="shimmer-effect"></div>
                                                     </div>
                                                     <div class="product-info">
                                                         <div class="product-name"> {{ item.product.name|slice:":20" }}{% if item.product.name|length > 20 %}...{% endif %}</div><!-- اقصى طول 20 حرف -->

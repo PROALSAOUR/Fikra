@@ -2,6 +2,18 @@ window.addEventListener("load", function() {
     document.getElementById("loader").style.display = "none";
 });
 // ============================================================================
+document.addEventListener('DOMContentLoaded', function() {  
+    const images = document.querySelectorAll(".lazy-load");
+    images.forEach(img => {
+    const tempImg = new Image();
+    tempImg.src = img.getAttribute("data-src");
+    tempImg.onload = function () {
+        img.src = tempImg.src; // استبدال الصورة الافتراضية بالأصلية
+        img.nextElementSibling.remove(); // إزالة التأثير عند تحميل الصورة
+    };
+    });
+});
+// ============================================================================
 const toggle = document.getElementById('them');
 const body = document.body;
 if (toggle && body) {
@@ -22,7 +34,6 @@ if (toggle && body) {
         }
     });
 }
-
 // ============================================================================
 // قائمة الميقا منيو
 document.addEventListener('DOMContentLoaded', function() {
@@ -184,8 +195,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 // =============================================================================================
+// دالة اضافة المنتج و ازالته من المفضلة
 document.addEventListener('DOMContentLoaded', function() {
-    // دالة اضافة المنتج و ازالته من المفضلة
     $(document).ready(function() {
         $('.add-to-fav-link').on('click', function(event) {
             event.preventDefault(); // Prevent the default link behavior
@@ -220,7 +231,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // دالة اضافة المنتج الى السلة من البطاقة الخاصة به
 document.addEventListener('DOMContentLoaded', function() {
     let hideTimeout;
-  
     function showAddToCartMenu() {
         const menu = document.querySelector('.add-cart-pop-page');
         if (!menu) return; // تأكد من وجود القائمة
@@ -320,7 +330,6 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
 });
-
 // =========================================================================================================
 //  كود  تغيير حالة الرسالة الى مقروئة عند النقر عليها
 function markMessageAsRead(markUrl, element) {
@@ -350,4 +359,3 @@ function markMessageAsRead(markUrl, element) {
       }
 }
 // =========================================================================================================
-  
