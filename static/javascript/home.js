@@ -20,10 +20,11 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         speed: 1000,
         loopAdditionalSlides: 30, // لجعل الحركة أكثر سلاسة
-        freeMode: true, // تفعيل الوضع الحر لضمان الحركة المستمرة
+        freeMode: true, 
+        lazy: true,  
+        preloadImages: false, 
       });
     }
-  
     // إعداد سلايدر العلامات التجارية
     if (document.querySelector('.branding-slider')) {
       var BrandingSlider = new Swiper('.branding-slider', {
@@ -33,11 +34,13 @@ document.addEventListener('DOMContentLoaded', function() {
         slidesPerView: 'auto',
         autoplay: {
           delay: 0,
-          disableOnInteraction: true, // استمرار التشغيل التلقائي حتى عند التفاعل مع السلايدر
+          disableOnInteraction: true, 
         },
         speed: 10000,
-        loopAdditionalSlides: 30, // لجعل الحركة أكثر سلاسة
-        freeMode: true, // تفعيل الوضع الحر لضمان الحركة المستمرة
+        loopAdditionalSlides: 30, 
+        freeMode: true, 
+        lazy: true,  
+        preloadImages: false, 
       });
     }
 });
