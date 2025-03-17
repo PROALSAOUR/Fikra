@@ -75,6 +75,10 @@ def sign(request):
                 last_name = sign_up_form.cleaned_data['last_name']
                 otp_code = OTPVerification.generate_code()
 
+                # ايقاف خدمة انشاء حساب مؤقتا
+                messages.error(request, "المعذرة خدمة انشاء حساب تم تعليقها مؤقتا من قبل مالك الموقع يرجى المحاولة لاحقا، او التواصل مع مالك الموقع.")
+                return redirect('accounts:sign')
+            
                 # إرسال OTP عبر واتساب
                 formatted_phone = format_phone_number(phone_number) # الحصول على رقم الهاتف بالصيغة الدولية
                 if formatted_phone:  
