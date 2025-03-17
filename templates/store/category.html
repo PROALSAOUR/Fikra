@@ -68,8 +68,8 @@
                 <div id="products-container" class="searched-products">
                     <div class="container">
                         <div class="products-cards">
-                            {% if products %}
-                                {% for product in products %}
+                            {% if results %}
+                                {% for product in results %}
                                     <!-- product-start -->
                                     <div class="specific">
                                         {% include "common/product-card.html" with product=product %}
@@ -97,8 +97,8 @@
                 <div class="searched-products">
                     <div class="container">
                         <div class="products-cards">
-                            {% if view_products %}
-                                {% for product in view_products %}
+                            {% if products %}
+                                {% for product in products %}
                                     <!-- product-start -->
                                     <div class="specific">
                                         {% include "common/product-card.html" %}
@@ -115,45 +115,46 @@
         </div>
         <!-- End Searched-products  -->
         <!-- Start Pagination -->
-        {% if request.GET.q or request.GET.price_min or request.GET.price_max  or request.GET.brand %}
-                {% if products %}
-                    <div class="pagination-container">
-                        <div class="container">
-                            <div class="pagination">
-                                <!-- Previous Page Link -->
-                                {% if products.has_previous %}
-                                    <a href="?page={{ products.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.price_min %}&price_min={{ request.GET.price_min }}{% endif %}{% if request.GET.price_max %}&price_max={{ request.GET.price_max }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}" 
-                                    class="previous">
-                                        <i class="fa-solid fa-arrow-right"></i>
-                                    </a>
-                                {% else %}
-                                    <div class="previous disapled">
-                                        <i class="fa-solid fa-arrow-right"></i>
-                                    </div>
-                                {% endif %}
-
-                                <!-- Page Number Display -->
-                                <div class="page-number">
-                                    <span class="in-page">{{ products.number }}</span>
-                                    <span class="from">من</span>
-                                    <span class="total-pages">{{ products.paginator.num_pages }}</span>
+        {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.brand %}
+        {% else %}
+            {% if products %}
+                <div class="pagination-container">
+                    <div class="container">
+                        <div class="pagination">
+                            <!-- Previous Page Link -->
+                            {% if products.has_previous %}
+                                <a href="?page={{ products.previous_page_number }}" 
+                                class="previous">
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            {% else %}
+                                <div class="previous disapled">
+                                    <i class="fa-solid fa-arrow-right"></i>
                                 </div>
+                            {% endif %}
 
-                                <!-- Next Page Link -->
-                                {% if products.has_next %}
-                                    <a href="?page={{ products.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.price_min %}&price_min={{ request.GET.price_min }}{% endif %}{% if request.GET.price_max %}&price_max={{ request.GET.price_max }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}" 
-                                    class="next">
-                                        <i class="fa-solid fa-arrow-left"></i>
-                                    </a>
-                                {% else %}
-                                    <div class="next disapled">
-                                        <i class="fa-solid fa-arrow-left"></i>
-                                    </div>
-                                {% endif %}
+                            <!-- Page Number Display -->
+                            <div class="page-number">
+                                <span class="in-page">{{ products.number }}</span>
+                                <span class="from">من</span>
+                                <span class="total-pages">{{ products.paginator.num_pages }}</span>
                             </div>
+
+                            <!-- Next Page Link -->
+                            {% if products.has_next %}
+                                <a href="?page={{ products.next_page_number }}" 
+                                class="next">
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                </a>
+                            {% else %}
+                                <div class="next disapled">
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
-                {% endif %}
+                </div>
+            {% endif %}
         {% endif %}
         <!-- End Pagination -->
     </div>

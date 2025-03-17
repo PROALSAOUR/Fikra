@@ -18,16 +18,10 @@ logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللو�
 @login_required
 def cards_repo(request):
     user = request.user
-    
     user_copons = CoponItem.objects.filter(user=user, has_used=False).prefetch_related('copon_code')
-    
     active_copons =  user_copons.filter(expire__gte=now().date()).order_by('-purchase_date')
     expired_copons  = user_copons.filter(expire__lt=now().date()).order_by('-purchase_date')[:5]
-    
     copons_count = active_copons.count() + expired_copons.count()
-    
-    # =================================================================
-
     context  = {
         'active_copons': active_copons,
         'expired_copons': expired_copons,
@@ -36,70 +30,10 @@ def cards_repo(request):
     
     return render(request, 'cards/cards-repo.html',context)
 # صفحة متجر البطاقات
-def cards_store(request):
-    #  خاص بالكوبونات
-    
-    copons_list = Copon.objects.filter(is_active=True).only('name','value','img','price', 'expiration_days').order_by('-sales_count')
-        
-    paginator_all = Paginator(copons_list, 20)  
-
-    page_all = request.GET.get('page_all', 1)
-    
-    try:
-        copons = paginator_all.page(page_all)
-    except PageNotAnInteger:
-        copons = paginator_all.page(1)
-    except EmptyPage:
-        copons = paginator_all.page(paginator_all.num_pages)
-    except Exception as e:
-        logger.error(f"خطأ بمتجر الكوبونات: {e}", exc_info=True)
-    
-    # =====================================================
-    
-    # إضافة فلترة أخرى بناءً على معايير المستخدم (البحث، السعر، العلامة التجارية)
-    query = request.GET.get('q', '')
-    price_min = request.GET.get('price_min')
-    price_max = request.GET.get('price_max')
-   
-    filters = Q(is_active=True)
-    
-    if query:
-        filters &= (Q(name__icontains=query) | Q(tags__name__icontains=query)) 
-
-    if price_min and price_min.isdigit():
-        price_min = int(price_min)
-        filters &= Q(price__gte=price_min) 
-        
-    if price_max and price_max.isdigit():
-        price_max = int(price_max)
-        filters &= Q(price__lte=price_max)
-    
-    # جلب المنتجات بناءً على الفلاتر
-    results_list = list(chain(
-    Copon.objects.filter(filters).distinct()
-    ))
-    
-    # إعداد التصفح المرقم
-    paginator = Paginator(results_list, 20)  # عرض 20 منتجًا في كل صفحة
-    page = request.GET.get('page', 1)
-
-    try:
-        results = paginator.page(page)
-    except PageNotAnInteger:
-        results = paginator.page(1)
-    except EmptyPage:
-        results = paginator.page(paginator.num_pages)
-    except Exception as e:
-        logger.error(f"خطأ بمتجر الكوبونات: {e}", exc_info=True)
-
-    results_count = len(results_list)
-    
-    # =====================================================
-    
+def cards_store(request):    
+    copons = Copon.objects.filter(is_active=True).only('name','value','img','price', 'expiration_days').order_by('-sales_count')
     context  = {
         'copons': copons,
-        'results':results,
-        'results_count':results_count,
     }
     return render(request, 'cards/cards-store.html',context)
 # صفحة تفاصيل الكوبون

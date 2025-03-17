@@ -89,7 +89,7 @@ def brand_page(request, slug):
     all_brand_products_list = Product.objects.filter(brand=brand, ready_to_sale=True).prefetch_related('items__variations')
     
     if all_brand_products_list.exists():
-        paginator_all = Paginator(all_brand_products_list, 12)  # 12 منتجًا لكل صفحة
+        paginator_all = Paginator(all_brand_products_list, 20) 
 
         page_all = request.GET.get('page_all', 1)
         try:
@@ -205,8 +205,19 @@ def category_page(request, slug):
     # حساب العدد الكلي للمنتجات
     total_products_count = combined_products.count()
     
-    # الحصول على المنتجات التي سيتم عرضها (احصرها إلى 12)
-    view_products = combined_products.distinct()[:12]
+    products = combined_products.distinct()
+    paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
+    page = request.GET.get('page', 1)
+
+    try:
+        products = paginator.page(page)
+    except (PageNotAnInteger, ValueError):
+        products = paginator.page(1)
+    except EmptyPage:
+        products = paginator.page(paginator.num_pages)
+    except Exception as e:
+        logger.error(f"خطأ بدالة التصنيف داخل المتجر: {e}", exc_info=True)
+        products = paginator.page(1)
     # ===========================================================
     # إضافة فلترة أخرى بناءً على معايير المستخدم (البحث، السعر، العلامة التجارية)
     query = request.GET.get('q', '')
@@ -216,59 +227,39 @@ def category_page(request, slug):
 
     # فلترة المنتجات حسب التصنيف الأب والتصنيفات الفرعية
     filters = Q(ready_to_sale=True) & Q(category__in=[category] + list(subcategories))
-    
     if query:
-        filters &= (Q(name__icontains=query) | Q(tag__name__icontains=query))
-
+        filters &= (Q(name__icontains=query) | Q(tag__name__icontains=query) | Q(description__icontains=query) )
     if price_min and price_min.isdigit():
         price_min = int(price_min)
         filters &= Q(
             Q(new_price__gte=price_min) | 
             (Q(offer=False) & Q(price__gte=price_min))
         )
-        
     if price_max and price_max.isdigit():
         price_max = int(price_max)
         filters &= Q(
             Q(new_price__lte=price_max) | 
             (Q(offer=False) & Q(price__lte=price_max))
         )
-    
     if brand_id:
         filters &= Q(brand_id=brand_id)
-
     # جلب المنتجات بناءً على الفلاتر
-    results = Product.objects.filter(filters, ready_to_sale=True).prefetch_related('items__variations').distinct()
-    
-    # إعداد التصفح المرقم
-    if results.exists():
-        paginator = Paginator(results, 20)  # عرض 20 منتجًا في كل صفحة
-        page = request.GET.get('page', 1)
-
-        try:
-            products = paginator.page(page)
-        except (PageNotAnInteger, ValueError):
-            products = paginator.page(1)
-        except EmptyPage:
-            products = paginator.page(paginator.num_pages)
-        except Exception as e:
-            logger.error(f"خطأ بدالة التصنيف داخل المتجر: {e}", exc_info=True)
-            products = paginator.page(1)
-    else:
-        products = []
+    results = Product.objects.filter(filters, ready_to_sale=True).prefetch_related('items__variations').distinct()[:32]
+    if not results.exists():
+        results = Product.objects.none()
 
     # البيانات الإضافية للعرض
     brands = Brand.objects.all()
     products_count = results.count()
     
     context = {
-        'view_products': view_products,
+        'products': products,
         'category': category,
         'subcategories': subcategories,
         'total_products_count': total_products_count,  # إضافة العدد الكلي للمنتجات قبل الفلترة  
         'brands': brands,
         'products_count': products_count, # إضافة العدد الكلي للمنتجات بعد الفلترة  
-        'products': products,  # عرض المنتجات التي تم فلترتها
+        'results': results,  # عرض المنتجات التي تم فلترتها
     }
     return render(request, 'store/category.html', context)
 # ===================================================
