@@ -3,22 +3,28 @@ document.addEventListener('DOMContentLoaded', function () {
     const installBtn = document.getElementById('pwa-download');
     const installLink = document.getElementById('install-link'); // الرابط
     let deferredPrompt;
-    // منع إعادة تحميل الصفحة عند النقر على الرابط
     if (installLink) {
         installLink.addEventListener('click', (event) => {
-            event.preventDefault();
+            event.preventDefault(); // منع إعادة تحميل الصفحة عند النقر على الرابط
         });
     }
-    // التقاط حدث beforeinstallprompt عند توفره
+    function isAppInstalled() {
+        return (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone);
+    }
+    if (installBtn) {
+        installBtn.addEventListener('click', () => {
+            if (isAppInstalled()) {
+                alert("التطبيق مثبت بالفعل على جهازك!");
+                return;
+            }
+        });
+    }
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;        
-        console.log("0")
         if (installBtn && downloadMenu) {
-            console.log("1")
             installBtn.addEventListener('click', () => {
                 if (deferredPrompt) {
-                    console.log("2")
                     deferredPrompt.prompt();
                     deferredPrompt.userChoice.then((choiceResult) => {
                         if (choiceResult.outcome === 'accepted') {
@@ -27,8 +33,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         } 
                         deferredPrompt = null;
                     });
-                } else {
-                    alert("التطبيق مثبت بالفعل على جهازك!");
                 }
             });
         }

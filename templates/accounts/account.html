@@ -56,7 +56,7 @@
                             <i class="fa-solid fa-angles-left " ></i>
                         </a>
                     </li>
-                    {% if not request.user.is_staff %}
+                    {% if request.user.is_staff %}
                         <li>                        
                             <a href="{% url 'admin:index' %}">
                                 <div class="item">
@@ -77,15 +77,6 @@
                             </a>
                         </li>
                     {% endif %}
-                    <li class="contact-us">
-                        <a href="" >
-                            <div class="item">
-                                <i class="fa-solid fa-headset"></i>
-                                <h5> تواصل معنا </h5>
-                            </div>
-                            <i class="fa-solid fa-angles-left "></i>
-                        </a>
-                    </li>
                     <li>
                         <a href="{% url "blog:blog" %}">
                             <div class="item">
