@@ -272,7 +272,7 @@ JAZZMIN_SETTINGS = {
     "site_logo": "images/icons/small-logo.webp",
 
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
-    "login_logo": 'images/admin-logo.webp',
+    "login_logo": 'images/icons/small-logo.webp',
 
     # CSS classes that are applied to the logo above
     "site_logo_classes": "img-circle",
