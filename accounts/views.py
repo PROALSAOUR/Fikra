@@ -11,6 +11,7 @@ from accounts.models import *
 from accounts.utils import send_otp_via_whatsapp, format_phone_number
 from django.core.exceptions import ValidationError
 import phonenumbers
+from django.core.cache import cache
 
 import logging
 logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
@@ -19,20 +20,15 @@ security_logger = logging.getLogger('django.security') # إنشاء logger لل�
 # دالة صفحة الحساب الرئيسية
 @login_required
 def main_account_page(request):
-    
     if request.method == 'POST' and 'logout' in request.POST: # التحقق من ضغط المستخدم على تسجيل الخروج
         logout(request)
         return redirect('store:home') # إعادة التوجيه بعد تسجيل الخروج
-
-    
-    # استدعاء المنتجات التي ستعرض اسفل الصفحة
-    products = Product.objects.filter(ready_to_sale=True, total_sales__gt=0).prefetch_related('items__variations').order_by('-total_sales')[:8]
-
-    
-    context = {
-        'products' : products ,
-    } 
-    
+    best_sales_products = cache.get('best_sales_products')
+    if not best_sales_products:
+        best_sales_products = Product.objects.filter(ready_to_sale=True, total_sales__gt=0).select_related('category').prefetch_related('items__variations').order_by('-total_sales')[:8]
+        cache.set('best_sales_products', best_sales_products, timeout=60*60)
+        
+    context = {'products' : best_sales_products ,} 
     return render(request, 'accounts/account.html', context)
 # دالة تسجيل الدخول و انشاء الحساب
 def sign(request):
@@ -415,5 +411,3 @@ def choose_city(request):
         }
         
     return render(request, 'accounts/choose-city.html', context)
-
-

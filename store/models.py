@@ -323,7 +323,3 @@ class CartItem(models.Model):
         self.qty = new_qty
         self.save()
 
-
-
-
-

@@ -28,19 +28,15 @@ def offline(request):
 # ===================================================
 # الصفحة الرئيسية
 def index(request):
-    
     # جلب الإعلانات التي يتم عرضها
     ads = AdsSlider.objects.filter(show=True)
-    
     # جلب العلامات التجارية من الكاش أو قاعدة البيانات
     brands = cache.get('brands')
     if not brands:
         brands = Brand.objects.filter(featured=True)
         cache.set('brands', brands, 60*15)
-    
     #جلب اسم المستخدم الاول اذا كان مسجل دخول 
     user_name = request.user.first_name if request.user.is_authenticated else None
-    
     # جلب الفئات المميزة والظاهرة فقط، وتحميل المنتجات التابعة لهذه الفئات
     categories = Category.objects.filter(
         featured=True,
@@ -52,11 +48,11 @@ def index(request):
         products__featured=True,
         products__ready_to_sale=True,
     ).distinct()[:8]
-    
-    offered_products = Product.objects.filter(ready_to_sale=True, offer=True).prefetch_related('items__variations')[:8] # تحميل العناصر ومتغيراتها دفعة واحدة
-    
-    best_sales_products = Product.objects.filter(ready_to_sale=True, total_sales__gt=0).prefetch_related('items__variations').order_by('-total_sales')[:8]
-    
+    offered_products = Product.objects.filter(ready_to_sale=True, offer=True).select_related('category').prefetch_related('items__variations')[:8] # تحميل العناصر ومتغيراتها دفعة واحدة
+    best_sales_products = cache.get('best_sales_products')
+    if not best_sales_products:
+        best_sales_products = Product.objects.filter(ready_to_sale=True, total_sales__gt=0).select_related('category').prefetch_related('items__variations').order_by('-total_sales')[:8]
+        cache.set('best_sales_products', best_sales_products, timeout=60*60)
     context = {
         'ads': ads,
         'brands': brands,
@@ -65,7 +61,6 @@ def index(request):
         'offered_products':offered_products,
         'best_sales_products':best_sales_products,
     }
-    
     return render(request, 'store/index.html', context)
 # ===================================================
 # صفحة الاعلان
@@ -265,11 +260,14 @@ def category_page(request, slug):
 # ===================================================
 # صفحة العروض
 def offer_page(request):
-    products = Product.objects.filter(offer=True, ready_to_sale=True).prefetch_related( 'items__variations').order_by('-new_price')
-    products_count = products.count()
+    get_offered_products = cache.get('get_offered_products')
+    if not get_offered_products:
+        get_offered_products = Product.objects.filter(ready_to_sale=True, offer=True).select_related('category').prefetch_related('items__variations').order_by('-new_price')
+        cache.set('get_offered_products', get_offered_products, timeout=60*60)
+    products_count = get_offered_products.count()
     
-    if products.exists():
-        paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
+    if get_offered_products.exists():
+        paginator = Paginator(get_offered_products, 20)  # عرض 20 منتجًا في كل صفحة
         page = request.GET.get('page', 1)
 
         try:
@@ -297,11 +295,14 @@ def offer_page(request):
 # ===================================================
 # صفحة اعلى المبيعات
 def best_sales(request):
-    products = Product.objects.filter(ready_to_sale=True, total_sales__gt=0).prefetch_related('items__variations').order_by('-total_sales')
-    products_count = products.count()
+    best_sales_products = cache.get('best_sales_products')
+    if not best_sales_products:
+        best_sales_products = Product.objects.filter(ready_to_sale=True, total_sales__gt=0).select_related('category').prefetch_related('items__variations').order_by('-total_sales')
+        cache.set('best_sales_products', best_sales_products, timeout=60*60)
+    products_count = best_sales_products.count()
     
-    if products.exists():
-        paginator = Paginator(products, 20)  # عرض 20 منتجًا في كل صفحة
+    if best_sales_products.exists():
+        paginator = Paginator(best_sales_products, 20)  # عرض 20 منتجًا في كل صفحة
         page = request.GET.get('page', 1)
 
         try:
