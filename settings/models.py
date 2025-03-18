@@ -27,7 +27,7 @@ class Settings(models.Model):
             
 class Social(models.Model):
     facebook = models.URLField(verbose_name='فيسبوك', blank=True)
-    tiktok = models.URLField(verbose_name='فيكتوك', blank=True)
+    tiktok = models.URLField(verbose_name='تيكتوك', blank=True)
     whatsapp = models.CharField(verbose_name='رقم الواتساب', blank=True, max_length=20)
     phone_number1 = models.CharField(verbose_name='رقم الهاتف الاساسي', null=True, max_length=20)
     phone_number2 = models.CharField(verbose_name='رقم الهاتف الثانوي', null=True, max_length=20)
