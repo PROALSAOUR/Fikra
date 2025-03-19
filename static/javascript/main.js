@@ -9,7 +9,11 @@ document.addEventListener('DOMContentLoaded', function() {
     tempImg.src = img.getAttribute("data-src");
     tempImg.onload = function () {
         img.src = tempImg.src; // استبدال الصورة الافتراضية بالأصلية
-        img.nextElementSibling.remove(); // إزالة التأثير عند تحميل الصورة
+        // التحقق من وجود العنصر التالي وهل هو التأثير المطلوب
+        const shimmerEffect = img.parentElement.querySelector(".shimmer-effect");
+        if (shimmerEffect) {
+            shimmerEffect.remove(); // إزالة تأثير التحميل
+        }
     };
     });
 });
@@ -358,4 +362,15 @@ function markMessageAsRead(markUrl, element) {
           });
       }
 }
+// =========================================================================================================
+// إعداد سلايدر المنتجات في السيكشن
+document.addEventListener('DOMContentLoaded', function() {
+  if (document.querySelector('.products-slider')) {
+    var ProductSlider = new Swiper('.products-slider', {
+      grabCursor: true,
+      slidesPerView: 'auto',
+      loopAdditionalSlides: 30, // لجعل الحركة أكثر سلاسة
+    });
+  }
+});
 // =========================================================================================================
