@@ -6,7 +6,7 @@ class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0  # عدم إظهار حقول إضافية
     readonly_fields = ('get_product_image', 'order_item', 'qty', 'price', 'get_total', 'discount_price',)  # جعل الحقول قابلة للقراءة فقط
-    fields = ('get_product_image', 'order_item', 'qty', 'price', 'get_total', 'discount_price', )  # تحديد ترتيب الحقول
+    fields = ('get_product_image', 'order_item',  'qty', 'price', 'get_total', 'discount_price', 'status', )  # تحديد ترتيب الحقول
     can_delete = False  # منع حذف العناصر
     max_num = 0  # منع إضافة عناصر جديدة
     show_change_link = True  
@@ -123,7 +123,6 @@ class DealingAdmin(admin.ModelAdmin):
     
     def has_add_permission(self, request):
         return False  # يمنع إضافة كائنات جديدة من لوحة الإدارة
-
 
 admin.site.register(Order, MyOrdersAdmin)
 admin.site.register(OrderDealing, DealingAdmin)

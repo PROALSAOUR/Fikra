@@ -66,7 +66,7 @@ class OrderItem(models.Model):
         ('replaced', 'مُستبدل'),
     ]
     
-    status = models.CharField(choices=ORDERITEM_STATUS, max_length=15, default='confirmed')
+    status = models.CharField(choices=ORDERITEM_STATUS, max_length=15, default='confirmed', verbose_name='الحالة')
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items', verbose_name='الطلب')
     order_item = models.ForeignKey(ProductVariation, on_delete=models.CASCADE, related_name='order_items' , verbose_name='المنتج')
     qty = models.PositiveIntegerField(default=1, verbose_name='الكمية')
