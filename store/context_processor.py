@@ -31,7 +31,7 @@ def social_data(request):
         'email': social.email,
     }
     
-
+    
 def globals(request):
     
     user = request.user

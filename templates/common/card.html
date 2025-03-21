@@ -31,15 +31,21 @@
                 </h4>
             </div>
         </a> 
-        {% if user_points >= card.price  %}
-            <span class="add-to-cart">
-                <a href="{% if user.is_authenticated  %}{% url "cards:buy-copon" card.id %}{% else %}{% url 'accounts:sign' %}{% endif %}" class="copon-buy-done-link">
-                    <span> شراء </span><i class="fa-solid fa-cart-shopping"></i>
-                </a>
-            </span>
+        {% if user.is_authenticated  %}
+            {% if user_points >= card.price  %}
+                <span class="add-to-cart">
+                    <a href="{% url "cards:buy-copon" card.id %}" class="copon-buy-done-link">
+                        <span> شراء </span><i class="fa-solid fa-cart-shopping"></i>
+                    </a>
+                </span>
+            {% else %}
+                <span class="add-to-cart">
+                    <a href="#"><span>نقاطك غير كافية!</span></a>
+                </span>
+            {% endif %}
         {% else %}
             <span class="add-to-cart">
-                <a href="#"><span>نقاطك غير كافية!</span></a>
+                <a href="{% url 'accounts:sign' %}"><span>سجل الدخول اولا!</span></a>
             </span>
         {% endif %}
     </div>

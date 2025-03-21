@@ -1,7 +1,7 @@
 from cards.models import *
 from store.models import *
 from accounts.models import UserProfile, Banned_users
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 import json
@@ -47,10 +47,10 @@ def buy_copon(request, cid):
     """
     دالة للتحقق من الكوبون المراد شرائه
     """
-    # الحصول على الكوبون والمستخدم
+    if request.user.is_authenticated:
+        user = request.user
     try:
         copon = get_object_or_404(Copon, id=cid)
-        user = request.user
         profile = get_object_or_404(UserProfile, user=user)
         inbox = profile.inbox
         points = profile.points
