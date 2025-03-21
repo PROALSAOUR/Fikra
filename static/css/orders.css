@@ -402,3 +402,106 @@ form.choose-to-replace {
       font-size: 8px !important;
     }
   }
+/* Start add-copon-pop-page  */
+.add-copon-pop-page {
+  width: 700px;
+  z-index: 10000;
+}
+.add-copon-pop-page form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.add-copon-pop-page .logo {
+  margin-bottom: 5px !important;
+}
+.add-copon-pop-page > p {
+  font-size: var(--lab-s-size);
+  text-align: center;
+  margin-bottom: 10px;
+}
+@media (max-width: 372px) {
+  .add-copon-pop-page > p {
+    font-size: var(--tab-s-size);
+  }
+}
+.add-copon-pop-page .choose-card {
+  overflow-y: auto;
+  max-height: 200px;
+  padding: 0 10px;
+}
+.add-copon-pop-page .choose-card .card {
+  margin-bottom: 10px;
+}
+.add-copon-pop-page .choose-card .card input[type='radio']{
+  display: none;
+  position: absolute;
+  visibility: hidden;
+}
+.add-copon-pop-page .choose-card .card label{
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  background-color: var(--background-color);
+  box-shadow:  3px 3px 2px rgba(0, 0, 0, 0.224);
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+}
+.add-copon-pop-page .choose-card .card input:checked ~ label {
+  border: 3px solid var(--main-color);
+}
+.add-copon-pop-page .choose-card .card .image {
+  width: 25%;
+}
+.add-copon-pop-page .choose-card .card .image img {
+  width: 100%;
+  height: 100%;
+}
+.add-copon-pop-page .choose-card .card .details {
+  padding: 10px; 
+  margin-right: 5px;
+}
+.add-copon-pop-page .choose-card .card .details h4 {
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+.add-copon-pop-page .choose-card .card .details p {
+  text-align: start;
+  font-size: 10px;
+}
+.add-copon-pop-page form button {
+  padding: 5px;
+  margin-top: 10px;
+  background-color: var(--main-color);
+  color: #ffffff;
+  border: none;
+  font-weight: 800;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+}
+@media (max-width: 602px) {
+  .add-copon-pop-page form .choose-card {
+    width: 95%;
+
+  }
+  .add-copon-pop-page form .card {
+    overflow: hidden;
+  }
+  .add-copon-pop-page form .image {
+    object-fit: cover;
+    width: 100px !important;
+    aspect-ratio: 1/1;
+  }
+  .add-copon-pop-page form p {
+    margin-top: 8px !important;
+    padding: 0;
+  }
+}

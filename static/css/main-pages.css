@@ -1339,11 +1339,6 @@
     -o-border-radius: 5px;
 }
 
-/* edit order pop-page */
-form.choose-to-replace {
-    display: flex;
-    flex-direction: column;
-}
 /* End add-copon-pop-page  */
   @media (max-width: 602px) {
     .add-copon-pop-page form .choose-card {

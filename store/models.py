@@ -167,6 +167,7 @@ class Product(models.Model):
     offer = models.BooleanField(default=False , verbose_name='مخفض؟')
     ready_to_sale = models.BooleanField(default=False , verbose_name='معروض؟')
     total_sales = models.IntegerField(blank=True, null=True, default=0 , verbose_name='إجمالي البيع')
+    url = models.URLField(blank=True, null=True, verbose_name='رابط المنتج')
     upload_at = models.DateTimeField(auto_now_add=True , verbose_name='تاريخ الإنشاء')
     updated_at = models.DateTimeField(auto_now=True , verbose_name='تاريخ التحديث')     
     
@@ -286,7 +287,6 @@ class ProductVariation(models.Model):
         verbose_name_plural = 'المخزون'
         
 # ========================== Favourite ===================================
-
 class Favourite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favourites' , verbose_name='المستخدم')
     products = models.ManyToManyField(Product , verbose_name='المنتج')
@@ -294,7 +294,7 @@ class Favourite(models.Model):
     def __str__(self):
         return f"{self.user.phone_number}قائمة المفضلة الخاصة ب"
     
-# ============================= Order ====================================
+# ============================= Cart ====================================
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts' , verbose_name='المستخدم')

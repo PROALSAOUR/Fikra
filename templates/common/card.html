@@ -33,11 +33,10 @@
         </a> 
         {% if user_points >= card.price  %}
             <span class="add-to-cart">
-                <a href="{% url "cards:buy-copon" card.id %}" class="copon-buy-done-link">
+                <a href="{% if user.is_authenticated  %}{% url "cards:buy-copon" card.id %}{% else %}{% url 'accounts:sign' %}{% endif %}" class="copon-buy-done-link">
                     <span> شراء </span><i class="fa-solid fa-cart-shopping"></i>
                 </a>
             </span>
-
         {% else %}
             <span class="add-to-cart">
                 <a href="#"><span>نقاطك غير كافية!</span></a>
@@ -60,7 +59,6 @@
                 link.style.opacity = ""; // إعادة الرابط لوضعه الطبيعي
             }, delay);
         }
-
         // استهداف جميع الروابط التي تحتوي على الكلاس "copon-buy-done-link"
         const links = document.querySelectorAll(".copon-buy-done-link");
         links.forEach(link => {

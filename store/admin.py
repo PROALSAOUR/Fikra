@@ -51,6 +51,22 @@ class ProductVariationAdmin(admin.ModelAdmin):
     list_display = ('item_thumbnail' ,'product_item' ,'size', 'stock', 'sold',)
     search_fields = ('product_item',)
     readonly_fields = ('sold',)
+
+class ProductVariationInline(admin.TabularInline):
+    model = ProductVariation
+    extra = 1
+    fields = ('size', 'stock', ) 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "size":
+            obj_id = request.resolver_match.kwargs.get('object_id')  # الحصول على ID العنصر في التعديل
+            if obj_id:
+                from .models import ProductItem  # استيراد النموذج هنا لمنع الدوران
+                product_item = ProductItem.objects.filter(id=obj_id).first()
+                if product_item and product_item.product.category.size_category:
+                    kwargs["queryset"] = SizeOption.objects.filter(size_category=product_item.product.category.size_category)
+                else:
+                    kwargs["queryset"] = SizeOption.objects.none()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
       
 class ProductItemInline(admin.TabularInline):
     model = ProductItem
@@ -61,6 +77,7 @@ class ProductItemAdmin(admin.ModelAdmin):
     list_display = ('sku', 'product__name', 'color', 'item_image')
     search_fields = ('sku',)
     list_filter = ('sku', 'color')
+    inlines = (ProductVariationInline,)
    
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('product_thumbnail', 'name', 'category', 'brand', 'total_sales', 'is_available', 'ready_to_sale', 'offer')

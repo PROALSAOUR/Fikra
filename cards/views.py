@@ -2,14 +2,10 @@ from cards.models import *
 from store.models import *
 from accounts.models import UserProfile, Banned_users
 from django.shortcuts import render, get_object_or_404
-from django.db.models import Q
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from itertools import chain
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import json
 from accounts.send_messages import buy_copon_done_message, receive_copon_done_message
-
 import logging
 logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
 
@@ -62,7 +58,6 @@ def buy_copon(request, cid):
         # التحقق مما إذا كان المستخدم محظورًا عبر حسابه أو رقم هاتفه
         is_banned = Banned_users.objects.filter(user=user).exists() or \
                     Banned_users.objects.filter(phone_number=user.phone_number).exists()
-        
         if is_banned:
             return JsonResponse({'error': 'لا يمكنك شراء الكوبون، حسابك أو رقم هاتفك محظور'}, status=403)
         
