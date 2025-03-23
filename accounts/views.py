@@ -351,33 +351,30 @@ def reset_password(request):
 # دالة تعديل اسم المستخدم
 @login_required
 def edit_name(request):    
-    context = {}
+    context = {
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+    }
     if request.method == 'POST':
         # الحصول على البيانات من الفورم
         first_name = request.POST.get('first-name')
         last_name = request.POST.get('last-name')
 
         if first_name and last_name :
-            # تحقق انه لم يقم بإدخال نفس الاسم القديم
-            if request.user.first_name!= first_name or request.user.last_name!= last_name:
-                request.user.first_name = first_name
-                request.user.last_name = last_name
-                request.user.save()
-                messages.success(request, 'تم تحديث الأسماء بنجاح.')
-                return redirect('accounts:account_info')    
+            if ' ' in first_name or ' ' in last_name:
+                messages.error(request, 'لايمكن استخدام المسافات داخل الاسماء!')
             else:
-                messages.error(request, 'الأسماء الحالية مطابقة للأسماء القديمة!.')
-            
+                # تحقق انه لم يقم بإدخال نفس الاسم القديم
+                if request.user.first_name!= first_name or request.user.last_name!= last_name:
+                    request.user.first_name = first_name
+                    request.user.last_name = last_name
+                    request.user.save()
+                    messages.success(request, 'تم تحديث الأسماء بنجاح.')
+                    return redirect('accounts:account_info')    
+                else:
+                    messages.error(request, 'الأسماء الحالية مطابقة للأسماء القديمة!.')
         else:
             messages.error(request, 'يرجى إدخال البيانات المطلوبة.')
-
-    else:
-        # عرض الأسماء الحالية في حالة الطلب GET
-        context = {
-            'first_name': request.user.first_name,
-            'last_name': request.user.last_name,
-        }
-
     return render(request, 'accounts/edit-name.html', context)
 # =============================================================
 # دالة اختيار المدينة
