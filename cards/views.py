@@ -1,7 +1,7 @@
 from cards.models import *
 from store.models import *
 from accounts.models import UserProfile, Banned_users
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 import json
@@ -14,8 +14,14 @@ logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللو�
 @login_required
 def cards_repo(request):
     user = request.user
+    today = now().date()
     user_copons = CoponItem.objects.filter(user=user, has_used=False).prefetch_related('copon_code')
     active_copons =  user_copons.filter(expire__gte=now().date()).order_by('-purchase_date')
+    for copon in active_copons:
+        if copon.expire and copon.expire >= today:
+            copon.days_remaining = (copon.expire - today).days
+        else:
+            copon.days_remaining = 0  # الكوبون منتهي الصلاحية
     expired_copons  = user_copons.filter(expire__lt=now().date()).order_by('-purchase_date')[:5]
     copons_count = active_copons.count() + expired_copons.count()
     context  = {

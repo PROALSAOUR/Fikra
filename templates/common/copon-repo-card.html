@@ -26,7 +26,8 @@
                     {% if usage_copon.is_expire %} 
                         انتهت صلاحيتها بتاريخ {{ causage_copon.expire }}
                     {% else %}
-                        صالح حتى تاريخ {{ usage_copon.expire }} 
+                        صالح حتى تاريخ {{ usage_copon.expire }} <br>
+                        متبقي {{ usage_copon.days_remaining}} يوم
                     {% endif %}
                 </p>
             </div>
