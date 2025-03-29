@@ -286,6 +286,15 @@ class ProductVariation(models.Model):
     class Meta:
         verbose_name = 'المخزون'
         verbose_name_plural = 'المخزون'
+    
+class Interested(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='interested_products' , verbose_name='المستخدم')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='interested_by' , verbose_name='المنتج')
+    created_at = models.DateTimeField(auto_now_add=True , verbose_name='تاريخ الإنشاء')
+    updated_at = models.DateTimeField(auto_now=True , verbose_name='تاريخ التعديل')
+    
+    def __str__(self):
+        return f"{self.user.phone_number}متابعة المنتج {self.product.name}"    
         
 # ========================== Favourite ===================================
 class Favourite(models.Model):

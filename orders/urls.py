@@ -11,5 +11,4 @@ urlpatterns = [
     path("cancel-order/", cancel_order, name="cancel-order"),
     path("remove-order-item/", remove_order_item, name="remove-order-item"),
     path("dealing/<oid>", order_dealing, name="order-dealing"),
-
 ]

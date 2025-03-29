@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.timezone import now 
+from django.views.decorators.csrf import csrf_protect
 from django.core.cache import cache
 from django.http import HttpResponse
 import os
@@ -403,6 +404,11 @@ def search_page(request):
 # صفحة تفاصيل المنتج 
 def product_details(request, pid):
     product = get_object_or_404(Product.objects.select_related('category', 'brand'), id=pid, ready_to_sale=True)
+    
+    is_interested = False
+    if request.user.is_authenticated:
+        is_interested = Interested.objects.filter(user=request.user, product=product).exists()
+    
     category = product.category
     brand = product.brand
 
@@ -411,8 +417,6 @@ def product_details(request, pid):
 
     product_images = product.images.all()
     variants = ProductVariation.objects.filter(product_item__product_id=pid, stock__gt=0).select_related('size', 'product_item')
-    
-
     # الحصول على جميع الأحجام الفريدة المرتبطة بالمنتج
     sizes = SizeOption.objects.filter(variations__product_item__product_id=pid, variations__stock__gt=0).distinct()
 
@@ -428,6 +432,7 @@ def product_details(request, pid):
 
     context = {
         'product': product,
+        'is_interested': is_interested,
         'product_images': product_images,
         'related_category_products': related_category_products,
         'related_brand_products': related_brand_products,
@@ -450,6 +455,16 @@ def get_stock(request):
         return JsonResponse({'stock': 0})  # إذا لم يتم العثور على المتغير، رجع 0
     except Exception as e:
         logger.error(f"خطأ بدالة الحصول على كمية المخزون داخل المتجر: {e}", exc_info=True)
+# دالة الاهتمام بالمنتج ان لم يكن المنتج متوفرا بالمخزون
+@csrf_protect
+@login_required
+def add_interest(request, pid):
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'message': 'يجب تسجيل الدخول'}, status=403)
+    product = get_object_or_404(Product, id=pid)
+    # التحقق مما إذا كان المستخدم قد أضاف الاهتمام مسبقًا
+    interest, created = Interested.objects.get_or_create(user=request.user, product=product)
+    return JsonResponse({'success': True, 'already_interested': not created})
 # ===================================================
 # صفحة المفضلة
 @login_required

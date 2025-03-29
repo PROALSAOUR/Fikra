@@ -5,7 +5,6 @@
     <link rel="stylesheet" href="{% static "/css/accounts.css" %}">   
 {% endblock %}
 
-
 {% block content %}
     <div class="account-info-page" style="position: relative;">
         <!-- Start Ponits Section -->
@@ -60,7 +59,7 @@
                                     <span class="time"> {{ message.timestamp|date:"Y/m/d , h:i a "  }} </span>
                                     <i class="fa-solid fa-chevron-down"></i>
                                 </div>
-                                <p class="content"> {{ message.content }} </p>
+                                <p class="content"> {{ message.content|safe }} </p>
                             </div>    
                         {% endfor %}
                     {% endif %}

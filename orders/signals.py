@@ -32,7 +32,7 @@ def update_user_points(sender, instance, **kwargs):
         user_profile.save()
 
         # إنشاء رسالة جديدة وإضافتها إلى صندوق الوارد
-        message = add_order_points_message(user_name=instance.user, points=instance.total_points, order_se=instance.serial_number)
+        message = add_order_points_message(user_name=instance.user, points=instance.total_points, order=instance)
         message.save()
         user_inbox.add_message(message)
 

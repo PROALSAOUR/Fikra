@@ -120,7 +120,7 @@ def cancel_order(request):
                     order.status = 'canceled'
                     order.save()
                     # ارسال رسالة بعد إلغاء الطلب
-                    message = cancel_order_message(user_name=user.first_name, order=order.serial_number)
+                    message = cancel_order_message(user_name=user.first_name, order=order)
                     inbox = user.profile.inbox
                     inbox.add_message(message)
                     inbox.save()
@@ -376,7 +376,7 @@ def edit_order(request):
                     # =================================================================
                     if  order.status == 'delivered':
                         #  ارسال رسالة الى المستخدم عند تعديل الطلب
-                        message = edit_order_message(user_name=user.first_name, order=order.serial_number)
+                        message = edit_order_message(user_name=user.first_name, order=order)
                         inbox = user.profile.inbox
                         inbox.add_message(message)
                         inbox.save() 
@@ -515,7 +515,7 @@ def create_order(request):
         order.save()
 
         # ارسال رسالة عند اتمام الطلب 
-        message = create_order_message(user_name=user.first_name, order=order.serial_number)
+        message = create_order_message(user_name=user.first_name, order=order)
         inbox = user.profile.inbox
         inbox.add_message(message)
         inbox.save()

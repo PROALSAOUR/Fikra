@@ -171,14 +171,12 @@
   .success {
     background-color: #1d9f4d !important;
   }
-  button:active {
-    transform: scale(0.95) !important;
-    background-color: #ffffff !important;
-    color: #B18E4B !important;
-    -webkit-transform: scale(0.95) !important;
-    -moz-transform: scale(0.95) !important;
-    -ms-transform: scale(0.95) !important;
-    -o-transform: scale(0.95) !important;
+  button:active , input[type="submit"]:active {
+    transform: scale(0.9) !important;
+    -webkit-transform: scale(0.9) !important;
+    -moz-transform: scale(0.9) !important;
+    -ms-transform: scale(0.9) !important;
+    -o-transform: scale(0.9) !important;
 }
 /* إخفاء السهمين في Chrome, Safari, و Edge */
 input[type="number"]::-webkit-outer-spin-button,

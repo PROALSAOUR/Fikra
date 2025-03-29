@@ -80,14 +80,17 @@ class ProductItemAdmin(admin.ModelAdmin):
     inlines = (ProductVariationInline,)
    
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('product_thumbnail', 'name', 'category', 'brand', 'total_sales', 'available', 'ready_to_sale', 'offer')
-    readonly_fields =('total_sales',)
+    list_display = ('product_thumbnail', 'name', 'category', 'brand', 'total_sales', 'available', 'ready_to_sale', 'offer', "interested_count")
+    readonly_fields =('total_sales', 'interested_count', 'available',)
     search_fields = ('name', )
     list_filter = ('category', 'brand', 'ready_to_sale', 'featured' , 'offer', 'available',)
     ordering = ('updated_at',)
     inlines = (ProductImagesInline, ProductItemInline,)
     
-    
+    def interested_count(self, obj):
+        return Interested.objects.filter(product=obj).count()
+    interested_count.short_description = "عدد المهتمين"
+
 admin.site.register(AdsSlider, AdsSliderAdmin)
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(SizeCategory, SizeCategoryAdmin)

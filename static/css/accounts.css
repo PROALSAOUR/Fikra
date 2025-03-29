@@ -410,6 +410,10 @@
     word-spacing: 4px;
     display: none;
   }
+  .my-info  .notfication-message .content a {
+    color:#462dff ;
+    text-decoration: underline;
+  }
   .my-info  .notfication-message.read .content{
     color: var(--disaple-text-color);
   }
