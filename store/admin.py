@@ -91,12 +91,26 @@ class ProductAdmin(admin.ModelAdmin):
         return Interested.objects.filter(product=obj).count()
     interested_count.short_description = "عدد المهتمين"
 
+class InterestedAdmin(admin.ModelAdmin):
+    list_display = ("user", 'product', 'created_at')
+    readonly_fields =("user", 'product', 'interested_count', 'created_at',)
+    search_fields = ('product', )
+    list_filter = ("user", 'product',)
+    
+    def interested_count(self, obj):
+        return Interested.objects.filter(product=obj.product).count()
+    interested_count.short_description = "عدد المهتمين"
+    
+    def has_add_permission(self, request):
+        return False
+
 admin.site.register(AdsSlider, AdsSliderAdmin)
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(SizeCategory, SizeCategoryAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Repository, RepositoryAdmin)
 admin.site.register(Tag, TagAdmin)
+admin.site.register(Interested, InterestedAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductItem, ProductItemAdmin)
 admin.site.register(ProductVariation, ProductVariationAdmin)
