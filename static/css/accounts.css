@@ -973,6 +973,7 @@
     padding-right: 10px;
   }
   .edit-card form button {
+    cursor: pointer;
     display: block;
     margin: 20px auto 0;
     background-color: var(--main-color);
@@ -986,7 +987,12 @@
     -moz-border-radius: var(--main-border-radius);
     -ms-border-radius: var(--main-border-radius);
     -o-border-radius: var(--main-border-radius);
-  }
+    transition: 0.2s;
+    -webkit-transition: 0.2s;
+    -moz-transition: 0.2s;
+    -ms-transition: 0.2s;
+    -o-transition: 0.2s;
+}
   @media (max-width: 885px) {
     .edit-card {
       max-width: 85%;
@@ -1116,6 +1122,7 @@
     width: 150px;
   }
   .choose-city-card  form button {
+    cursor: pointer;
     position: absolute;
     bottom: 10px;
     left: 10px;
@@ -1130,7 +1137,16 @@
     -moz-border-radius: var(--main-border-radius);
     -ms-border-radius: var(--main-border-radius);
     -o-border-radius: var(--main-border-radius);
+    transition: 0.2s;
+    -webkit-transition: 0.2s;
+    -moz-transition: 0.2s;
+    -ms-transition: 0.2s;
+    -o-transition: 0.2s;
   }
+.choose-city-card .error-messages {
+  padding: 5px;
+  margin-bottom: 10px;
+}
   @media (max-width: 492px) {
     .choose-city-card  form label {
       font-size: var(--tab-m-size);

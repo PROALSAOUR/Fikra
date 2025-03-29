@@ -147,30 +147,39 @@
     overflow: hidden;
   }
   .unclicable {
-    cursor: not-allowed;
-    color: var(--disaple-text-color);
+    cursor: not-allowed !important;
+    color: var(--disaple-text-color) !important;
   }
   .forbidden {
-    color: #b72727;
+    color: #b72727 !important;
   }
   .free {
-    color:#1d9f4d;
+    color:#1d9f4d !important;
   }
   .dont-show {
-    display: none;
+    display: none !important;
     visibility: hidden;
     width: 0;
     height: 0;
     opacity: 0;
   }
   .hidden {
-    display: none;
+    display: none !important;
     visibility: hidden;
     position: absolute;
   }
   .success {
     background-color: #1d9f4d !important;
   }
+  button:active {
+    transform: scale(0.95) !important;
+    background-color: #ffffff !important;
+    color: #B18E4B !important;
+    -webkit-transform: scale(0.95) !important;
+    -moz-transform: scale(0.95) !important;
+    -ms-transform: scale(0.95) !important;
+    -o-transform: scale(0.95) !important;
+}
 /* إخفاء السهمين في Chrome, Safari, و Edge */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {

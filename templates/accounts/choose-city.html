@@ -26,12 +26,11 @@
                 {% endfor %}
             {% endif %}
             <label for="city">يرجى اختيار المدينة:</label>
-        
             <select name="city" id="city" required>
                 {% if user_city %}
-                    <option value="{{user_city}}">{{user_city}}</option> <!-- خيار افتراضي مدينة المستخدم المختارة سابقا -->
+                    <option value="{{user_city}}">{{user_city}}</option>
                 {% else %}
-                    <option value="">اختر مدينة</option> <!-- خيار افتراضي فارغ -->
+                    <option value="">اختر مدينة</option>
                 {% endif %}
                 {% for city in cites %}
                     <option value={{ city.name }}>{{ city.name }}</option>
@@ -39,8 +38,6 @@
             </select>  
             <button type="submit">تأكيد</button>    
         </form>
-        
-
     </div>           
 </div>         
 

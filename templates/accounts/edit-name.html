@@ -57,5 +57,18 @@
         </form>
     </div>           
 </div>         
-
 {% endblock content %}
+{% block additional_js %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelector(".edit-card form button").addEventListener("click", function(event) {
+                let button = event.target;
+                button.disabled = true; // تعطيل الزر
+                setTimeout(() => {
+                    button.disabled = false; // إعادة التمكين بعد 500 مللي ثانية
+                }, 500);
+            });
+        });
+    </script>
+{% endblock %}
+
