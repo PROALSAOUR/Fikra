@@ -81,7 +81,7 @@
                     </div>
                     <div class="name-price">
                         <h2>{{ product.name }}<span class="category" style="text-wrap:nowrap;"> {{product.category}} </span></h2>
-                        {% if product.get_total_stock > 0 %}
+                        {% if product.available %}
                             <h4 class="product-price {% if product.offer %} offer {% endif %}">
                                 <span class="offer-percient">تخفيض <span>{{product.get_offer_percentage}}%</span></span>
                                 <div class="buy-by-money"><span class="old"> {{product.price}} </span><span class="new"> | {{product.new_price|floatformat:0}} </span><span> دل </span></div>
@@ -100,7 +100,7 @@
                 </div>
 
                 <div class="product-variants">
-                    {% if product.get_total_stock > 0 %}
+                    {% if product.available %}
                         <form action="{% url 'store:add_to_cart' %}" method="post" class='form'>
 
                             <div class="size">

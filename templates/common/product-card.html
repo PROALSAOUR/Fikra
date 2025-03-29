@@ -21,7 +21,7 @@
             <div class="product-name"> {{ product.name|slice:":20" }}{% if product.name|length > 20 %}...{% endif %}</div> <!-- اقصى طول 20 حرف -->
                 <p class="product-description"> {{ product.description|slice:":50" }}{% if product.description|length > 50 %}...{% endif %}</p> <!-- اقل طول 42 حرف اقصى طول 50 حرف -->
 
-            {% if product.get_total_stock > 0 %}
+            {% if product.available %}
                 <div class="product-price">
                     <div class="buy-by-money"><span class="old"> {{ product.price }} </span><span class="new"> | {{ product.new_price |floatformat:0 }} </span><span> دل </span></div>
                 </div>

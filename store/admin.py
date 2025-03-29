@@ -80,16 +80,13 @@ class ProductItemAdmin(admin.ModelAdmin):
     inlines = (ProductVariationInline,)
    
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('product_thumbnail', 'name', 'category', 'brand', 'total_sales', 'is_available', 'ready_to_sale', 'offer')
+    list_display = ('product_thumbnail', 'name', 'category', 'brand', 'total_sales', 'available', 'ready_to_sale', 'offer')
     readonly_fields =('total_sales',)
     search_fields = ('name', )
-    list_filter = ('category', 'brand', 'ready_to_sale', 'price', 'featured' , 'offer')
-    ordering = ('updated_at',)   
+    list_filter = ('category', 'brand', 'ready_to_sale', 'featured' , 'offer', 'available',)
+    ordering = ('updated_at',)
     inlines = (ProductImagesInline, ProductItemInline,)
     
-    def is_available(self, obj):
-        return  obj.get_total_stock() 
-    is_available.short_description = 'الكمية المتاحة'
     
 admin.site.register(AdsSlider, AdsSliderAdmin)
 admin.site.register(Brand, BrandAdmin)

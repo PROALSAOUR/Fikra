@@ -166,6 +166,7 @@ class Product(models.Model):
     bonus =  models.IntegerField(blank=True, null=True, default=20 , verbose_name='المكافأة')
     offer = models.BooleanField(default=False , verbose_name='مخفض؟')
     ready_to_sale = models.BooleanField(default=False , verbose_name='معروض؟')
+    available = models.BooleanField(default=False , verbose_name='متوفر؟')
     total_sales = models.IntegerField(blank=True, null=True, default=0 , verbose_name='إجمالي البيع')
     url = models.URLField(blank=True, null=True, verbose_name='رابط المنتج')
     upload_at = models.DateTimeField(auto_now_add=True , verbose_name='تاريخ الإنشاء')
@@ -194,7 +195,7 @@ class Product(models.Model):
             
     def get_total_stock(self):
         """
-        تستعمل هذه الدالة للتحقق من ان المنتج متاح بالمخزن والا فبدلا من عرض السعر في بطاقة المنتج سيتم عرض نفذت الكمية
+        تستعمل هذه الدالة للتحقق من ان المنتج متاح بالمخزن 
         """
         total_stock = 0
         for item in self.items.all():
