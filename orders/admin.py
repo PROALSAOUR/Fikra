@@ -55,7 +55,7 @@ class MyOrdersAdmin(admin.ModelAdmin):
     search_fields = ('serial_number',)
     list_filter = ('status', 'user__phone_number', 'city',)
     ordering = ('-order_date', '-updated_at',)
-    fields = ( 'user', 'status', 'serial_number',  'old_total', 'used_discount', 'total_price', 'copon_value', 'total_points', 'free_delivery', 'city', 'neighborhood', 'order_date', 'deliverey_date', )
+    fields = ( 'user', 'status', 'serial_number',  'old_total', 'used_discount', 'total_price', 'copon_value', 'total_points', 'free_delivery', 'delivery_price', 'city', 'neighborhood', 'order_date', 'deliverey_date', )
     readonly_fields = ( 'user', 'serial_number',  'old_total', 'used_discount', 'total_price', 'copon_value', 'total_points', 'free_delivery', 'order_date', 'deliverey_date', )
     inlines = [OrderItemInline, OrderDealingInline] 
     
@@ -63,6 +63,8 @@ class MyOrdersAdmin(admin.ModelAdmin):
         """جعل حقل الحالة غير قابل للتعديل إذا كانت الحالة مُلغاة."""
         if obj and obj.status == 'canceled':
             return self.readonly_fields + ('status',)
+        if obj and obj.free_delivery == True:
+            return self.readonly_fields + ('delivery_price',)
         return self.readonly_fields
     
     def get_user(self,obj):

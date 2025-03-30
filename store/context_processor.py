@@ -30,10 +30,8 @@ def social_data(request):
         'phone_number2': social.phone_number2,
         'email': social.email,
     }
-    
-    
+        
 def globals(request):
-    
     user = request.user
        
     # تحقق من وجود men_category في الكاش
@@ -77,8 +75,8 @@ def globals(request):
     
     if user.is_authenticated:
         
-        favourite, created = Favourite.objects.get_or_create(user=user) # احصل أو أنشئ المفضلة للمستخدم
-        favourite_products =  favourite.products.values_list('id', flat=True) # احصل على جميع المنتجات المفضلة للمستخدم  
+        favourite, created = Favourite.objects.get_or_create(user=user)
+        favourite_products =  favourite.products.values_list('id', flat=True) 
         
         # تحقق مما إذا كان المستخدم لديه بروفايل وصندوق بريد بالفعل
         profile, created = UserProfile.objects.get_or_create(user=user)
@@ -93,8 +91,7 @@ def globals(request):
         inbox = Inbox.objects.get(user=user)
         unread_messages = inbox.messages.filter(is_read=False).only('id')
         unread_messages_count = unread_messages.count()
-        
-        
+            
     else:
         favourite_products = []
         user_points = 0

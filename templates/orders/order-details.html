@@ -14,6 +14,7 @@
                     <div class="order-id-status">
                         <h3>رقم الطلب: <span>{{ order.serial_number|stringformat:"06d" }}</span></h3>                     
                         <h3>حالة الطلب: <span style="color:{% if order.status == 'canceled' %}#cf2222{% elif  order.status == 'delivered' %}#27bc27{% else %}#e39554{% endif %};" >{{ order.get_status_display }}</span></h3>                    
+                        <h3>ملاحظة: <span>{% if order.free_delivery %}التوصيل مجاني{% else %}سعر التوصيل غير مضمن بالفاتورة ({{order.delivery_price}} دينار){% endif %}</span></h3>   
                         <a class='edit-exit' href="javascript:void(0);" onclick="goBack()">
                             <span class="exit-button"><i class="fa-solid fa-arrow-left"></i></span>
                         </a>

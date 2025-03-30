@@ -11,7 +11,7 @@
         <div class="search-bar">
             <div class="container">
                 <form id="filter-form" method="get" action="{% url 'store:category' category.slug %}" class="search">
-                    {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.category or request.GET.brand %}
+                    {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.category or request.GET.brand  or request.GET.available_only %}
                         <button class='clear-search' OnClick="resetFilters();"><i class="fa-solid fa-xmark"></i><p>إلغاء الفلترة</p></button>
                     {% endif %}
                     <input type="search" class="search-input" id="search-query" name="q" placeholder="ما الذي تبحث عنه؟" value="{{ request.GET.q }}">                   
@@ -27,6 +27,10 @@
                             <div class="filter-tabs">
                                 <button type="button" class="filter-tab" data-target="price">السعر</button>
                                 <button type="button" class="filter-tab" data-target="brand">العلامة التجارية</button>
+                                <div class="filter-tab" >
+                                    <input type='checkbox' name='available_only' id='available_only' >
+                                    <label for='available_only'>المنتجات المتاحة فقط</label>
+                                </div>
                             </div>
                             <div class="filter-content">
                                 <!-- الفلاتر المخفية هنا -->
@@ -55,7 +59,7 @@
         </div>
         <!-- End Search Bar -->
         <!-- Start Product quantities --> 
-        {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.brand %}
+        {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.brand  or request.GET.available_only %}
             {% if products %}
                 <h2 class='searched-product-counts'>عدد النتائج ({{ products_count }})</h2>
             {% endif %}
@@ -63,13 +67,13 @@
         <!-- End Product quantities --> 
         <!-- Start Searched-products  -->
         <div class="search">
-            {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.brand %}
+            {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.brand  or request.GET.available_only %}
                 <!-- إذا كان هناك استعلام بحث، اعرض المنتجات -->
                 <div id="products-container" class="searched-products">
                     <div class="container">
                         <div class="products-cards">
-                            {% if results %}
-                                {% for product in results %}
+                            {% if products %}
+                                {% for product in products %}
                                     <!-- product-start -->
                                     <div class="specific">
                                         {% include "common/product-card.html" with product=product %}
@@ -97,8 +101,8 @@
                 <div class="searched-products">
                     <div class="container">
                         <div class="products-cards">
-                            {% if products %}
-                                {% for product in products %}
+                            {% if all_category_products %}
+                                {% for product in all_category_products %}
                                     <!-- product-start -->
                                     <div class="specific">
                                         {% include "common/product-card.html" %}
@@ -111,19 +115,55 @@
                         </div>
                     </div>
                 </div>
+                {% if all_category_products %}
+                    <div class="pagination-container">
+                        <div class="container">
+                            <div class="pagination">
+                                <!-- Previous Page Link -->
+                                {% if all_category_products.has_previous %}
+                                    <a href="?page_all={{ all_category_products.previous_page_number }}" class="previous">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </a>
+                                {% else %}
+                                    <div class="previous disapled">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                {% endif %}
+
+                                <!-- Page Number Display -->
+                                <div class="page-number">
+                                    <span class="in-page">{{ all_category_products.number }}</span>
+                                    <span class="from">من</span>
+                                    <span class="total-pages">{{ all_category_products.paginator.num_pages }}</span>
+                                </div>
+
+                                <!-- Next Page Link -->
+                                {% if all_category_products.has_next %}
+                                    <a href="?page_all={{ all_category_products.next_page_number }}" class="next"> 
+                                        <i class="fa-solid fa-arrow-left"></i>
+                                    </a>
+                                {% else %}
+                                    <div class="next disapled">
+                                        <i class="fa-solid fa-arrow-left"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                <!-- End Pagination -->
             {% endif %}
         </div>
         <!-- End Searched-products  -->
         <!-- Start Pagination -->
-        {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.brand %}
-        {% else %}
+        {% if request.GET.q or request.GET.price_min or request.GET.price_max or request.GET.brand  or request.GET.available_only %}
             {% if products %}
                 <div class="pagination-container">
                     <div class="container">
                         <div class="pagination">
                             <!-- Previous Page Link -->
                             {% if products.has_previous %}
-                                <a href="?page={{ products.previous_page_number }}" 
+                                <a href="?page={{ products.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.price_min %}&price_min={{ request.GET.price_min }}{% endif %}{% if request.GET.price_max %}&price_max={{ request.GET.price_max }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}" 
                                 class="previous">
                                     <i class="fa-solid fa-arrow-right"></i>
                                 </a>
@@ -142,7 +182,7 @@
 
                             <!-- Next Page Link -->
                             {% if products.has_next %}
-                                <a href="?page={{ products.next_page_number }}" 
+                                <a href="?page={{ products.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.price_min %}&price_min={{ request.GET.price_min }}{% endif %}{% if request.GET.price_max %}&price_max={{ request.GET.price_max }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}" 
                                 class="next">
                                     <i class="fa-solid fa-arrow-left"></i>
                                 </a>

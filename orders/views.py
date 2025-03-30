@@ -50,9 +50,7 @@ def order_details(request, oid):
     for item in items:
         item.total_price = item.qty * item.price
     
-    
-    # الحصول على المنتجات في السلة لعرضها بقائمة الاستبدال
-    available_items = []
+    available_items = [] # الحصول على المنتجات في السلة لعرضها بقائمة الاستبدال
     if order.status != 'canceled':
         try:
             cart = Cart.objects.get(user=user)
@@ -74,7 +72,6 @@ def order_details(request, oid):
             logger.error(f"خطأ بالطلب: {e}", exc_info=True)
             available_items = None    
     
-
     context = {
         'order':order,
         'items':items,

@@ -24,7 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const queryParams = new URLSearchParams();
 
             inputs.forEach(input => {
-                if (input.value.trim() !== '') {
+                if (input.type === 'checkbox') {
+                    if (input.checked) {  // إضافة فقط إذا كان محددًا
+                        queryParams.append(input.name, 'on');
+                    }
+                } else if (input.value.trim() !== '') {
                     queryParams.append(input.name, input.value);
                 }
             });
@@ -81,6 +85,7 @@ function resetFilters() {
    const max = document.getElementById('price_max');
    const category = document.getElementById('category_filter');
    const brand = document.getElementById('brand_filter'); 
+   const available_only = document.getElementById('available_only');
 
    if (q) {
     q.value = '';
@@ -97,7 +102,9 @@ function resetFilters() {
    if (brand) {
     brand.selectedIndex = 0;
    }
-
+   if (available_only) {
+    available_only.checked = false;
+    }
 }
 // =========================================================================================================
 //  التعامل مع قائمة الفلاتر بصفحة البحث 
@@ -173,9 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
           }
         });
-      });
-  
-    
+      });  
     }
 });
 // =========================================================================================================
