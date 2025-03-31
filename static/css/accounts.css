@@ -411,7 +411,7 @@
     display: none;
   }
   .my-info  .notfication-message .content a {
-    color:#462dff ;
+    color: var(--url-color);
     text-decoration: underline;
   }
   .my-info  .notfication-message.read .content{
@@ -963,7 +963,7 @@
   }
   .edit-card form .edit-items label a {
     font-size: 12px;
-    color: #3e3ee7;
+    color: var(--url-color);
     text-decoration: underline;
     cursor: pointer;
   }

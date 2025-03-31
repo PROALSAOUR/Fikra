@@ -341,6 +341,10 @@
     margin-bottom: 20px;
     padding: 10px;
   }
+  .product-details-page .product-details .product-description a {
+    color: var(--url-color);
+    text-decoration: underline;
+  }
   /* tab media */
   @media (max-width: 768px) {
     .product-details-page .product-details .product-description{

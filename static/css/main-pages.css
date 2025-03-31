@@ -2169,7 +2169,7 @@ input[type="radio"]:checked + .custom-radio::after {
 }
 .cards-details .lower-part .recipet > a {
   font-size: var(--tab-s-size);
-  color: #312eb1;
+  color: var(--url-color);
   text-decoration: underline;
 }
 .cards-details .lower-part .recipet .price span {

@@ -80,7 +80,7 @@
                         <!-- image-slider -->
                     </div>
                     <div class="name-price">
-                        <h2>{{ product.name }}<span class="category" style="text-wrap:nowrap;"> {{product.category}} </span></h2>
+                        <h2>{{ product.name }}<a href="{% url "store:category" product.category.slug %}" class="category" style="text-wrap:nowrap;"> {{product.category}} </a></h2>
                         {% if product.available %}
                             <h4 class="product-price {% if product.offer %} offer {% endif %}">
                                 <span class="offer-percient">تخفيض <span>{{product.get_offer_percentage}}%</span></span>
@@ -93,6 +93,9 @@
                         {% endif %}
                     </div>
                     <div class="product-description">
+                        <p>
+                            العلامة التجارية: <a href="{% url "store:brand" product.brand.title %}" >{{product.brand}}</a>
+                        </p>
                         <p>
                            {{ product.description }}
                         </p>
