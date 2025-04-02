@@ -8,6 +8,7 @@ class Settings(models.Model):
     partners_percentage = models.DecimalField(max_digits=4, decimal_places=2, verbose_name='نسبة الشركاء' , default=0.0)
     free_delivery =  models.BooleanField(default=False, verbose_name='توصيل مجاني؟' )
     expected_days = models.IntegerField(verbose_name=" الأيام المتوقعة لوصول الطلب", default=7)
+    send_otp_by_twilio = models.BooleanField(default=False, verbose_name='ارسال رسائل التحقق')
     
     @classmethod
     def get_settings(cls):

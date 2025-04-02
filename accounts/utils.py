@@ -1,6 +1,8 @@
 from twilio.rest import Client
 from django.conf import settings
 import phonenumbers
+import json
+
 
 def send_otp_via_whatsapp(phone_number, otp_code):
     client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
@@ -9,7 +11,7 @@ def send_otp_via_whatsapp(phone_number, otp_code):
         from_=f"whatsapp:{settings.TWILIO_WHATSAPP_NUMBER}",
         to=f"whatsapp:{phone_number}",
         content_sid=settings.TWILIO_TEMPLATE_SID, # المعرف الخاص بالقالب المستعمل
-        template={"name": "otp_verify", "params": [otp_code]}  # إرسال رمز OTP في القالب
+        content_variables=json.dumps({ "1": otp_code }) 
     )
     return message.sid
 

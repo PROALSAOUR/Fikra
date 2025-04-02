@@ -33,16 +33,6 @@
 </div>
 {% endblock content %}
 {% block additional_js %}
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            let submitButton = document.querySelector(".verify-face form input[type='submit']");    
-            submitButton.addEventListener("click", function(event) {
-                submitButton.disabled = true; // تعطيل الزر
-                setTimeout(() => {
-                    submitButton.disabled = false; // إعادة التمكين بعد 500 مللي ثانية
-                }, 500);
-            });
-        });
-    </script>
+    
 {% endblock %}
 

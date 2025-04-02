@@ -12,6 +12,7 @@ from accounts.utils import send_otp_via_whatsapp, format_phone_number
 from django.core.exceptions import ValidationError
 import phonenumbers
 from django.core.cache import cache
+from settings.models import Settings
 
 import logging
 logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
@@ -71,16 +72,18 @@ def sign(request):
                 last_name = sign_up_form.cleaned_data['last_name']
                 otp_code = OTPVerification.generate_code()
 
-                # ايقاف خدمة انشاء حساب مؤقتا
-                messages.error(request, "المعذرة خدمة انشاء حساب تم تعليقها مؤقتا من قبل مالك الموقع يرجى المحاولة لاحقا، او التواصل مع مالك الموقع.")
-                return redirect('accounts:sign')
+                # تحقق ان المستخدم قام بتفعيل خدمة ارسال الرسائل
+                send_otp = Settings.objects.values_list('send_otp_by_twilio', flat=True).first()
+                if send_otp == False :
+                    messages.error(request, "المعذرة خدمة انشاء حساب تم ايقافها مؤقتا من قبل مالك الموقع يرجى المحاولة لاحقا.")
+                    return redirect('accounts:sign')
             
                 # إرسال OTP عبر واتساب
-                formatted_phone = format_phone_number(phone_number) # الحصول على رقم الهاتف بالصيغة الدولية
+                formatted_phone = format_phone_number(phone_number) 
                 if formatted_phone:  
-                    send_otp_via_whatsapp(formatted_phone, otp_code)  # إرسال OTP للرقم الصحيح
+                    send_otp_via_whatsapp(formatted_phone, otp_code) 
                 else:
-                    messages.error(request, "يرجى إدخال رقم هاتف صالح.")  # إرجاع رسالة خطأ
+                    messages.error(request, "يرجى إدخال رقم هاتف صالح.")  
 
                 # تخزين OTP في قاعدة البيانات
                 otp_instance = OTPVerification.objects.create(
@@ -227,6 +230,12 @@ def forget_password(request):
     if request.method == 'POST':
 
         otp_code = OTPVerification.generate_code()
+        
+        # تحقق ان المستخدم قام بتفعيل خدمة ارسال الرسائل
+        send_otp = Settings.objects.values_list('send_otp_by_twilio', flat=True).first()
+        if send_otp == False :
+            messages.error(request, "المعذرة خدمة تغيير كلمة السر تم ايقافها مؤقتا من قبل مالك الموقع يرجى المحاولة لاحقا.")
+            return redirect('accounts:phone_number_of_forgeted_password')
 
         # إرسال OTP عبر واتساب
         formatted_phone = format_phone_number(phone_number) # الحصول على رقم الهاتف بالصيغة الدولية
