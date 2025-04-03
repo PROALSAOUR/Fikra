@@ -81,6 +81,8 @@
             </div>
             <div class="lower-part">
                 <div class="categories">
+                    <a class="category" href="{% url "store:all_brands" %}" aria-label="جميع البراندات">البراندات</a>
+                    <a class="category" href="{% url "store:all_categories" %}" aria-label="جميع التصنيفات">التصنيفات</a>
                     <a class="category" href="{% url "store:offer_page" %}" aria-label="العروض">عروض</a>
                     {% if men_category %}<a class="category" href=" {% url "store:category" men_category.slug %}" aria-label="الملابس الرجالية"> رجالي</a>{% endif %}
                     {% if women_category %}<a class="category" href=" {% url "store:category" women_category.slug %}" aria-label="الملابس النسائية"> نسائي</a>{% endif %} 

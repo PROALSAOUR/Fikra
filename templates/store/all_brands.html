@@ -1,0 +1,40 @@
+{% extends "partials/base.html" %}
+{% load static %}
+
+{% block additional_css %}
+    <link rel="stylesheet" href="{% static "/css/main-pages.css" %}">   
+{% endblock %}
+
+{% block content %}
+    <div class="search-page brand-bage" style='padding-top:100px;padding-bottom:30px;'>
+        <div class="search">
+            {% if  brands %}
+                <div class="search-title">
+                    <h2 style='color:var(--main-color);' >جميع البراندات<span style='color:var(--main-text-color);' >({{ brands_count }})</span></h2>
+                    <div class="title-image"></div>
+                </div>
+                {% for brand in brands %}
+                    <a href="{% url "store:brand" brand.title %}" aria-label="استعرض {{ brand.title}}" class="search-title">
+                        <div class="title-image">
+                            <img src="{{ brand.img.url }}" alt="{{ brand.title }}">
+                        </div>
+                        <h2>{{ brand.title }}<span>({{ brand.products_count }})</span></h2>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="searched-products">
+                    <div class="container">
+                        <div class="products-cards">
+                            {% include "common/no-result.html" %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+    </div>
+{% endblock content %}
+
+{% block additional_js %}
+    <script src=" {% static "/javascript/main-pages.js" %}" defer></script>
+{% endblock %}
