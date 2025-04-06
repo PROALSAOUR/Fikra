@@ -9,7 +9,7 @@
 
 <!-- Start blog page   -->
 <div class="blog secondary-page" style="position: relative;  padding-top: 80px;">
-    <div class="image">
+    <div class="long-image">
         <img class=" lazy-load" 
             src="{% static 'images/rectangle-default.webp' %}" 
             data-src="{{ questions_page.image.url }}" 
@@ -26,7 +26,7 @@
             {% for question in questions %}
             <div class="paragraph article" id="{{ question.slug }}">
                 <h3 class="article-title" onclick="toggleContent(this)" id="what-points"> {{ question.title }} <i class="fa-solid fa-chevron-down "></i></h3>
-                <p class="article-content"> {{ question.content }} </p>        
+                <div class="article-content"> {{ question.content|safe }} </div>        
             </div>
             {% endfor %}
         </div>

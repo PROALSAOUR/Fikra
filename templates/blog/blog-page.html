@@ -9,7 +9,7 @@
 {% block content %}
 <!-- Start blog page   -->
 <div class="blog secondary-page" style="position: relative;  padding-top: 80px;">
-    <div class="image">
+    <div class="long-image">
         <img class=" lazy-load" 
             src="{% static 'images/rectangle-default.webp' %}" 
             data-src="{{ blog_page.image.url }}" 
@@ -26,7 +26,7 @@
             {% for section in sections %}
                 <div class="paragraph">
                     <h3> {{ section.title }} </h3>
-                    <p> {{ section.content }} </p>
+                    <div> {{ section.content|safe }} </div>
                 </div>
             {% endfor %}
         </div>

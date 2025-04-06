@@ -1,4 +1,6 @@
 from django.db import models
+from django_ckeditor_5.fields import CKEditor5Field
+
 
 # For Blog pages in the Blog =========================
 
@@ -18,7 +20,7 @@ class BlogPage(models.Model):
 class PageSection(models.Model):
     blog_page = models.ForeignKey(BlogPage, on_delete=models.CASCADE, related_name='sections', verbose_name='الصفحة' )
     title = models.CharField(max_length=255, verbose_name='العنوان')
-    content = models.TextField(verbose_name='المحتوى')
+    content = CKEditor5Field('المحتوى', config_name='default')
     order = models.IntegerField(default=100 , verbose_name='الترتيب')
  
     def __str__(self):
@@ -41,6 +43,6 @@ class QuestionContent(models.Model):
     questions_page = models.ForeignKey(QuestionPage, on_delete=models.CASCADE, related_name='questions', verbose_name='الصفحة')
     slug = models.SlugField(max_length=100, unique=True, verbose_name='slug')
     title = models.CharField(max_length=255, verbose_name='العنوان')
-    content = models.TextField( verbose_name='المحتوى')
+    content = CKEditor5Field('المحتوى', config_name='default')
     order = models.IntegerField(default=100, verbose_name='الترتيب')
 

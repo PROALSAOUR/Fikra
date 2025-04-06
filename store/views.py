@@ -3,7 +3,7 @@ from cards.models import  CoponItem
 from settings.models import Settings
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils.timezone import now 
@@ -182,7 +182,7 @@ def brand_page(request, slug):
     return render(request, 'store/brand.html', context)
 # جميع البراندات
 def all_brands(request):
-    brands = Brand.objects.all()
+    brands = Brand.objects.annotate(products_count=Count('products')).filter(products_count__gt=0).order_by('-products_count')
     brands_count = brands.count() if brands else 0
     context = {
         'brands': brands,

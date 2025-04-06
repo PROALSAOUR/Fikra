@@ -5,6 +5,7 @@ from django.utils.html import mark_safe
 from shortuuid.django_fields import ShortUUIDField
 from accounts.models import User
 import string
+from django_ckeditor_5.fields import CKEditor5Field   
 
 # ======================== Product ======================================
 
@@ -21,7 +22,7 @@ class AdsSlider(models.Model):
     slug = models.SlugField(max_length=100, unique=True , verbose_name='slug')
     img = models.ImageField( upload_to='store/Ads' , verbose_name='الصورة')
     show = models.BooleanField( default=False , verbose_name='عرض')
-    info = models.TextField(null=True, blank=True , verbose_name='الوصف')
+    info = CKEditor5Field('الوصف', config_name='default', blank=True, null=True)
     ads_for = models.CharField(choices=ads_options, max_length=20, default='special_products' , verbose_name='إعلان من اجل ')
     category = models.ForeignKey('Category', null=True, blank=True, related_name='ads', on_delete=models.CASCADE , verbose_name='اعلان للتصنيف ..')
     one_product = models.ForeignKey('Product', null=True, blank=True, related_name='ads', on_delete=models.CASCADE , verbose_name='اعلان للمنتج..')
@@ -153,7 +154,7 @@ class Tag(models.Model):
 class Product(models.Model):
     pid = ShortUUIDField(unique=True, length=12, max_length=30, prefix='pr', alphabet= string.ascii_lowercase + string.digits , verbose_name='المعرف')
     name = models.CharField(max_length=255 , verbose_name='الاسم')
-    description = models.TextField(verbose_name='الوصف')
+    description = CKEditor5Field('الوصف', config_name='default',)
     brand = models.ForeignKey(Brand, related_name='products', on_delete=models.CASCADE , verbose_name='البراند')
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE , verbose_name='التصنيف')
     repository =  models.ForeignKey(Repository, related_name='products', on_delete=models.CASCADE , verbose_name='المستودع',)

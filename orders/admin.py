@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from orders.models import *
+from django.urls import reverse
+from django.shortcuts import redirect
+
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
@@ -58,6 +61,8 @@ class MyOrdersAdmin(admin.ModelAdmin):
     fields = ( 'user', 'status', 'serial_number',  'old_total', 'used_discount', 'total_price', 'copon_value', 'total_points', 'free_delivery', 'delivery_price', 'city', 'neighborhood', 'order_date', 'deliverey_date', )
     readonly_fields = ( 'user', 'serial_number',  'old_total', 'used_discount', 'total_price', 'copon_value', 'total_points', 'free_delivery', 'order_date', 'deliverey_date', )
     inlines = [OrderItemInline, OrderDealingInline] 
+    change_form_template = "admin/orders/change_form.html"
+    
     
     def get_readonly_fields(self, request, obj=None):
         """جعل حقل الحالة غير قابل للتعديل إذا كانت الحالة مُلغاة."""

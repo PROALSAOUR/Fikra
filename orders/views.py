@@ -12,9 +12,42 @@ from accounts.models import UserProfile, Banned_users
 from django.utils import timezone
 from accounts.send_messages import create_order_message, cancel_order_message, edit_order_message, return_order_item_message
 import logging
+import qrcode
+from io import BytesIO
+import base64
+
 
 logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
 
+# دالة طباعة فاتورة الطلب بلوحة الادارة
+def print_invoice_view(request, order_id):
+    order = get_object_or_404(Order, pk=order_id)
+    items = order.order_items.prefetch_related('order_item__product_item__product')
+    for item in items:
+        item.total_price = item.qty * item.price
+    
+    replace_possibility = Settings.objects.values_list("replace_possibility", flat=True).first()    
+    return_possibility = Settings.objects.values_list("return_possibility", flat=True).first()
+    max_replace_days = Settings.objects.values_list('max_replace_days', flat=True).first()
+    max_return_days = Settings.objects.values_list('max_return_days', flat=True).first()
+
+    order_details_url = request.build_absolute_uri(f"/order-details/{order_id}")
+    qr = qrcode.make(order_details_url)
+    qr_image = BytesIO()
+    qr.save(qr_image)
+    qr_image.seek(0)
+    qr_code_base64 = base64.b64encode(qr_image.read()).decode('utf-8').replace("\n", "")
+
+    context = {
+        'order':order,
+        'items':items,
+        'qr_code': qr_code_base64,
+        'replace_possibility': replace_possibility,
+        'return_possibility': return_possibility,
+        'max_replace_days': max_replace_days,
+        'max_return_days': max_return_days,
+    }
+    return render(request, "admin/orders/print_invoice.html", context)
 
 # دالة عرض الطلبات
 @login_required

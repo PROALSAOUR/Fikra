@@ -31,6 +31,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('cards/', include('cards.urls')),
     path('orders/', include('orders.urls')),
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
     path('', include('pwa.urls')),# إضافة مسارات PWA
 ] + debug_toolbar_urls()
 

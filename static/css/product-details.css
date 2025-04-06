@@ -334,6 +334,7 @@
     color: var(--main-color);
   }
   .product-details-page .product-details .product-description{
+    position: relative;
     color: var(--main-text-color);
     word-spacing: 5px;
     line-height: 1.7;
@@ -344,6 +345,20 @@
   .product-details-page .product-details .product-description a {
     color: var(--url-color);
     text-decoration: underline;
+  }
+  .product-details-page .product-details .product-description figure {
+    text-align: center; 
+    margin: 10px 0 0;
+    padding: 0;
+  }
+  .product-details-page .product-details .product-description img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--main-border-radius) ;
+    -webkit-border-radius: var(--main-border-radius) ;
+    -moz-border-radius: var(--main-border-radius) ;
+    -ms-border-radius: var(--main-border-radius) ;
+    -o-border-radius: var(--main-border-radius) ;
   }
   /* tab media */
   @media (max-width: 768px) {

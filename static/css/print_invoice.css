@@ -1,0 +1,107 @@
+body {
+    background-color: #f5f5f5;
+    font-family: "Almarai", sans-serif;
+}
+.invoice-container {
+    width: 80%;
+    margin: 30px auto;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    background: #fff;
+}
+.website-name {
+    text-align: left;
+    font-size: 24px;
+    font-weight: 700;
+    padding: 10px;
+}
+.invoice-header {
+    text-align: center;
+    margin-bottom: 50px;
+    position: relative;
+}
+.invoice-header img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100px;
+}
+.invoice-header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+.invoice-header p {
+    margin: 5px 0;
+    color: #555;
+}
+.invoice-details table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+.invoice-details th, .invoice-details td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+.invoice-details th , .invoice-details .sep {
+    background: #f4f4f4;
+}
+.invoice-footer {
+    margin-top: 20px;
+}
+.notes ul {
+    text-align: right;
+    list-style-type: disc; 
+    margin: 10px 0 0;
+}
+.notes li {
+    margin-bottom: 10px; /* المسافة بين العناصر */
+    font-size: 14px; /* حجم الخط */
+    color: #333; /* لون النص */
+}
+@media print {
+    @page {
+      size: 80mm auto;
+      margin: 5px; /* يمكنك تعديله حسب طابعتك */
+    }
+    body {
+      width: 80mm;
+      margin: 0 auto;
+      font-size: 11px; /* حجم الخط المناسب للطباعة الحرارية */
+      background-color: white !important;
+    }
+    body * {
+      visibility: hidden;
+    }
+    .invoice-container, .invoice-container * {
+      visibility: visible;
+    }
+    .invoice-container {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      padding: 0;
+      border: none;
+      box-shadow: none;
+    }
+    .website-name {
+        font-size: 16px;
+    }
+    .invoice-details th, .invoice-details td {
+      font-size: 10px; 
+      padding: 4px;
+    }
+    .invoice-header h1 {
+      font-size: 14px;
+    }
+    .invoice-header p,
+    .invoice-footer.notes li {
+      font-size: 10px;
+    }
+    .invoice-header img {
+      width: 80px;
+    }
+}

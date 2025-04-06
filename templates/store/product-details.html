@@ -97,7 +97,7 @@
                             العلامة التجارية: <a href="{% url "store:brand" product.brand.title %}" >{{product.brand}}</a>
                         </p>
                         <p>
-                           {{ product.description }}
+                           {{ product.description|safe }}
                         </p>
                     </div>
                 </div>

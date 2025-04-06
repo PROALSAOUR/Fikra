@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar">
+    {% load pwa %} 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content=" الوجهة المثالية لعشاق الأناقة، نقدم ملابس عصرية للرجال والنساء بتصاميم فريدة وجودة عالية، استمتعوا بتجربة تسوق ممتعة لتجديد إطلالتكم بأحدث صيحات الموضة.">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <!-- import css files -->
+    <link rel="stylesheet" href="{% static "/css/normalize.css" %}" media="print" onload="this.media='all'"> 
+    <link rel="stylesheet" href="{% static "/css/all.min.css" %}">  <!-- Font Awesome Icons File     -->
+    <link rel="stylesheet" href="{% static "/css/print_invoice.css" %}"> 
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Preload font for faster rendering -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <!-- Load the font stylesheet (fallback for browsers that don't support preload) -->
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap"></noscript>
+    <!-- import PWA  -->
+    <link rel="apple-touch-icon" href="{% static "/images/icons/small-logo.webp" %}" sizes="192x192">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    {% progressive_web_app_meta %}
+    <!-- website title & icon -->
+    <title>Fikra Print Invoice </title>
+    <link rel="website icon" type="" href="{% static "/images/icons/small-logo.webp" %}" sizes="192x192">
+
+</head>
+<body dir="rtl"  >
+    <div class="invoice-container">
+        <div class='website-name'>
+            Fikra-Store
+        </div>
+        <div class="invoice-header">
+            <h1>فاتورة الطلب #{{ order.serial_number }}</h1>
+            <p>تاريخ الطلب: {{ order.order_date|date:"h:i A Y/m/d " }}</p>
+            <p>المدينة: {{ order.city }} {% if order.neighborhood %},  الحي: {{ order.neighborhood }}  {% endif %} </p>
+            <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">       
+        </div>
+        <div class="invoice-details">
+            <table>
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>المنتج</th>
+                        <th>المقاس</th>
+                        <th>الكمية</th>
+                        <th>السعر</th>
+                        <th>المجموع</th>
+                        <th>بعد الخصم</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.order_item.id }}</td>
+                        <td>{{ item.order_item.product_item.product.name }}</td>
+                        <td>{{ item.order_item.size }}</td>
+                        <td>{{ item.qty }}</td>
+                        <td>${{item.price}}</td>
+                        <td>${{ item.total_price }}</td>
+                        <td>${{ item.discount_price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="7" class='sep'></td>
+                    </tr>
+                    <tr>
+                        <td colspan="1" >المجموع :</td>
+                        <td colspan="5"></td>
+                        <td>{{ order.old_total }} دل </td>
+                    </tr>
+                    <tr>
+                        <td colspan="1" >  قيمة الخصم:</td>
+                        <td colspan="5"></td>
+                        <td>-{{ order.used_discount }} دل </td>
+                    </tr>
+                    <tr>
+                        <td colspan="1" > المجموع النهائي:</td>
+                        <td colspan="5"></td>
+                        <td >{{ order.total_price }} دل </td>
+                    </tr>  
+                </tfoot>
+            </table>
+        </div>
+    
+        <div class="invoice-footer">
+            <div class="notes">ملاحظة: 
+                <ul>
+                    <li>{% if order.free_delivery %}التوصيل مجاني{% else %}سعر التوصيل غير مضمن بالفاتورة ({{order.delivery_price}} دينار){% endif %}</li>
+                    {% if replace_possibility %}
+                        <li>اقصى مدة لإستبدال المنتجات هي {{max_replace_days}} أيام من تاريخ التسليم</li>
+                    {% else %}
+                        <li>خدمة الاستبدال غير متاحة حاليا</li>
+                    {% endif %}
+                    {% if return_possibility %}
+                        <li>اقصى مدة لإرجاع المنتجات هي {{max_return_days}} أيام من تاريخ التسليم</li>
+                    {% else %}
+                        <li>خدمة الإرجاع غير متاحة حاليا</li>
+                    {% endif %}
+                </ul>
+            </div>   
+        </div>
+    </div>
+    
+    <script>
+        window.onload = function() {
+            window.print();  // تشغيل الطباعة تلقائيًا عند تحميل الصفحة
+        }  
+    </script>
+</body>
+</html>
+
+
