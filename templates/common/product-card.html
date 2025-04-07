@@ -1,4 +1,6 @@
 {% load static %}
+{% load filters %}
+
 <!-- product-start -->
 <div class="swiper-slide product-box {% if product.offer %} offer {% endif %}"> <!-- اضف كلاس اوفر اذا كان هنالك تخفيض- -->
     <a href="{% url "store:product_details" product.id %}" aria-label="استعرض {{product.name}}">
@@ -19,7 +21,7 @@
         </div>
         <div class="product-info">
             <div class="product-name"> {{ product.name|slice:":20" }}{% if product.name|length > 20 %}...{% endif %}</div> <!-- اقصى طول 20 حرف -->
-                <p class="product-description"> {{ product.description|slice:":50" }}{% if product.description|length > 50 %}...{% endif %}</p> <!-- اقل طول 42 حرف اقصى طول 50 حرف -->
+                <p class="product-description">  {{ product.description|striptags|html_unescape|slice:50 }}{% if product.description|striptags|length > 50 %}...{% endif %}</p> <!-- اقل طول 42 حرف اقصى طول 50 حرف -->
 
             {% if product.available %}
                 <div class="product-price">
