@@ -692,6 +692,10 @@ def cart_page(request):
     
     settings =  Settings.get_settings()
     delivery = settings.free_delivery
+    replace_possibility = settings.replace_possibility
+    return_possibility = settings.return_possibility
+    max_replace_days = settings.max_replace_days
+    max_return_days = settings.max_return_days
     
     context = {
         'cart_items': cart_items,
@@ -704,6 +708,10 @@ def cart_page(request):
         'total_bonus': total_bonus,
         'delivery': delivery,
         'user_copons': user_copons,
+        'replace_possibility': replace_possibility,
+        'return_possibility': return_possibility,
+        'replace_days': max_replace_days,
+        'return_days': max_return_days,
     }
 
     return render(request, 'store/cart.html', context)

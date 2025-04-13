@@ -42,6 +42,7 @@ class ReceiveCoponAdmin(admin.ModelAdmin):
     list_filter = ('is_used', 'copon')
     ordering = ('updated_at',)   
     readonly_fields = ('code', 'is_used', 'used_by')
+    fields = ('copon', 'code', 'is_used', 'used_by', 'note')
     
     def get_gift_image(self, obj):
         return f"{obj.copon.copon_image()}"

@@ -58,7 +58,7 @@ class MyOrdersAdmin(admin.ModelAdmin):
     search_fields = ('serial_number',)
     list_filter = ('status', 'user__phone_number', 'city',)
     ordering = ('-order_date', '-updated_at',)
-    fields = ( 'user', 'status', 'serial_number',  'old_total', 'used_discount', 'total_price', 'copon_value', 'total_points', 'free_delivery', 'delivery_price', 'city', 'neighborhood', 'order_date', 'deliverey_date', )
+    fields = ( 'user', 'status', 'serial_number',  'old_total', 'used_discount', 'total_price', 'copon_value', 'total_points', 'free_delivery', 'delivery_price', 'city', 'neighborhood', 'note', 'order_date', 'deliverey_date', )
     readonly_fields = ( 'user', 'serial_number',  'old_total', 'used_discount', 'total_price', 'copon_value', 'total_points', 'free_delivery', 'order_date', 'deliverey_date', )
     inlines = [OrderItemInline, OrderDealingInline] 
     change_form_template = "admin/orders/change_form.html"
@@ -98,9 +98,10 @@ class DealingItemsInline(admin.TabularInline):
     extra = 0  # عدم إظهار حقول إضافية
     readonly_fields = ('old_item', 'new_item', 'old_qty', 'new_qty', 'price_difference', 'status', ) 
     fields = ('old_item', 'new_item', 'old_qty', 'new_qty', 'price_difference', 'is_dealt', 'status' )  # تحديد ترتيب الحقول
-    can_delete = False  # منع حذف العناصر
+    can_delete = True  
     max_num = 0  # منع إضافة عناصر جديدة
     show_change_link = True  
+    verbose_name_plural = 'تفاصيل التعديل'
     
 class DealingAdmin(admin.ModelAdmin):
     list_display = ('order__user', 'order', 'status', 'get_modifications', 'is_dealt', 'created_at', )    

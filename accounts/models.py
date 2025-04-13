@@ -125,7 +125,7 @@ class City(models.Model):
     
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile' , verbose_name='المستخدم')
-    points = models.IntegerField(default=0, verbose_name='الرصيد')
+    points = models.IntegerField(default=20, verbose_name='الرصيد')
     inbox = models.OneToOneField(Inbox, on_delete=models.CASCADE, verbose_name='البريد')
     city = models.ForeignKey(City, on_delete=models.SET_NULL,  related_name='profile_city', blank=True, null=True, verbose_name='المدينة')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الإنشاء')

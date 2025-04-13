@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     'orders',
     'reportes',
     'settings',
-    
 ]
 
 CKEDITOR_5_CONFIGS = {

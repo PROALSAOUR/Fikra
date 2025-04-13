@@ -193,6 +193,11 @@
                                     <h3>النقاط  المكتسبة:</h3>
                                     <h4 class='total-bouns'>+ <span class='total_bonus_value' >{{ total_bonus }}</span><i class="fa-solid fa-gem"></i></h4>
                                 </div>
+                                <div class="replace_police">
+                                    <h3>الاستبدال والاسترجاع</h3>
+                                    <p>{% if replace_possibility %}اقصى مدة للإستبدال {{ replace_days }} ايام{% else %} خدمة الاستبدال متوقفة حاليا {% endif %}</p> 
+                                    <p>{% if return_possibility %}اقصى مدة للإرجاع {{ return_days }} ايام{% else %} خدمة الإرجاع متوقفة حاليا {% endif %}</p> 
+                                </div>
 
                                 <form action="" class="discount">
                                 

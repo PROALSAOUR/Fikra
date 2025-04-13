@@ -33,7 +33,7 @@ def cards_repo(request):
     return render(request, 'cards/cards-repo.html',context)
 # صفحة متجر البطاقات
 def cards_store(request):    
-    copons = Copon.objects.filter(is_active=True).only('name','value','img','price', 'expiration_days').order_by('-sales_count')
+    copons = Copon.objects.filter(is_active=True).only('name','value','img','price', 'expiration_days').order_by('value')
     context  = {
         'copons': copons,
     }

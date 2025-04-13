@@ -172,6 +172,7 @@ class Product(models.Model):
     url = models.URLField(blank=True, null=True, verbose_name='رابط المنتج')
     upload_at = models.DateTimeField(auto_now_add=True , verbose_name='تاريخ الإنشاء')
     updated_at = models.DateTimeField(auto_now=True , verbose_name='تاريخ التحديث')     
+    note = models.TextField(null=True, blank=True, verbose_name='ملاحظة')
     
 
     def __str__(self) -> str:
@@ -296,9 +297,17 @@ class Interested(models.Model):
     def __str__(self):
         return f"{self.user.phone_number}متابعة المنتج {self.product.name}"    
         
+    def product_thumbnail(self):
+        # دالة مسؤولة عن عرض صورة المنتج المصغرة في لوحة الادارة
+        return mark_safe("<img src='%s' width='50' height='50'/>" % (self.product.thumbnail_img.url) )
+    product_thumbnail.short_description = 'صورة'
+
+    
     class Meta:
         verbose_name = 'طلب توفير منتج'
         verbose_name_plural = 'منتجات مطلوب توفيرها'    
+
+
 # ========================== Favourite ===================================
 class Favourite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favourites' , verbose_name='المستخدم')

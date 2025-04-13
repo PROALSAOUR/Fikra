@@ -7,8 +7,6 @@ import string
 from django.utils.html import mark_safe
 from datetime import timedelta
 
-# ============================= Cards ====================================
-
 class Copon(models.Model):
     code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_uppercase + string.digits , verbose_name='الكود')
     name = models.CharField(max_length=30 , verbose_name='الاسم')
@@ -71,6 +69,7 @@ class ReceiveCopon(models.Model):
     code = ShortUUIDField(unique=True, length=12, max_length=20, alphabet= string.ascii_uppercase + string.digits, verbose_name='الكود')  # كود فريد لهذا الكوبون المشتراة
     is_used = models.BooleanField(default=False, verbose_name='مستعمل؟')
     used_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='user' , verbose_name='استعمل بواسطة') # اذا كان مستخدما يتم انشاء علاقة مع المستخدم الذي اساخدمه
+    note = models.TextField(null=True, blank=True, verbose_name='ملاحظة')
     created_at = models.DateField(auto_now_add=True, verbose_name='تاريخ الإنشاء')
     updated_at = models.DateField(auto_now=True, verbose_name='تاريخ التعديل')
         
@@ -81,4 +80,3 @@ class ReceiveCopon(models.Model):
         verbose_name = 'كود استلام كوبون'
         verbose_name_plural = 'اكواد استلام كوبونات'
   
-# ================== Functions ================================================

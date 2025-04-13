@@ -92,15 +92,14 @@ class ProductAdmin(admin.ModelAdmin):
     interested_count.short_description = "عدد المهتمين"
 
 class InterestedAdmin(admin.ModelAdmin):
-    list_display = ("user", 'product', 'created_at')
+    list_display = ('product_thumbnail', 'product', "user", 'created_at')
     readonly_fields =("user", 'product', 'interested_count', 'created_at',)
-    search_fields = ('product', )
+    search_fields = ('product__name',)
     list_filter = ("user", 'product',)
     
     def interested_count(self, obj):
         return Interested.objects.filter(product=obj.product).count()
     interested_count.short_description = "عدد المهتمين"
-    
     def has_add_permission(self, request):
         return False
 

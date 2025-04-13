@@ -29,6 +29,7 @@ class Order(models.Model):
     order_date = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الطلب')
     deliverey_date = models.DateTimeField(null=True, blank=True, verbose_name='تاريخ التسليم')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')
+    note = models.TextField(null=True, blank=True, verbose_name='ملاحظة')
         
     def get_total_items(self):
         total = 0
