@@ -290,8 +290,6 @@ def all_categories_page(request):
     # تجميع جميع التصنيفات المستهدفة
     all_categories = [category] + list(subcategories) + list(sub_subcategories)
     all_category_products = Product.objects.filter(category__in=all_categories, ready_to_sale=True).prefetch_related('items__variations')
-    # حساب العدد الكلي للمنتجات
-    total_products_count = all_category_products.count()
     all_category_products_list = all_category_products.distinct()
     paginator = Paginator(all_category_products_list, 20)  # عرض 20 منتجًا في كل صفحة
     page = request.GET.get('page', 1)
@@ -363,7 +361,6 @@ def all_categories_page(request):
         'products': products, # عرض المنتجات التي تم فلترتها
         'category': category,
         'subcategories': subcategories,
-        'total_products_count': total_products_count,  # إضافة العدد الكلي للمنتجات قبل الفلترة  
         'brands': brands,
         'products_count': products_count, # إضافة العدد الكلي للمنتجات بعد الفلترة  
     }
