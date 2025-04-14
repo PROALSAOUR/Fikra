@@ -34,6 +34,21 @@
     margin-bottom: 15px;
     position: relative;
   }
+  .product-details-page .main-slider .image-count {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 1;
+    color: var(--main-text-color);
+    font-size: 16px;
+    background-color: var(--seprator-color);
+    padding: 5px;
+    border-radius: calc(var(--main-border-radius) - 3px);
+    -webkit-border-radius: calc(var(--main-border-radius) - 3px);
+    -moz-border-radius: calc(var(--main-border-radius) - 3px);
+    -ms-border-radius: calc(var(--main-border-radius) - 3px);
+    -o-border-radius: calc(var(--main-border-radius) - 3px);
+}
   .product-details-page .main-slider img , .product-details-page .thumbnail-slider img {
     width: 100%;
     height: 100%;

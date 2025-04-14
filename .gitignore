@@ -2,3 +2,4 @@ logs/
 venv/
 secret_key.txt
 media/
+staticfiles/

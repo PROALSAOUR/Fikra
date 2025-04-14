@@ -3,50 +3,77 @@ document.addEventListener('DOMContentLoaded', function() {
     const mainproductSwiper = new Swiper('.main-slider', {
         loop: true, // يجعل السلايدر دائريًا
         navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
         },
         autoplay: {
-        delay: 5000, // تبديل الصورة تلقائيًا كل 5 ثانية
-        disableOnInteraction: false,
+            delay: 5000, // تبديل الصورة تلقائيًا كل 5 ثواني
+            disableOnInteraction: false,
         },
+        on: {
+            init: function () {
+                updateImageCount(this); // عند تحميل الصفحة لأول مرة
+            },
+            slideChange: function () {
+                updateImageCount(this); // عند تغيير الشريحة
+            }
+        }
     });
+
     // تفعيل Swiper.js للصور الثانوية
     const thumbnailSwiper = new Swiper('.thumbnail-slider', {
         slidesPerView: 4, // عدد الصور الظاهرة في العرض الواحد
         spaceBetween: 10, // المسافة بين الصور
         navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
         },
         loop: false,
     });
+
     // جافا سكريبت لتبديل الصور عند النقر على الصور الثانوية
     const thumbnails = document.querySelectorAll('.thumbnail');
     if (thumbnails.length > 0) {
         thumbnails.forEach((thumbnail, index) => {
-        thumbnail.addEventListener('click', () => {
-            if (mainproductSwiper) {
-                mainproductSwiper.slideToLoop(index, 500, false); // التبديل إلى الصورة المحددة
-            }
-        });
+            thumbnail.addEventListener('click', () => {
+                if (mainproductSwiper) {
+                    mainproductSwiper.slideToLoop(index, 500, false); // التبديل إلى الصورة المحددة
+                }
+            });
         });
     }
-    // تحديث الصورة الرئيسية عند التمرير في السلايدر الرئيسي
+
+    // تحديث الصورة المصغرة عند التمرير في السلايدر الرئيسي
     if (mainproductSwiper) {
         mainproductSwiper.on('slideChange', () => {
-        const activeIndex = mainproductSwiper.realIndex;
-        if (thumbnailSwiper) {
-            thumbnailSwiper.slideTo(activeIndex, 500);
-        }
-        thumbnails.forEach((thumb, index) => {
-            if (thumb.parentElement) {
-            thumb.parentElement.classList.toggle('swiper-slide-active', index === activeIndex);
+            const activeIndex = mainproductSwiper.realIndex;
+
+            // تزامن السلايدر الثانوي
+            if (thumbnailSwiper) {
+                thumbnailSwiper.slideTo(activeIndex, 500);
             }
-        });
+
+            // تمييز الصورة المصغرة النشطة
+            thumbnails.forEach((thumb, index) => {
+                if (thumb.parentElement) {
+                    thumb.parentElement.classList.toggle('swiper-slide-active', index === activeIndex);
+                }
+            });
         });
     }
+
+    // دالة لتحديث العداد
+    function updateImageCount(swiper) {
+        const currentIndex = swiper.realIndex + 1; // لأن realIndex يبدأ من 0
+        const totalSlides = swiper.slides.length - swiper.loopedSlides * 2; // حذف الصور المكررة بسبب loop
+        const imageCountElement = document.querySelector('.image-count');
+
+        if (imageCountElement) {
+            imageCountElement.textContent = `${currentIndex} / ${totalSlides}`;
+        }
+    }
 });
+
 // =============================================================================================
 // الدالة المسؤلة عن تغيير لون المنتج و  كمية المخزون بشكل ديناميكي واضافة المنتج الى السلة من الصفحة
 document.addEventListener('DOMContentLoaded', function() {

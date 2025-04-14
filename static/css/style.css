@@ -395,19 +395,20 @@ input[type="number"] {
     visibility: hidden;
     display: none;
   }
-  .product-box.offer .product-info .product-price .old{
-    color: var(--disaple-text-color);
-  }
   .product-box.offer .product-info .product-price .new{
     visibility: visible;
     display: inline-block;
   }
+  .product-box.offer .product-info .product-price .old{
+    position: relative;
+    color: var(--disaple-text-color);
+  }
   .product-box.offer .product-info .product-price .old::after{
     content: '';
     position: absolute;
-    top: 45%;
-    right: -1%;
-    width: 12%;
+    top: 50%;
+    right: 0%;
+    width: 85%;
     height: 2px;
     background-color: var(--disaple-text-color);
     transform: rotate(150deg);
