@@ -589,9 +589,6 @@ input[type="number"] {
     .cart .specific .product-box .product-info .product-price{
       font-size: var(--lab-m-size);
     }
-    .specific .product-box.offer .product-info .product-price .old::after {
-      width: 28%;
-    }
   }
   /* small tab media */
   @media (max-width: 692px) {
@@ -679,9 +676,6 @@ input[type="number"] {
     .specific .product-box .product-info .product-price {
       font-size: var(--mob-l-size);
       bottom: 2px;
-    }
-    .specific .product-box.offer .product-info .product-price .old::after{
-      width: 26%;
     }
   }
   /* very small mobile media */
