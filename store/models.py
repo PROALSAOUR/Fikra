@@ -124,6 +124,16 @@ class Category(models.Model):
     def products_count(self):
         return self.products.count()
     
+    def get_all_children_ids(self):
+        """دالة تجلب التصنيفات الفرعية والفرع فرعية الخ"""
+        children_ids = []
+        direct_children = Category.objects.filter(parent_category=self,  status='visible').only('id')
+        for child in direct_children:
+            children_ids.append(child.id)
+            children_ids += child.get_all_children_ids()
+        return children_ids
+
+    
     class Meta:
         verbose_name = 'تصنيف'
         verbose_name_plural = 'التصنيفات'

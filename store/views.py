@@ -100,13 +100,11 @@ def brand_page(request, slug):
     else:
         all_brand_products = []    
     # ===========================================================
-    # إضافة فلترة أخرى بناءً على معايير المستخدم (البحث، السعر، العلامة التجارية)
     query = request.GET.get('q', '')
     price_min = request.GET.get('price_min')
     price_max = request.GET.get('price_max')
     category_id = request.GET.get('category')
     available_only = request.GET.get('available_only')
-
    
     filters = Q(ready_to_sale=True) & Q(brand=brand)
     
@@ -129,12 +127,12 @@ def brand_page(request, slug):
     
     if category_id:
         # جلب التصنيف الأب
-        parent_category = get_object_or_404(Category, id=category_id, )
+        parent_category = get_object_or_404(Category, id=category_id)
         # جلب التصنيفات الفرعية
-        subcategories = Category.objects.filter(parent_category=parent_category, status="visible")
-        # دمج التصنيف الأب والتصنيفات الفرعية
-        category_ids = [parent_category.id] + list(subcategories.values_list('id', flat=True))
-        filters &= Q(category_id__in=category_ids)
+        all_children_ids = parent_category.get_all_children_ids()
+        # إضافة التصنيف الأساسي نفسه
+        all_category_ids = [parent_category.id] + all_children_ids
+        filters &= Q(category_id__in=all_category_ids)
 
     if available_only == "on" :
         filters &= Q(available=True)
@@ -194,16 +192,12 @@ def all_brands(request):
 def category_page(request, slug):
     
     category = get_object_or_404(Category, slug=slug, status='visible')
-    # استرجاع التصنيفات الفرعية التي تنتمي للتصنيف الأب
-    subcategories = Category.objects.filter(parent_category=category, status='visible')
-    # استرجاع التصنيفات الفرعية التي تنتمي للتصنيف الأب الفرعي
-    sub_subcategories = Category.objects.filter(parent_category__in=subcategories, status='visible')
-    # تجميع جميع التصنيفات المستهدفة
-    all_categories = [category] + list(subcategories) + list(sub_subcategories)
-    all_category_products = Product.objects.filter(category__in=all_categories, ready_to_sale=True).prefetch_related('items__variations')
-    # حساب العدد الكلي للمنتجات
-    total_products_count = all_category_products.count()
-    all_category_products_list = all_category_products.distinct()
+    subcategories = Category.objects.filter(parent_category=category, status='visible') # استرجاع التصنيفات الفرعية التي تنتمي للتصنيف الأب
+    
+    all_categories = [category.id] + category.get_all_children_ids()
+    all_category_products_list = Product.objects.filter(category_id__in=all_categories, ready_to_sale=True).prefetch_related('items__variations').distinct()
+    
+    total_products_count = all_category_products_list.count()# حساب العدد الكلي للمنتجات
     paginator = Paginator(all_category_products_list, 20)  # عرض 20 منتجًا في كل صفحة
     page = request.GET.get('page', 1)
 
@@ -283,15 +277,10 @@ def category_page(request, slug):
 def all_categories_page(request):
         
     category = get_object_or_404(Category, slug='all', status='visible')
-    # استرجاع التصنيفات الفرعية التي تنتمي للتصنيف الأب
-    subcategories = Category.objects.filter(parent_category=category, status='visible')
-    # استرجاع التصنيفات الفرعية التي تنتمي للتصنيف الأب الفرعي
-    sub_subcategories = Category.objects.filter(parent_category__in=subcategories, status='visible')
-    # تجميع جميع التصنيفات المستهدفة
-    all_categories = [category] + list(subcategories) + list(sub_subcategories)
-    all_category_products = Product.objects.filter(category__in=all_categories, ready_to_sale=True).prefetch_related('items__variations')
-    all_category_products_list = all_category_products.distinct()
-    paginator = Paginator(all_category_products_list, 20)  # عرض 20 منتجًا في كل صفحة
+    subcategories = Category.objects.filter(parent_category=category, status='visible') # استرجاع التصنيفات الفرعية التي تنتمي للتصنيف الأب
+    all_categories = [category.id] + category.get_all_children_ids()
+    all_category_products_list = Product.objects.filter(category_id__in=all_categories, ready_to_sale=True).prefetch_related('items__variations').distinct()
+    paginator = Paginator(all_category_products_list, 20)  
     page = request.GET.get('page', 1)
 
     try:
@@ -468,10 +457,10 @@ def search_page(request):
         # جلب التصنيف الأب
         parent_category = get_object_or_404(Category, id=category_id)
         # جلب التصنيفات الفرعية
-        subcategories = Category.objects.filter(parent_category=parent_category)
-        # دمج التصنيف الأب والتصنيفات الفرعية
-        category_ids = [parent_category.id] + list(subcategories.values_list('id', flat=True))
-        filters &= Q(category_id__in=category_ids)
+        all_children_ids = parent_category.get_all_children_ids()
+        # إضافة التصنيف الأساسي نفسه
+        all_category_ids = [parent_category.id] + all_children_ids
+        filters &= Q(category_id__in=all_category_ids)
     if brand_id:
         filters &= Q(brand_id=brand_id)
         
@@ -630,8 +619,8 @@ def clear_favourites(request):
     Clears all products from the user's favourites list.
     """
     favourite, created = Favourite.objects.get_or_create(user=request.user)
-    favourite.products.clear()  # Remove all products from the favourites
-    return redirect('store:favourite_page')  # Redirect back to the favourites page
+    favourite.products.clear() 
+    return redirect('store:favourite_page')
 # ===================================================
 # صفحة السلة 
 @login_required
@@ -641,10 +630,9 @@ def cart_page(request):
     
     available_items = []
     unavailable_items = []
-    
-    total_qty = 0  # عدد المنتجات الاجمالي
-    total_price = 0  # (متضمن سعر التوصيل)حساب السعر الاجمالي 
-    total_bonus = 0  # حساب  الـبونس الاجمالي
+    total_qty = 0 
+    total_price = 0 
+    total_bonus = 0  
 
     for item in cart_items:
         # تحقق من وجود المخزون للمتغير المرتبط بالمنتج
@@ -653,14 +641,13 @@ def cart_page(request):
         
         if stock > 0:
             available_items.append({
-                # اريد تمرير الكمية stock هنا المرتبطة بالمتغير المرتبط ب cartitem
                 'product': item.cart_item.product_item.product,
                 'product_item': item.cart_item.product_item,
                 'size': product_variation.size.value if product_variation else 0,
                 'color': item.cart_item.product_item.color,
                 'qty': item.qty,
                 'cart_item': item,
-                'stock': int(stock)  # إضافة الكمية المتاحة
+                'stock': int(stock)  
             })
             # تحديث العدد والسعر بناءً على العناصر المتاحة
             total_qty += item.qty
@@ -676,17 +663,12 @@ def cart_page(request):
                 'cart_item': item,
                 'stock': 0,
             })
-
     av_count =  len(available_items)
     unav_count =  len(unavailable_items)
-    
     # ======== تضمين بطاقات المستخدم ==========
     user = request.user
-    
     user_copons = CoponItem.objects.filter(user=user, has_used=False ,expire__gte=now().date()).prefetch_related('copon_code').order_by('copon_code__value')
-    
     # ========  الاستعلام عما ان كان التوصيل مجاني ==========
-    
     settings =  Settings.get_settings()
     delivery = settings.free_delivery
     replace_possibility = settings.replace_possibility
@@ -719,8 +701,6 @@ def add_to_cart(request):
         size_id = request.POST.get('size')
         sku = request.POST.get('item')
         quantity = int(request.POST.get('qty', 1))
-
-        # التحقق من وجود المستخدم وسلة التسوق
         cart, created = Cart.objects.get_or_create(user=request.user)
 
         try:
@@ -754,11 +734,9 @@ def add_to_cart(request):
 def add_to_cart2(request, pid):
     if request.method == 'POST':
         product = get_object_or_404(Product, pid=pid)
-
         # الحصول على جميع عناصر المنتج
         product_items = product.items.all()
         available_variation = None
-        
         # البحث عن متغير متوفر له مخزون في جميع عناصر المنتج
         for product_item in product_items:
             variations = product_item.variations.all()
@@ -814,12 +792,9 @@ def update_cart_item_qty(request):
     if request.method == 'POST':
         cart_item_id = request.POST.get('cart_item_id')
         new_qty = request.POST.get('qty')
-        # تحقق من أن cart_item_id و new_qty غير فارغين
         if not cart_item_id or not new_qty:
             return JsonResponse({'error': 'يرجى تقديم بيانات صحيحة.'}, status=400)
-
         try:
-            # جلب العنصر من السلة
             cart_item = CartItem.objects.get(id=cart_item_id)
             product_variation = cart_item.cart_item  # تأكد من أن هذا هو الكائن الصحيح
             # تحقق من الكمية الجديدة
