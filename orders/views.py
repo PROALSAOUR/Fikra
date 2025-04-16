@@ -48,7 +48,6 @@ def print_invoice_view(request, order_id):
         'max_return_days': max_return_days,
     }
     return render(request, "admin/orders/print_invoice.html", context)
-
 # دالة عرض الطلبات
 @login_required
 def my_orders(request):
@@ -78,7 +77,15 @@ def order_details(request, oid):
     
     replace_possibility = Settings.objects.values_list('replace_possibility', flat=True).first()
     return_possibility = Settings.objects.values_list("return_possibility", flat=True).first()
-    
+    if order.status == "delivered" and order.deliverey_date: # التحقق ان كانت مضت مدة على تسليم المنتج اكبر من اقصى مدة للاستبدال والاسترجاع
+        days_since_delivery = (timezone.now() - order.deliverey_date).days # احسب الفرق بين التاريخ الحالي وتاريخ التسليم
+        max_return_days = Settings.objects.values_list('max_return_days', flat=True).first()
+        max_replace_days = Settings.objects.values_list('max_replace_days', flat=True).first()
+        if days_since_delivery > max_return_days :
+            return_possibility = False
+        if days_since_delivery > max_replace_days :
+            replace_possibility = False
+            
     # إضافة حقل السعر الإجمالي لكل عنصر
     for item in items:
         item.total_price = item.qty * item.price
@@ -193,10 +200,8 @@ def remove_order_item(request):
             if order.status == 'shipped':
                 return JsonResponse({'success': False, 'error': "نعتذر لا يمكن تعديل الطلب أثناء قيامنا بشحنه إليك، رجاء قم بإعادة محاولة التعديل بعد استلامك للطلب"})
             if order.status == 'delivered' and order.deliverey_date:
-                # احسب الفرق بين التاريخ الحالي وتاريخ التسليم
-                days_since_delivery = (timezone.now() - order.deliverey_date).days
+                days_since_delivery = (timezone.now() - order.deliverey_date).days # احسب الفرق بين التاريخ الحالي وتاريخ التسليم
                 # تحقق مما إذا كانت المدة أكبر من عدد أيام الاستبدال القصوى
-                
                 return_possibility = Settings.objects.values_list("return_possibility", flat=True).first()
                     
                 if return_possibility == False: # لو المتجر مقفل عمليات الارجاع
@@ -207,7 +212,7 @@ def remove_order_item(request):
                     max_return_days = 3  # ثلاث أيام كقيمة افتراضية
                 
                 if days_since_delivery > max_return_days:
-                    return JsonResponse({'success': False, 'error': F"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإرجاع و هي {max_return_days}"})
+                    return JsonResponse({'success': False, 'error': F"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإرجاع و هي {max_return_days} أيام"})
                 
             
             order_item = order.order_items.get(id=remove_id)
@@ -319,7 +324,7 @@ def edit_order(request):
                         max_replace_days = 3  # ثلاث أيام كقيمة افتراضية
                     
                     if days_since_delivery > max_replace_days:
-                        return JsonResponse({'success': False, 'error': f"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإستبدال و هي {max_replace_days}"})
+                        return JsonResponse({'success': False, 'error': f"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإستبدال و هي {max_replace_days} أيام"})
                     
                 try:
                     # الحصول على عنصر الطلب المراد استبداله

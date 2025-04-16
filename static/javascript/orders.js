@@ -43,47 +43,104 @@ document.addEventListener('DOMContentLoaded', function () {
 // =============================================================================================
 // دالة حذف عنصر من عناصر الطلب
 document.addEventListener('DOMContentLoaded', function () {
-    const removeIcons = document.querySelectorAll('.remove-clicable');
-  
-    if (removeIcons.length > 0) {
+  const removeIcons = document.querySelectorAll('.remove-clicable');
+  const popup = document.getElementById('confirm-return-popup');
+  const cancelBtn = document.getElementById('cancel-return-btn');
+  const confirmBtn = document.getElementById('confirm-return-btn');
+
+  // متغيرات لتخزين البيانات مؤقتاً
+  let currentRemoveId = null;
+  let currentOrderId = null;
+
+  // دالة إظهار النافذة بشكل سلس
+  function showPopup() {
+    popup.style.display = 'block';
+    setTimeout(() => {
+      popup.style.visibility = 'visible';
+      popup.style.opacity = '1';
+      popup.style.transform = 'translate(-50%, -50%) scale(1)';
+    }, 10);
+  }
+
+  function hidePopup() {
+    popup.style.opacity = '0';
+    popup.style.transform = 'translate(-50%, -50%) scale(0.5)';
+    setTimeout(() => {
+      popup.style.visibility = 'hidden';
+      popup.style.display = 'none';
+    }, 300);
+  }
+
+
+  if (removeIcons.length > 0 && popup && cancelBtn && confirmBtn ) {
       removeIcons.forEach(icon => {
-        icon.addEventListener('click', function () {
-            // الحصول على العنصر الأب الذي يحتوي على البيانات
-            const parentElement = this.closest('.remove');
-            const removeId = parentElement.getAttribute('data-remove-id');
-            const orderId = parentElement.getAttribute('data-order-id');
-  
-            // تأكيد أن هناك بيانات مطلوبة
-            if (removeId && orderId) {
-                // إرسال البيانات إلى دالة بايثون باستخدام fetch
-                fetch('/orders/remove-order-item/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken') // تضمين CSRFToken إذا كان مطلوبًا
-                    },
-                    body: JSON.stringify({
-                        remove_id: removeId,
-                        order_id: orderId
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        location.reload();                      
-                    } else {
-                        alert(data.error);
-                    }
-                })
-                .catch(error => {
-                    console.error('حدث خطأ:', error);
-                });
-            }
-        });
+          icon.addEventListener('click', function () {
+              const parentElement = this.closest('.remove');
+              const removeId = parentElement.getAttribute('data-remove-id');
+              const orderId = parentElement.getAttribute('data-order-id');
+
+              if (removeId && orderId) {
+                  // حفظ القيم مؤقتاً
+                  currentRemoveId = removeId;
+                  currentOrderId = orderId;                
+                  // إظهار النافذة
+                  showPopup();
+              }
+          });
       });
-    }
+  }
+
+  // زر التراجع
+  cancelBtn.addEventListener('click', function () {
+      hidePopup();
+      currentRemoveId = null;
+      currentOrderId = null;
+  });
+
+  // زر تأكيد الحذف
+  confirmBtn.addEventListener('click', function () {
+      if (currentRemoveId && currentOrderId) {
+          fetch('/orders/remove-order-item/', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': getCookie('csrftoken')
+              },
+              body: JSON.stringify({
+                  remove_id: currentRemoveId,
+                  order_id: currentOrderId
+              })
+          })
+          .then(response => response.json())
+          .then(data => {
+              hidePopup();
+              if (data.success) {
+                  alert(data.message);
+                  location.reload();
+              } else {
+                  alert(data.error);
+              }
+          })
+          .catch(error => {
+              console.error('حدث خطأ:', error);
+              hidePopup();
+          });
+      }
+  });
+
+  // إخفاء النافذة عند النقر خارجها
+  document.addEventListener('click', function (e) {
+      if (popup.style.visibility === 'visible' &&
+          !popup.contains(e.target) &&
+          ![...removeIcons].some(icon => icon.contains(e.target))) {
+          hidePopup();
+          currentRemoveId = null;
+          currentOrderId = null;
+      }
+  });
+  
 });
+
 // =============================================================================================
 // دالة تأخذ معرف العنصر المراد استبداله وترسله الى الفورم لكي يتم ارساله الى دالة المعالجة
 document.addEventListener('DOMContentLoaded', function() {

@@ -107,7 +107,16 @@
     <!-- End Order Details -->
 </div>
 
-
+<div class="Pop-up-page  return-item-pop-page"  id="confirm-return-popup">
+    <div class="logo">
+        <img src="{% static "images/name-logo.webp" %}" alt="خدمة استبدال واسترجاع بسهولة">
+    </div>
+    <p class="confirm-message">هل انت متأكد من رغبتك في حذف المنتج من الطلب؟</p>
+    <div class="choices">
+        <button class="back" id="cancel-return-btn">تراجع</button>
+        <button class="delete" id="confirm-return-btn">حذف</button>
+    </div>
+</div>
 
 {% include "pop-pages/edit-order.html" %}
 
