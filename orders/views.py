@@ -16,7 +16,6 @@ import qrcode
 from io import BytesIO
 import base64
 
-
 logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
 
 # دالة طباعة فاتورة الطلب بلوحة الادارة
@@ -93,7 +92,7 @@ def order_details(request, oid):
     available_items = [] # الحصول على المنتجات في السلة لعرضها بقائمة الاستبدال
     if order.status != 'canceled':
         try:
-            cart = Cart.objects.get(user=user)
+            cart = Cart.objects.get_or_create(user=user)
             cart_items = cart.items.prefetch_related('cart_item__product_item__variations').select_related('cart_item__product_item__product')
 
             for item in cart_items:
@@ -255,7 +254,7 @@ def remove_order_item(request):
                                          
             #  ارسال رسالة الى المستخدم عند ارجاع منتج من الطلب
             if  order.status == 'delivered':
-                message = return_order_item_message(user_name=user.first_name, order=order.serial_number)
+                message = return_order_item_message(user_name=user.first_name, order=order)
                 inbox = user.profile.inbox
                 inbox.add_message(message)
                 inbox.save()            

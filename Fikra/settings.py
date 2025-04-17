@@ -386,7 +386,8 @@ PWA_APP_SPLASH_SCREEN = [
     {
         "src": "/static/images/screenshots/splach.jpg",
         "sizes": "720x1280",
-        "type": "image/jpg"
+        "type": "image/jpg",
+        'media': '(device-width: 720px)'
     }
 ]
 # ===================================================================
