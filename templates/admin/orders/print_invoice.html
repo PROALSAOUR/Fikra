@@ -38,7 +38,7 @@
             <h1>فاتورة الطلب #{{ order.serial_number }}</h1>
             <p>تاريخ الطلب: {{ order.order_date|date:"h:i A Y/m/d " }}</p>
             <p>المدينة: {{ order.city }} {% if order.neighborhood %},  الحي: {{ order.neighborhood }}  {% endif %} </p>
-            <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">       
+            <img src="{% static "images/QR-Code.jpg" %}" alt="QR Code">       
         </div>
         <div class="invoice-details">
             <table>
@@ -71,17 +71,17 @@
                     <tr>
                         <td colspan="1" >المجموع :</td>
                         <td colspan="4"></td>
-                        <td>{{ order.old_total }} دل </td>
+                        <td>${{ order.old_total }}</td>
                     </tr>
                     <tr>
                         <td colspan="1" >  قيمة الخصم:</td>
                         <td colspan="4"></td>
-                        <td>{% if order.used_discount %}-{% endif %} {{ order.used_discount }} دل </td>
+                        <td>{% if order.used_discount %}-{% endif %}${{ order.used_discount }}</td>
                     </tr>
                     <tr>
                         <td colspan="1" > المجموع النهائي:</td>
                         <td colspan="4"></td>
-                        <td >{{ order.total_price }} دل </td>
+                        <td >${{ order.total_price }}</td>
                     </tr>  
                 </tfoot>
             </table>

@@ -26,7 +26,8 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    width: 100px;
+    width: 80px;
+    padding: 10px;
 }
 .invoice-header h1 {
     margin: 0;
@@ -92,6 +93,9 @@ body {
       font-size: 16px;
       text-align: center;
     }
+    .invoice-header img {
+    width: 60px;
+  }
     .invoice-details th, .invoice-details td {
       font-size: 10px; 
       padding: 4px;
@@ -99,11 +103,7 @@ body {
     .invoice-header h1 {
       font-size: 14px;
     }
-    .invoice-header p,
-    .invoice-footer.notes {
-      font-size: 10px;
-    }
-    .invoice-header img {
-      width: 80px;
+    .invoice-header p, .invoice-footer .notes li {
+      font-size: 12px;
     }
 }
