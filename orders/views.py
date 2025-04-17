@@ -92,9 +92,8 @@ def order_details(request, oid):
     available_items = [] # الحصول على المنتجات في السلة لعرضها بقائمة الاستبدال
     if order.status != 'canceled':
         try:
-            cart = Cart.objects.get_or_create(user=user)
+            cart, created = Cart.objects.get_or_create(user=user)
             cart_items = cart.items.prefetch_related('cart_item__product_item__variations').select_related('cart_item__product_item__product')
-
             for item in cart_items:
                 product_variation = item.cart_item
                 stock = product_variation.stock if product_variation else 0
@@ -105,8 +104,7 @@ def order_details(request, oid):
                         'product_variation': product_variation,
                         'cart_item': item,
                         'qty': item.qty,
-                    })
-                
+                    })    
         except Exception as e:
             logger.error(f"خطأ بالطلب: {e}", exc_info=True)
             available_items = None    
@@ -119,7 +117,6 @@ def order_details(request, oid):
         'replace_possibility':replace_possibility,
         'return_possibility':return_possibility,
     }
-    
     return render(request, 'orders/order-details.html', context)   
 # دالة الغاء الطلب
 @login_required

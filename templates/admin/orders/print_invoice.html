@@ -45,7 +45,6 @@
                 <thead>
                     <tr>
                         <th>id</th>
-                        <th>المنتج</th>
                         <th>المقاس</th>
                         <th>الكمية</th>
                         <th>السعر</th>
@@ -57,7 +56,6 @@
                     {% for item in items %}
                     <tr>
                         <td>{{ item.order_item.id }}</td>
-                        <td>{{ item.order_item.product_item.product.name }}</td>
                         <td>{{ item.order_item.size }}</td>
                         <td>{{ item.qty }}</td>
                         <td>${{item.price}}</td>
@@ -68,21 +66,21 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="7" class='sep'></td>
+                        <td colspan="6" class='sep'></td>
                     </tr>
                     <tr>
                         <td colspan="1" >المجموع :</td>
-                        <td colspan="5"></td>
+                        <td colspan="4"></td>
                         <td>{{ order.old_total }} دل </td>
                     </tr>
                     <tr>
                         <td colspan="1" >  قيمة الخصم:</td>
-                        <td colspan="5"></td>
-                        <td>-{{ order.used_discount }} دل </td>
+                        <td colspan="4"></td>
+                        <td>{% if order.used_discount %}-{% endif %} {{ order.used_discount }} دل </td>
                     </tr>
                     <tr>
                         <td colspan="1" > المجموع النهائي:</td>
-                        <td colspan="5"></td>
+                        <td colspan="4"></td>
                         <td >{{ order.total_price }} دل </td>
                     </tr>  
                 </tfoot>

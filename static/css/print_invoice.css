@@ -17,9 +17,10 @@ body {
     padding: 10px;
 }
 .invoice-header {
-    text-align: center;
+    text-align: right;
     margin-bottom: 50px;
     position: relative;
+    padding: 10px;
 }
 .invoice-header img {
     position: absolute;
@@ -41,8 +42,8 @@ body {
     margin-top: 15px;
 }
 .invoice-details th, .invoice-details td {
-    border: 1px solid #ddd;
-    padding: 8px;
+    border: 1px solid #000000;
+    padding: 5px;
     text-align: center;
 }
 .invoice-details th , .invoice-details .sep {
@@ -69,7 +70,7 @@ body {
     body {
       width: 80mm;
       margin: 0 auto;
-      font-size: 11px; /* حجم الخط المناسب للطباعة الحرارية */
+      font-size: 12px; /* حجم الخط المناسب للطباعة الحرارية */
       background-color: white !important;
     }
     body * {
@@ -88,7 +89,8 @@ body {
       box-shadow: none;
     }
     .website-name {
-        font-size: 16px;
+      font-size: 16px;
+      text-align: center;
     }
     .invoice-details th, .invoice-details td {
       font-size: 10px; 
@@ -98,7 +100,7 @@ body {
       font-size: 14px;
     }
     .invoice-header p,
-    .invoice-footer.notes li {
+    .invoice-footer.notes {
       font-size: 10px;
     }
     .invoice-header img {
