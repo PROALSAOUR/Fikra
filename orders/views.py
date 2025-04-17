@@ -30,7 +30,7 @@ def print_invoice_view(request, order_id):
     max_replace_days = Settings.objects.values_list('max_replace_days', flat=True).first()
     max_return_days = Settings.objects.values_list('max_return_days', flat=True).first()
 
-    order_details_url = request.build_absolute_uri(f"/order-details/{order_id}")
+    order_details_url = request.build_absolute_uri(f"/orders/order-details/{order_id}")
     qr = qrcode.make(order_details_url)
     qr_image = BytesIO()
     qr.save(qr_image)
