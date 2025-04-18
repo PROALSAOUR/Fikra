@@ -709,9 +709,7 @@
     .cart .specific .product-box .product-info .product-price{
       font-size: var(--lab-xs-size);
     }
-    .favorite .specific .product-box.offer .product-info .product-price .old::after {
-      width: 28%;
-    }
+
   }
   /* for very large screen */
   @media (min-width: 923px) {

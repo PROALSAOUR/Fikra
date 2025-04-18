@@ -47,11 +47,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const popup = document.getElementById('confirm-return-popup');
   const cancelBtn = document.getElementById('cancel-return-btn');
   const confirmBtn = document.getElementById('confirm-return-btn');
-
   // متغيرات لتخزين البيانات مؤقتاً
   let currentRemoveId = null;
   let currentOrderId = null;
-
   // دالة إظهار النافذة بشكل سلس
   function showPopup() {
     popup.style.display = 'block';
@@ -61,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function () {
       popup.style.transform = 'translate(-50%, -50%) scale(1)';
     }, 10);
   }
-
   function hidePopup() {
     popup.style.opacity = '0';
     popup.style.transform = 'translate(-50%, -50%) scale(0.5)';
@@ -70,15 +67,12 @@ document.addEventListener('DOMContentLoaded', function () {
       popup.style.display = 'none';
     }, 300);
   }
-
-
   if (removeIcons.length > 0 && popup && cancelBtn && confirmBtn ) {
       removeIcons.forEach(icon => {
           icon.addEventListener('click', function () {
               const parentElement = this.closest('.remove');
               const removeId = parentElement.getAttribute('data-remove-id');
               const orderId = parentElement.getAttribute('data-order-id');
-
               if (removeId && orderId) {
                   // حفظ القيم مؤقتاً
                   currentRemoveId = removeId;
@@ -90,13 +84,14 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   }
 
-  // زر التراجع
-  cancelBtn.addEventListener('click', function () {
+  if (cancelBtn) {
+    // زر التراجع
+    cancelBtn.addEventListener('click', function () {
       hidePopup();
       currentRemoveId = null;
       currentOrderId = null;
-  });
-
+    });
+  }
   // زر تأكيد الحذف
   confirmBtn.addEventListener('click', function () {
       if (currentRemoveId && currentOrderId) {
