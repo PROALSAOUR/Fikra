@@ -38,6 +38,7 @@
             <h1>فاتورة الطلب #{{ order.serial_number }}</h1>
             <p>تاريخ الطلب: {{ order.order_date|date:"h:i A Y/m/d " }}</p>
             <p>المدينة: {{ order.city }} {% if order.neighborhood %},  الحي: {{ order.neighborhood }}  {% endif %} </p>
+            <p>رقم المستلم: {{order.phone_number}}</p>
             <img src="{% static "images/QR-Code.jpg" %}" alt="QR Code">       
         </div>
         <div class="invoice-details">

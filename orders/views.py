@@ -503,6 +503,7 @@ def create_order(request):
         # إنشاء الطلب
         order = Order.objects.create(
             user=user,
+            phone_number=user.phone_number,
             old_total=old_total,
             total_price=total_price,
             total_points=total_bonus,

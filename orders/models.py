@@ -15,6 +15,7 @@ class Order(models.Model):
     ]
     
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders' , verbose_name='المستخدم')
+    phone_number = models.CharField(max_length=20, verbose_name='رقم المستلم', blank=True)
     serial_number = models.IntegerField(unique=True, verbose_name='الرقم التسلسلي')
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending' , verbose_name='الحالة')
     old_total = models.IntegerField(verbose_name='الإجمالي القديم')
