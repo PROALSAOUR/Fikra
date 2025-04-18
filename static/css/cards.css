@@ -150,17 +150,6 @@
       font-size: var(--mob-xs-size) !important ;
     }
   }
-  @media (max-width: 376px) {
-    .cards-store .product-box .product-price {
-      font-size: var(--mob-s-size) !important;
-      padding-bottom: 5px;
-    }
-  }
-  @media (max-width: 336px) {
-    .cards-store .product-box .product-price {
-      padding-bottom: 25px;
-    }
-  }
   .use-code-pop-page {
     text-align: center;
     padding-bottom: 40px;
@@ -546,117 +535,8 @@
       font-size: var(--mob-s-size);
     }
   }
-  .buy-as-gift {
-    background-color: var(--background-color);
-    padding: 20px 15px;
-    box-shadow: 0 0 10px var(--main-color);
-  }
-  .buy-as-gift .form-item {
-    margin-bottom: 10px;
-  }
-  .buy-as-gift .form-item label:first-child {
-    display: inline-block;
-    color: var(--main-color);
-    font-size: var(--lab-s-size);
-    width: 150px;
-  }
-  .buy-as-gift .form-item input:not([type="checkbox"]){
-    background-color: var(--background-color-alt);
-    padding: 5px;
-    width: 250px;
-  }
-  .buy-as-gift .form-item input[type='checkbox']{
-    margin-left: 5px;
-  }
-  .buy-as-gift .message-details .form-item {
-    display: flex;
-    flex-direction: column;
-  }
-  .buy-as-gift .message-details .form-item input ,  .form-item #content{
-    margin: 10px;
-  }
-  .buy-as-gift .message-details .form-item #content {
-    background-color: var(--background-color-alt);
-    border: none;
-    color: var(--main-text-color);
-    caret-color: var(--main-color);
-    min-width: 250px;
-    width: 400px;
-    max-width: 800px;
-    min-height: 40px;
-    height: 150px;
-    max-height: 400px;
-    padding: 10px;
-    border-radius: var(--main-border-radius);
-    -webkit-border-radius: var(--main-border-radius);
-    -moz-border-radius: var(--main-border-radius);
-    -ms-border-radius: var(--main-border-radius);
-    -o-border-radius: var(--main-border-radius);
-  }
   .cards-details .form-item #content:focus {
     outline: none;
-  }
-  @media (max-width:602px) {
-    .buy-as-gift .form-item label:first-child {
-      font-size: var(--mob-xs-size);
-      width: 130px;
-    }
-    .buy-as-gift .form-item input:not([type="checkbox"]){
-      width: 200px;
-    }
-    .buy-as-gift .form-item input:not([type="checkbox"])::placeholder {
-      font-size: var(--mob-xs-size);
-    }
-    .buy-as-gift .message-details .form-item #content {
-      min-width: 50px;
-      width: 95%;
-      max-width: 300px;
-      height: 100px;
-      max-height: 200px;
-      padding: 5px;
-      font-size: var(--mob-s-size);
-    }
-  }
-  @media (max-width:518px) {
-    .buy-as-gift .message-details .form-item input ,  .form-item #content{
-      margin: 10px 5px;
-    }
-    .buy-as-gift > .form-item label {
-      font-size: calc(var(--mob-s-size) + 2px);
-      margin-bottom: 10px;
-    }
-    .buy-as-gift .form-item input:not([type="checkbox"]){
-      margin-right: 5px;
-      width: 180px;
-    }
-    .buy-as-gift .form-item input[type='text']::placeholder {
-      font-size: var(--mob-s-size);
-    }
-    .buy-as-gift .message-details .form-item #content {
-      min-width: 50px;
-      width: 95%;
-      max-width: 300px;
-      height: 100px;
-      max-height: 200px;
-      padding: 5px;
-      font-size: var(--mob-s-size);
-    }
-  }
-  @media (max-width:402px) {
-    .buy-as-gift .form-item label {
-      font-size: var(--mob-s-size) ;
-    }
-    .buy-as-gift .form-item input[type='text']::placeholder {
-      font-size: var(--mob-s-size);
-    }
-    .buy-as-gift .message-details .form-item #content {
-      font-size: var(--mob-s-size);
-    }
-  }
-  @media (max-width:360px) {
-    .buy-as-gift .form-item input:not([type="checkbox"]){
-      width: 135px;
-    }
   }
   .cards-details .lower-part .recipet .price {
     background-color: var(--background-color);
@@ -764,9 +644,8 @@
       font-size: calc(var(--mob-s-size) - 2px);
     }
   }
-/* End Copon & Gift Details Page */
-
-/* Start some ediit in copon & gift card */
+/* End Copon Details Page */
+/* Start some ediit in copon card */
 .specific .product-info .card-info {
     line-height: 1.6;
   }
@@ -785,3 +664,8 @@
         font-size: 10px !important;
     }
   }
+.disabled {
+  background-color: var(--seprator-color)  !important;
+  color: var(--disaple-text-color)  !important;
+  opacity: 0.7;
+}

@@ -39,13 +39,13 @@
                     </a>
                 </span>
             {% else %}
-                <span class="add-to-cart">
-                    <a href="#"><span>نقاطك غير كافية!</span></a>
+                <span class="add-to-cart disabled ">
+                    <a href="#" class=""><span > شراء </span><i class="fa-solid fa-cart-shopping"></i></a>
                 </span>
             {% endif %}
         {% else %}
             <span class="add-to-cart">
-                <a href="{% url 'accounts:sign' %}"><span>سجل الدخول اولا!</span></a>
+                <a href="{% url 'accounts:sign' %}" ><span>سجل أولا!</span></a>
             </span>
         {% endif %}
     </div>

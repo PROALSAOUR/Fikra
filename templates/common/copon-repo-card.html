@@ -22,11 +22,11 @@
             </div>
             <div class="product-info">
                 <h4 class="product-name">{{ usage_copon.copon_code.name }}</h4>
-                <p class="product-description card-info">كوبون خصم  بقيمة {{ usage_copon.copon_code.value }}دينار <br>
+                <p class="product-description card-info">القيمة: {{ usage_copon.copon_code.value }}دينار <br>
                     {% if usage_copon.is_expire %} 
-                        انتهت صلاحيتها بتاريخ {{ causage_copon.expire }}
+                        انتهت صلاحيتها بتاريخ {{ usage_copon.expire }}
                     {% else %}
-                        صالح حتى تاريخ {{ usage_copon.expire }} <br>
+                        الصلاحية: {{ usage_copon.expire }} <br>
                         متبقي {{ usage_copon.days_remaining}} يوم
                     {% endif %}
                 </p>
@@ -39,7 +39,7 @@
                 </a>
             {% else %}
                     {% comment %} رابط لصفحة الاسئلة  ان كان المستخدم مالك البطاقة{% endcomment %}
-                    <a href="{% url "blog:questions-page" %}#how-to-use-copon"><span> طريقة الاستعمال </span></a>
+                    <a href="{% url "blog:questions-page" %}#how-to-use-copon"><span><i class="fa-solid fa-lightbulb" style="padding:0 2px;text-align:center;"></i></span></a>
             {% endif %}
             
         </span>

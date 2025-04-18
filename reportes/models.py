@@ -229,7 +229,7 @@ class PackForMonth(models.Model):
 class Cost(models.Model):
     month = models.ForeignKey(MonthlyTotal, on_delete=models.CASCADE, related_name='costs' , verbose_name='شهر')
     title = models.CharField(verbose_name='الاسم')
-    value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='التكلفة')
+    value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='القيمة')
     description = models.TextField(verbose_name='الوصف' , null=True, blank=True)
     
     def __str__(self) -> str:
@@ -242,7 +242,7 @@ class Cost(models.Model):
 class AdditionalIncome(models.Model):
     month = models.ForeignKey(MonthlyTotal, on_delete=models.CASCADE, related_name='incomes'  , verbose_name='شهر')
     title = models.CharField(verbose_name='الاسم')
-    value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='التكلفة')
+    value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='القيمة')
     description = models.TextField(verbose_name='الوصف' , null=True, blank=True)
     
     def __str__(self) -> str:

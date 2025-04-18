@@ -429,6 +429,8 @@ class MonthlyTotalAdmin(admin.ModelAdmin):
             readonly += ('total_income', 'additional_income', 'total_costs', 'total_packaging', 'goods_price', 'total_profit')
         return readonly
     
+    def has_add_permission(self, request: HttpRequest) -> bool:
+        return False
 
     change_list_template = "admin/reportes/monthly-statis.html"  
     def changelist_view(self, request, extra_context=None):
