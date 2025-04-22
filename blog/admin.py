@@ -5,6 +5,7 @@ class PageSectionInline(admin.TabularInline):
     model = PageSection
     fields = ('title', 'content', 'order')  # الحقول التي تريد عرضها في واجهة الإدارة
     ordering = ('order',)  # ترتيب الحقول حسب القيمة الافتراضية لـ 'order'
+    extra = 0 
 
 class BlogPageAdmin(admin.ModelAdmin):
     list_display = ('title', 'order')
@@ -15,8 +16,9 @@ class BlogPageAdmin(admin.ModelAdmin):
 
 class QuestionContentInline(admin.TabularInline):  
     model = QuestionContent
-    fields = ('slug', 'title','content', 'order')  # الحقول التي تريد عرضها في واجهة الإدارة
+    fields = ('slug', 'title','content', 'order') 
     ordering = ('order',)  # ترتيب الحقول حسب القيمة الافتراضية لـ 'order'
+    extra = 0 
 
 class QuestionPageAdmin(admin.ModelAdmin):
     list_display = ('title',)
