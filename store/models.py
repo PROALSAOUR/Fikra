@@ -20,7 +20,7 @@ class AdsSlider(models.Model):
     
     title = models.CharField(max_length=255 , verbose_name='العنوان')
     slug = models.SlugField(max_length=100, unique=True , verbose_name='slug')
-    img = models.ImageField( upload_to='store/Ads' , verbose_name='الصورة')
+    img = models.ImageField( upload_to='store/Ads' , verbose_name='[16:9]الصورة')
     show = models.BooleanField( default=False , verbose_name='عرض')
     info = CKEditor5Field('الوصف', config_name='default', blank=True, null=True)
     ads_for = models.CharField(choices=ads_options, max_length=20, default='special_products' , verbose_name='إعلان من اجل ')
@@ -63,7 +63,7 @@ class AdsProducts(models.Model):
    
 class Brand(models.Model):
     title = models.CharField(max_length=255 , verbose_name='الاسم')
-    img = models.ImageField( upload_to='store/Brands' , verbose_name='الصورة')
+    img = models.ImageField( upload_to='store/Brands' , verbose_name='[1:1]الصورة')
     featured = models.BooleanField(default=False , verbose_name='مميز')
         
     def __str__(self) -> str:
@@ -108,7 +108,7 @@ class Category(models.Model):
     
     name = models.CharField(max_length=100 , verbose_name='الاسم')
     slug = models.SlugField(max_length=100, unique=True , verbose_name='slug')
-    img = models.ImageField( upload_to='store/categories' , verbose_name='الصورة') 
+    img = models.ImageField( upload_to='store/categories' , verbose_name='[1:1]الصورة') 
     gender_cat = models.BooleanField(default=False , verbose_name='تصنيف جنسي؟') 
     featured = models.BooleanField(default=False , verbose_name='مميز؟')
     status = models.CharField(choices=status_choices, max_length=20, default='visible' , verbose_name='الظهور')
@@ -169,7 +169,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE , verbose_name='التصنيف')
     repository =  models.ForeignKey(Repository, related_name='products', on_delete=models.CASCADE , verbose_name='المستودع',)
     tag = models.ManyToManyField(Tag, related_name='products' , verbose_name='الهاشتاج')
-    thumbnail_img = models.ImageField(upload_to='store/Products/thumbnails' , verbose_name='صورة العرض')
+    thumbnail_img = models.ImageField(upload_to='store/Products/thumbnails' , verbose_name='صورة العرض[1:1]')
     featured = models.BooleanField(default=False , verbose_name='مميز؟')
     purchase_price =  models.IntegerField(default=0 , verbose_name='سعر الشراء') 
     price = models.IntegerField(default=0 , verbose_name='سعر البيع') 
@@ -234,7 +234,7 @@ class Product(models.Model):
 
 class ProductImages(models.Model):
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE , verbose_name='المنتج')
-    image = models.ImageField(upload_to='store/Products/images' , verbose_name='الصورة')
+    image = models.ImageField(upload_to='store/Products/images' , verbose_name='[4:5]الصورة')
     
     def __str__(self):
         return self.product.name
@@ -317,7 +317,6 @@ class Interested(models.Model):
         verbose_name = 'طلب توفير منتج'
         verbose_name_plural = 'منتجات مطلوب توفيرها'    
 
-
 # ========================== Favourite ===================================
 class Favourite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favourites' , verbose_name='المستخدم')
@@ -354,4 +353,3 @@ class CartItem(models.Model):
             raise ValueError("الكمية المطلوبة أكبر من المخزون المتاح.")
         self.qty = new_qty
         self.save()
-

@@ -273,28 +273,30 @@ function copyLink() {
 // دالة اضافة المنتج لقائمة الاهتمامات
 document.addEventListener("DOMContentLoaded", function() {
     let btn = document.getElementById("notify-btn");
-    btn.addEventListener("click", function() {
-        let url = btn.getAttribute("data-url");  // استخراج رابط API من data-url
-        let csrfToken = getCookie("csrftoken");  // جلب الـ CSRF token من الكوكيز
-        
-        fetch(url, {
-            method: "POST",
-            headers: { 
-                "X-CSRFToken": csrfToken,  // استخدام الـ CSRF token من الكوكيز
-                "Content-Type": "application/json"
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                btn.classList.add("interested");
-                btn.textContent = "سوف نقوم بإعلامك فور توفر المنتج✅";
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => console.error("Error:", error));
-    });
+    if (btn) {
+        btn.addEventListener("click", function() {
+            let url = btn.getAttribute("data-url");  // استخراج رابط API من data-url
+            let csrfToken = getCookie("csrftoken");  // جلب الـ CSRF token من الكوكيز
+            
+            fetch(url, {
+                method: "POST",
+                headers: { 
+                    "X-CSRFToken": csrfToken,  // استخدام الـ CSRF token من الكوكيز
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    btn.classList.add("interested");
+                    btn.textContent = "سوف نقوم بإعلامك فور توفر المنتج✅";
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    }
 });
 // =============================================================================================
 

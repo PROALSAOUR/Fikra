@@ -48,10 +48,6 @@
                                 
                                 <div class="swiper-wrapper">
 
-                                    <div class="swiper-slide">
-                                        <img src="{{product.thumbnail_img.url}}" alt="{{product.name}}">
-                                    </div>
-
                                     {% for image in product_images %}
                                         <div class="swiper-slide">
                                             <img src="{{image.image.url}}" alt="{{product.name}}">
@@ -68,10 +64,6 @@
                             <!-- السلايدر الثانوي -->
                             <div class="swiper-container thumbnail-slider">
                               <div class="swiper-wrapper">
-
-                                <div class="swiper-slide">
-                                  <img src="{{product.thumbnail_img.url}}" alt="{{product.name}}" class="thumbnail">
-                                </div>
 
                                 {% for image in product_images %}
                                     <div class="swiper-slide">
