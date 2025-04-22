@@ -52,17 +52,19 @@ INSTALLED_APPS = [
     'reportes',
     'settings',
 ]
-
 CKEDITOR_5_CONFIGS = {
     "default": {
         "toolbar": [
             "bold", "italic", "link", "underline", "bulletedList", "numberedList", 
             "blockQuote", "imageUpload", "mediaEmbed", "undo", "redo"
         ],
+        "mediaEmbed": {
+            "previewsInData": True  
+        },
+        'extraAllowedContent': 'iframe[*]; script[*];',
         "language": "ar",
     }
 }
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
