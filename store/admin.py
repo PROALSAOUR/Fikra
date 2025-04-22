@@ -4,7 +4,6 @@ from django.utils.html import mark_safe
 
 class AdsProductsInline(admin.TabularInline):
     model = AdsProducts
-    extra = 1 
     fields = ('product',)
 
 class AdsSliderAdmin(admin.ModelAdmin):
@@ -20,7 +19,6 @@ class BrandAdmin(admin.ModelAdmin):
  
 class SizeOptionInline(admin.TabularInline):
     model = SizeOption
-    extra = 1 
     fields = ('value',)
  
 class SizeCategoryAdmin(admin.ModelAdmin):
@@ -44,7 +42,6 @@ class TagAdmin(admin.ModelAdmin):
   
 class ProductImagesInline(admin.TabularInline): 
     model = ProductImages
-    extra = 1
     fields = ('image',)
      
 class ProductVariationAdmin(admin.ModelAdmin):
@@ -54,7 +51,6 @@ class ProductVariationAdmin(admin.ModelAdmin):
 
 class ProductVariationInline(admin.TabularInline):
     model = ProductVariation
-    extra = 1
     fields = ('size', 'stock', ) 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "size":
@@ -70,7 +66,6 @@ class ProductVariationInline(admin.TabularInline):
       
 class ProductItemInline(admin.TabularInline):
     model = ProductItem
-    extra = 1
     fields = ('sku', 'color', 'image') 
 
 class ProductItemAdmin(admin.ModelAdmin):

@@ -236,22 +236,21 @@ def forget_password(request):
         if send_otp == False :
             messages.error(request, "المعذرة خدمة تغيير كلمة السر تم ايقافها مؤقتا من قبل مالك الموقع يرجى المحاولة لاحقا.")
             return redirect('accounts:phone_number_of_forgeted_password')
-
-        # إرسال OTP عبر واتساب
-        formatted_phone = format_phone_number(phone_number) # الحصول على رقم الهاتف بالصيغة الدولية
-        if formatted_phone:  
-            send_otp_via_whatsapp(formatted_phone, otp_code)  # إرسال OTP للرقم الصحيح
         else:
-            messages.error(request, "رقم الهاتف الخاص بك غير صالح ")  # إرجاع رسالة خطأ
-            return redirect('accounts:edit-password')
-
-        # تخزين OTP في قاعدة البيانات
-        otp_instance = OTPVerification.objects.create(
-            phone_number=phone_number, 
-            code=otp_code
-        )
-        request.session['otp_id'] = otp_instance.id  # تخزين الـ OTP ID في الجلسة
-        return redirect("accounts:verify_forget_password")  # الانتقال لصفحة التحقق   
+            # إرسال OTP عبر واتساب
+            formatted_phone = format_phone_number(phone_number) # الحصول على رقم الهاتف بالصيغة الدولية
+            if formatted_phone:  
+                send_otp_via_whatsapp(formatted_phone, otp_code)  # إرسال OTP للرقم الصحيح
+            else:
+                messages.error(request, "رقم الهاتف الخاص بك غير صالح ")  # إرجاع رسالة خطأ
+                return redirect('accounts:edit-password')
+            # تخزين OTP في قاعدة البيانات
+            otp_instance = OTPVerification.objects.create(
+                phone_number=phone_number, 
+                code=otp_code
+            )
+            request.session['otp_id'] = otp_instance.id  # تخزين الـ OTP ID في الجلسة
+            return redirect("accounts:verify_forget_password")  # الانتقال لصفحة التحقق   
 
     return render(request, 'accounts/forgot_password.html', context)
 def verify_forget_password(request):

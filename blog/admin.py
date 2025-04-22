@@ -1,10 +1,8 @@
 from django.contrib import admin
 from .models import BlogPage, PageSection, QuestionPage, QuestionContent
 
-
 class PageSectionInline(admin.TabularInline): 
     model = PageSection
-    extra = 1  # عدد النماذج الفارغة التي سيتم عرضها بشكل افتراضي
     fields = ('title', 'content', 'order')  # الحقول التي تريد عرضها في واجهة الإدارة
     ordering = ('order',)  # ترتيب الحقول حسب القيمة الافتراضية لـ 'order'
 
@@ -29,6 +27,5 @@ class QuestionPageAdmin(admin.ModelAdmin):
         # السماح بالإضافة فقط إذا لم يكن هناك أي صفحة اسئلة موجودة
         return not QuestionPage.objects.exists()
     
-
 admin.site.register(QuestionPage, QuestionPageAdmin)
 admin.site.register(BlogPage, BlogPageAdmin)
