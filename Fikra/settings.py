@@ -24,8 +24,7 @@ with open(os.path.join(BASE_DIR, 'secret_key.txt')) as f:
     SECRET_KEY = f.read().strip()
     
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost','82.29.180.27', 'fikra-store.shop', 'www.fikra-store.shop']
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost','82.29.180.27', '2a02:4780:41:ac93::1', 'fikra-store.shop', 'www.fikra-store.shop']
 
 # Application definition
 
