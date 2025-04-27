@@ -78,8 +78,8 @@ def ads_page(request, slug):
 # صفحة العلامة التجارية
 def brand_page(request, slug):
     brand = get_object_or_404(Brand, title=slug)
-    last_products = Product.objects.filter(brand=brand).order_by('-updated_at').prefetch_related( 'items__variations')[:12]
-    offerd_products = Product.objects.filter(brand=brand, offer=True).prefetch_related('items__variations')[:12]
+    last_products = Product.objects.filter(brand=brand, ready_to_sale=True).order_by('-updated_at').prefetch_related( 'items__variations')[:12]
+    offerd_products = Product.objects.filter(brand=brand, offer=True, ready_to_sale=True).prefetch_related('items__variations')[:12]
 
     # تطبيق Paginator على جميع منتجات العلامة التجارية
     all_brand_products_list = Product.objects.filter(brand=brand, ready_to_sale=True).prefetch_related('items__variations')
