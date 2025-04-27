@@ -121,9 +121,9 @@ class InvestigatorProfit(models.Model):
 # كلاس مجموعة استثمارية
 class InvestmentGroup(models.Model):
     name = models.CharField(max_length=50, verbose_name='الاسم')
-    value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='الحصة', null=True)
-    remaining_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='المبلغ المتبقي', null=True)
-    refund_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="العوائد", null=True)
+    value = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='الحصة', null=True, default=0)
+    remaining_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='المبلغ المتبقي', null=True, default=0)
+    refund_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="العوائد", null=True, default=0)
     ready = models.BooleanField(default=False , verbose_name="جاهزة؟") # هل المجموعة مكتملة الاعضاء وجاهزة لتوزيع الارباح
     completed = models.BooleanField(default=False , verbose_name="مكتملة؟") # هل المجموعة تم توزيع ارباحها بالكامل؟
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الإنشاء')
@@ -165,16 +165,30 @@ class InvestmentGroupMember(models.Model):
 class MonthlyInvestmentGroup(models.Model):
     monthly_total = models.ForeignKey("MonthlyTotal", on_delete=models.CASCADE, verbose_name='إحصائية شهرية', related_name='investment_groups')
     investment_group = models.ForeignKey(InvestmentGroup, on_delete=models.CASCADE, verbose_name='المجموعة', related_name='monthly_totals')
-    monthly_percentage = models.DecimalField(max_digits=3, decimal_places=2, verbose_name="النسبة الشهرية", null=True)
-    goods_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="من البضاعة", null=True)
-    profit_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="من الربح", null=True)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=" الإجمالي", null=True)
+    monthly_percentage = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="النسبة الشهرية", default=0)
+    goods_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="من البضاعة", default=0)
+    profit_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="من الربح",  default=0)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=" الإجمالي",  default=0)
     def __str__(self):
         return f"{self.monthly_total} - {self.investment_group}"
 
     class Meta:
         verbose_name = 'مجموعة استثمارية شهرية'
         verbose_name_plural = 'المجموعات الاستثمارية الشهرية'
+# كلاس عوائد المتجر الشهرية
+class StoreProfit(models.Model):
+    monthly_total = models.ForeignKey("MonthlyTotal", on_delete=models.CASCADE, verbose_name='إحصائية شهرية', related_name='store_profit')
+    monthly_percentage = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="النسبة الشهرية",  default=0)
+    goods_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="من البضاعة", default=0)
+    profit_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="من الربح",  default=0)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=" الإجمالي",  default=0)
+    
+    def __str__(self):
+        return f"{self.monthly_total} <= ربح المتجر لشهر"
+
+    class Meta:
+        verbose_name = 'ربح المتجر الشهري'
+        verbose_name_plural = "ارباح المتجر الشهرية"
 
 # ======================== Total Profits & Costs ================================
 # كلاس احصائية لكل شهر
@@ -188,6 +202,7 @@ class MonthlyTotal(models.Model):
     goods_price =  models.DecimalField(max_digits=10, decimal_places=2, verbose_name='سعر البضاعة', null=True, default=0)
     total_profit = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='إجمالي الربح', null=True, default=0)
     sales_number = models.IntegerField(null=True, verbose_name='المنتجات المباعة', default=0) # عدد الامنتجات المباع بالشهر
+    contributing_groups = models.ManyToManyField('InvestmentGroup', verbose_name='المجموعات المساهمة', blank=True)
     
     def __str__(self) -> str:
         return f"{self.month}/{self.year}"

@@ -5,6 +5,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 import decimal
 import logging
+from django.db.models import Sum
 logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
 # ترتيب عمل الاشارات الخاصة بالاحصائيات
 # 1 update_monthly_totals 
@@ -16,7 +17,6 @@ logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللو�
 def get_partners_percentage():
     """دالة تجلب نسبة الشركاء من الربح من ملف الاعدادات"""
     percentage = Settings.objects.values_list('partners_percentage', flat=True).first()
-    print(f'persentage is {percentage}++++++++++++++++++++++++++++++++++++++++++')
     return decimal.Decimal(percentage) if percentage else decimal.Decimal(0)
 
 # ========================== SIGNALS =========================
@@ -30,7 +30,7 @@ def update_monthly_totals(sender, created, instance, **kwargs):
     """
     
     # تحقق انه تم تسليم الطلب    
-    if instance.status == 'delivered' and instance.deliverey_date:
+    if (instance.status == 'delivered' or instance.deliverey_date) :
                 
         # الحصول على الشهر والسنة من تاريخ التسليم الخاص بالطلب
         order = Order.objects.get(id=instance.pk)
@@ -104,33 +104,100 @@ def calc_groups_incomes(sender, created, instance, **kwargs):
     دالة وظيفتها حساب نصيب المجموعات الاستثمارية من المجموع الشهري
     """
     
-    # جلب احصائيات الشهر
-    total_goods_amount = instance.goods_price or decimal.Decimal(0)  # تعيين قيمة افتراضية
-    partners_percentage = get_partners_percentage()  # استدعاء الدالة للحصول على النسبة
-    total_profit = decimal.Decimal(instance.total_profit or 0)  # تعيين قيمة افتراضية إذا كان None
-    total_profits = total_profit - (total_profit * partners_percentage)  # اجمالي الربح بعد خصم نسبة الشركاء من الربح
-
-    if created: # اذا تم انشاء احصائية قم بإنشاء روابط مجموعات استثمارية
-        all_groups = InvestmentGroup.objects.filter(ready=True, completed=False, remaining_amount__gt=0) # جلب جميع المجموعات
+    # اذا لم تكن الاحصائية احدث احصائية بقاعدة البيانات اخرج من الدالة
+    latest_stat = MonthlyTotal.objects.all().order_by('-year', '-month').first()
+    # إذا كانت هذه الإحصائية ليست الأحدث (أي هناك إحصائية لاحقة لها في نفس العام)
+    if latest_stat != instance:
+        return
     
-        if not all_groups: # اذا لم يكن هنالك مجموعات اخرج
-            return
+    # جلب احصائيات الشهر
+    total_goods_amount = instance.goods_price 
+    partners_percentage = get_partners_percentage()
+    total_profit = instance.total_profit
+    # خصم نسبة الشركاء ان كان الربح موجبا فقط
+    adjusted_profit = decimal.Decimal((total_profit - (total_profit * partners_percentage)) if total_profit > 0  else total_profit)
+
+    # تصفير ربح المتجر اول شيء
+    store_profit, created = StoreProfit.objects.get_or_create(monthly_total=instance)
+    store_profit.monthly_percentage = decimal.Decimal(0)   
+    store_profit.goods_amount = decimal.Decimal(0)   
+    store_profit.profit_amount = decimal.Decimal(0)   
+    store_profit.total_amount = decimal.Decimal(0)
+    store_profit.save()    
+
+    if created:
+        all_groups = InvestmentGroup.objects.filter(ready=True, completed=False, remaining_amount__gt=0)
+        instance.contributing_groups.set(all_groups)
+    else: 
+        all_groups = instance.contributing_groups.all()
+        # اعادة حساب متبقي وعائد المجموعات المرتبطة عند تحديث الاحصائية الشهرية
+        for group in all_groups: # ايجاد نسبة كل مجموعة من اجمالي الحصص
+            monthly_group , create = MonthlyInvestmentGroup.objects.get_or_create(
+                monthly_total= instance,
+                investment_group = group,
+            )
+            monthly_group.monthly_percentage = decimal.Decimal(0)
+            monthly_group.goods_amount = decimal.Decimal(0)
+            monthly_group.profit_amount = decimal.Decimal(0)
+            monthly_group.total_amount = decimal.Decimal(0)
+            monthly_group.save()
+            
+            # حدث قيمة المتبقي الخاص بكل مجموعة
+            group.remaining_amount = group.value # اعد ضبط المتبقي اولا
+            group.refund_amount = 0 
+            all_group_months = MonthlyInvestmentGroup.objects.filter(investment_group=group) # جلب جميع روابط الشهور بالمجموعة المحددة
+            for group_month in all_group_months:
+                group.remaining_amount -= group_month.goods_amount # ازالة سعر البضاعة التي بيعت من المتبقي
+                group.refund_amount += group_month.total_amount # اضافة اجمالي الربح الى العوائد
+                group.save() 
         
-        #  ايجاد مجموع الحصص لجميع المجموعات
-        total_shares = decimal.Decimal(0)
+    if not all_groups:
+        # نعيد الكتابة على قيم ربح المتجر
+        store_profit.monthly_percentage = decimal.Decimal(1)   
+        store_profit.goods_amount = decimal.Decimal(total_goods_amount)   
+        store_profit.profit_amount = decimal.Decimal(adjusted_profit)   
+        store_profit.total_amount = decimal.Decimal(total_goods_amount + adjusted_profit)
+        store_profit.save()
+    
+    total_remaining = all_groups.aggregate(total=Sum('remaining_amount'))['total'] or decimal.Decimal(0)    
+    if total_remaining <= 0: # لايوجد متبقي بالمجموعات الاستثمارية الربح كله للمتجر
+        # نعيد الكتابة على قيم ربح المتجر
+        store_profit.monthly_percentage = decimal.Decimal(1)   
+        store_profit.goods_amount = decimal.Decimal(total_goods_amount)   
+        store_profit.profit_amount = decimal.Decimal(adjusted_profit)   
+        store_profit.total_amount = decimal.Decimal(total_goods_amount + adjusted_profit)
+        store_profit.save()
+        
+    else: # يوجد متبقي بالمجموعات الستثمارية 
+        total_groups_shares = decimal.Decimal(0)
         for group in all_groups:
-            total_shares += group.remaining_amount # جلب قيمة الاستثمار المتبقية بكل مجموعة
-                
-        # ايجاد نسبة كل مجموعة من اجمالي الحصص
-        for group in all_groups:
-            group_share = group.remaining_amount / total_shares 
+            total_groups_shares += group.remaining_amount # جلب قيمة الاستثمار المتبقية بكل مجموعة   
+            
+        # جلب نسبة المجموعات الاستثمارية من البضاعة المباعة
+        if total_groups_shares >= total_goods_amount: # المتبقي بالمجموعات اعلى او مساوي لسعر البضائع المباعة لذا الربح كله للمجموعات
+            all_groups_percentage = decimal.Decimal(1)
+            store_share =  decimal.Decimal(0)
+        elif total_groups_shares < total_goods_amount: # المتبقي بالمجموعات اقل من سعر البضائع المباعة لذا الربح يقسم بين المتجر و المجموعات
+            all_groups_percentage = decimal.Decimal(total_groups_shares / total_goods_amount)  #  نسبة المجموعات من البضاعة المباعة
+            store_share = total_goods_amount - total_groups_shares  #  نسبة المتجر من البضاعة المباعة
+        
+        # نحدث قيم ربح المتجر
+        store_profit.monthly_percentage = (decimal.Decimal(store_share) / decimal.Decimal(total_goods_amount)) if store_share != 0 else decimal.Decimal(0)
+        store_profit.goods_amount = decimal.Decimal(total_goods_amount * store_profit.monthly_percentage)   
+        store_profit.profit_amount = decimal.Decimal(adjusted_profit * store_profit.monthly_percentage)   
+        store_profit.total_amount = decimal.Decimal(store_profit.goods_amount + store_profit.profit_amount)
+        store_profit.save()
+        
+        # نحدث قيم ربح المجموعات الاستثمارية
+        for group in all_groups: # ايجاد نسبة كل مجموعة من اجمالي الحصص
+            group_share = group.remaining_amount / total_groups_shares 
             monthly_group , create = MonthlyInvestmentGroup.objects.get_or_create(
                 monthly_total= instance,
                 investment_group = group,
             )
             monthly_group.monthly_percentage = group_share
-            monthly_group.goods_amount = total_goods_amount * group_share
-            monthly_group.profit_amount = total_profits * group_share
+            monthly_group.goods_amount = (total_goods_amount * all_groups_percentage) * group_share
+            monthly_group.profit_amount = (adjusted_profit * all_groups_percentage) * group_share
             monthly_group.total_amount = monthly_group.goods_amount + monthly_group.profit_amount
             monthly_group.save()
             
@@ -138,32 +205,11 @@ def calc_groups_incomes(sender, created, instance, **kwargs):
             group.remaining_amount = group.value # اعد ضبط المتبقي اولا
             group.refund_amount = 0 
             all_group_months = MonthlyInvestmentGroup.objects.filter(investment_group=group) # جلب جميع روابط الشهور بالمجموعة المحددة
-            
             for group_month in all_group_months:
                 group.remaining_amount -= group_month.goods_amount # ازالة سعر البضاعة التي بيعت من المتبقي
                 group.refund_amount += group_month.total_amount # اضافة اجمالي الربح الى العوائد
                 group.save() 
-
-    else: 
-        # عند تعديل الاستمارة عدل روابط المجموعات الستثمارية فقط
-        all_groups_monthly = MonthlyInvestmentGroup.objects.filter(monthly_total=instance) # جلب جميع الروابط
-        # جلب المجموعة الخاصة بكل رابط واعادة حساب بياناتها
-        for group_monthly in all_groups_monthly:
-            # اولا جلب البيانالت الجديدة بعد تعديل الاحصائية
-            group_monthly.goods_amount = group_monthly.monthly_percentage *  total_goods_amount
-            group_monthly.profit_amount = group_monthly.monthly_percentage * total_profits
-            group_monthly.total_amount = group_monthly.goods_amount + group_monthly.profit_amount
-            group_monthly.save()
-            
-            group = group_monthly.investment_group # جلب المجموعة
-            group.remaining_amount = group.value # اعادة ضبط قيمة المتبقي
-            group.refund_amount = 0 # اعادة ضبط قيمة المتبقي
-            all_group_months = MonthlyInvestmentGroup.objects.filter(investment_group=group) # جلب جميع روابط الشهور بالمجموعة المحددة
-            for group_month in all_group_months: # اعادة حساب المتبقي
-                group.remaining_amount -= group_month.goods_amount # ازالة سعر البضاعة التي بيعت من المتبقي
-                group.refund_amount += group_month.total_amount 
-                group.save() 
-
+                    
 @receiver(post_save, sender=AdditionalIncome)
 def handle_additional_income(sender, created, instance, **kwargs):
     """
@@ -278,7 +324,7 @@ def update_Group_members_percentage(sender, created, instance, **kwargs):
                         group_member.investment_percentage = ( group_member.investment_value  / group_value ) * decimal.Decimal(100)
                         group_member.save()
                         
-            elif group.ready and group.refund_amount > 0: # في حال كانت المجموعة جاهزة ولديها عوائد
+            elif group.ready and group.refund_amount is not None and group.refund_amount > 0:  # في حال كانت المجموعة جاهزة ولديها عوائد
                 total_refund = group.refund_amount # جلب عائد المجموعة الاجمالي
                 
                 for group_member in group_members: # حساب عائد كل فرد من المجموعة وفقا لنسبته
@@ -288,21 +334,29 @@ def update_Group_members_percentage(sender, created, instance, **kwargs):
 @receiver(post_save, sender=MonthlyTotal)
 def update_partners_profit(sender, created, instance, **kwargs):
     " دالة وظيفتها حساب ربح الشركاء عند حفظ  احصائية شهرية"
-    if instance.total_profit > 0 : # تحقق انه يوجد ربح هذا الشهر
-        partners = Partners.objects.all() # جلب جميع الشركاء
-
-        if partners.exists():  # تحقق من وجود الشركاء
-            total_profit = decimal.Decimal(instance.total_profit or 0)
+    partners = Partners.objects.all() # جلب جميع الشركاء
+    if partners.exists():  # تحقق من وجود الشركاء
+        if instance.total_profit > 0 : # تحقق انه يوجد ربح هذا الشهر
+            
+            total_profit = decimal.Decimal(instance.total_profit)
             partners_percentage = get_partners_percentage()  # استدعاء الدالة للحصول على النسبة
             total_partners_profit = total_profit * partners_percentage  # جلب نسبة الشركاء الإجمالية من الربح
-
             for partner in partners:
                 partner_profit, created = PartnersProfit.objects.get_or_create(
                     month=instance,
                     partner=partner,
                 )
                 partner_profit.profit = total_partners_profit * (decimal.Decimal(partner.share_percentage / 100)) # حساب ربح كل شريك
-                partner_profit.save()       
+                partner_profit.save()  
+                 
+        else: # مافي ربح فيه خسارة
+            for partner in partners:
+                partner_profit, created = PartnersProfit.objects.get_or_create(
+                    month=instance,
+                    partner=partner,
+                )
+                partner_profit.profit = decimal.Decimal(0)
+                partner_profit.save()
                             
 @receiver(pre_save, sender=PartnersProfit)
 def prevent_received_false(sender, instance, **kwargs):
@@ -316,9 +370,7 @@ def prevent_received_false(sender, instance, **kwargs):
             pass 
         except Exception as e:
             logger.error(f"خطأ بالإشارات : {e}", exc_info=True)
-            
-        
-        
+                
 @receiver(pre_save, sender=InvestigatorProfit)
 def prevent_received_false(sender, instance, **kwargs):
     """تمنع إعادة تعيين حالة الاستلام لدى المستثمرين من مسلم إلى لا."""

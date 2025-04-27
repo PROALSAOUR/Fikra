@@ -344,15 +344,104 @@ class MonthPartnersProfitInline(admin.TabularInline):
     readonly_fields = ('partner', 'profit', "received")    
     can_delete = False  
     show_change_link = False 
-# دالة ربح المجموعات دالة الاحصائية
+# دالة ربح المجموعات داخل الاحصائية
 class MonthlyInvestmentGroupInline(admin.TabularInline):
     model = MonthlyInvestmentGroup
     extra = 0  # عدد الصفوف الإضافية
     max_num = 0
-    readonly_fields = ('monthly_total', 'investment_group', "monthly_percentage", 'goods_amount', 'profit_amount', 'total_amount')    
+    fields = ('investment_group', 'percentage', 'colored_goods_amount', 'colored_profit_amount', 'colored_total_amount')     
+    readonly_fields = ('investment_group', 'percentage', 'colored_goods_amount', 'colored_profit_amount', 'colored_total_amount') 
     can_delete = False  
     show_change_link = False 
-    verbose_name_plural = 'الاستثمارات'
+    verbose_name_plural = 'عوائد الاستثمارات'
+    
+    def percentage(self, obj):
+        if obj.monthly_percentage:
+            return f"{obj.monthly_percentage * 100}%"
+        else:
+            return '-'
+    percentage.short_description = 'النسبة الشهرية'
+    
+    def colored_goods_amount(self, obj):
+        if obj.goods_amount:
+            if obj.goods_amount > 0:
+                return format_html('<span style="color:#28a745;">+{}</span>', obj.goods_amount)
+        else:
+            return '-'
+    colored_goods_amount.short_description = 'من البضاعة'
+    
+    def colored_profit_amount(self, obj):
+        if obj.profit_amount:
+            if obj.profit_amount > 0:
+                return format_html('<span style="color:#28a745;">+{}</span>', obj.profit_amount)
+            elif obj.profit_amount < 0:
+                return format_html('<span style="color: red;">{}</span>', obj.profit_amount)
+            else: # = 0
+                return format_html('<span style="color: #e1d221;">{}</span>', obj.profit_amount)
+        else:
+            return '-'
+    colored_profit_amount.short_description = 'من الأرباح'
+    
+    def colored_total_amount(self, obj):
+        if obj.total_amount:
+            if obj.total_amount > obj.goods_amount:
+                return format_html('<span style="color:#28a745;">+{}</span>', obj.total_amount)
+            elif obj.profit_amount < obj.goods_amount:
+                return format_html('<span style="color: red;">{}</span>', obj.total_amount)
+            else: 
+                return format_html('<span style="color: #e1d221;">{}</span>', obj.total_amount)
+        else:
+            return '-'
+    colored_total_amount.short_description = 'الإجمالي'    
+# دالة ربح المتجر داخل الاحصائية
+class StoreProfitInline(admin.TabularInline):
+    model = StoreProfit
+    extra = 0  
+    max_num = 0
+    fields = ( 'percentage', 'colored_goods_amount', 'colored_profit_amount', 'colored_total_amount')     
+    readonly_fields = ( 'percentage', 'colored_goods_amount', 'colored_profit_amount', 'colored_total_amount') 
+    can_delete = False  
+    show_change_link = False 
+    verbose_name_plural = 'عوائد المتجر'
+    
+    def percentage(self, obj):
+        if obj.monthly_percentage:
+            return f"{obj.monthly_percentage * 100}%"
+        else:
+            return '-'
+    percentage.short_description = 'النسبة الشهرية'
+    
+    def colored_goods_amount(self, obj):
+        if obj.goods_amount:
+            if obj.goods_amount > 0:
+                return format_html('<span style="color:#28a745;">+{}</span>', obj.goods_amount)
+        else:
+            return '-'
+    colored_goods_amount.short_description = 'من البضاعة'
+    
+    def colored_profit_amount(self, obj):
+        if obj.profit_amount:
+            if obj.profit_amount > 0:
+                return format_html('<span style="color:#28a745;">+{}</span>', obj.profit_amount)
+            elif obj.profit_amount < 0:
+                return format_html('<span style="color: red;">{}</span>', obj.profit_amount)
+            else: # = 0
+                return format_html('<span style="color: #e1d221;">{}</span>', obj.profit_amount)
+        else:
+            return '-'
+    colored_profit_amount.short_description = 'من الأرباح'
+    
+    def colored_total_amount(self, obj):
+        if obj.total_amount:
+            if obj.total_amount > obj.goods_amount:
+                return format_html('<span style="color:#28a745;">+{}</span>', obj.total_amount)
+            elif obj.profit_amount < obj.goods_amount:
+                return format_html('<span style="color: red;">{}</span>', obj.total_amount)
+            else:
+                return format_html('<span style="color: #e1d221;">{}</span>', obj.total_amount)
+        else:
+            return '-'
+    colored_total_amount.short_description = 'الإجمالي'
 # دالة عرض الاحصائية الرئيسية
 class MonthlyTotalAdmin(admin.ModelAdmin):
     list_display = ('history', 'colored_total_income', 'colored_total_profit' ,'sales_number')
@@ -361,8 +450,7 @@ class MonthlyTotalAdmin(admin.ModelAdmin):
     fields = ('history', 'colored_total_income', 'colored_additional_income', 'colored_total_costs', 'colored_total_packaging', 'colored_goods_price', 'colored_total_profit', 'sales_number',)
     readonly_fields = ('history', 'colored_total_income', 'colored_additional_income', 'colored_total_costs', 'colored_total_packaging', 'colored_goods_price', 'colored_total_profit', 'sales_number',)
     exclude = ('total_income', 'additional_income', 'total_costs', 'total_packaging', 'goods_price','total_profit', 'month', 'year')
-    inlines = [CostInline, AdditionalInline, PackForMonthInline, MonthPartnersProfitInline, MonthlyInvestmentGroupInline]
-
+    inlines = [CostInline, AdditionalInline, PackForMonthInline, MonthPartnersProfitInline, MonthlyInvestmentGroupInline, StoreProfitInline]
     def colored_total_income(self, obj):
         if obj.total_income:
             if obj.total_income > 0:

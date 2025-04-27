@@ -7,7 +7,6 @@ def distribute_profits():
     """
     دالة تحسب ارباح المستثمرين وتعمل كل شهر   
     """
-    
     # احصل على الشهر الحالي
     current_month = datetime.now().month
 
