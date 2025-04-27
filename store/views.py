@@ -639,7 +639,7 @@ def cart_page(request):
         product_variation = item.cart_item
         stock = product_variation.stock if product_variation else 0  # الكمية المتاحة
         
-        if stock > 0:
+        if stock > 0 and (item.cart_item.product_item.product.ready_to_sale==True) :
             available_items.append({
                 'product': item.cart_item.product_item.product,
                 'product_item': item.cart_item.product_item,
