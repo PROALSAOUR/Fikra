@@ -134,13 +134,6 @@ def cancel_order(request):
                 elif order.status == 'delivered' :
                     return JsonResponse({'success': False, 'error': 'هذا الطلب تم تسليمه اليك بالفعل ولا يمكن إلغائه الأن'})
                 else:
-                    
-                    # إعادة الكمية إلى المخزون
-                    for item in order.order_items.all():
-                        product_variant = item.order_item
-                        product_variant.update_stock(item.qty)  # زيادة المخزون بناءً على الكمية
-                        product_variant.sold -= item.qty  # انقاص الكمية المباعة بناءً على الكمية
-                        product_variant.save()
                         
                     order.status = 'canceled'
                     order.save()
@@ -149,7 +142,6 @@ def cancel_order(request):
                     inbox = user.profile.inbox
                     inbox.add_message(message)
                     inbox.save()
-                    
                     return JsonResponse({'success': True, 'message': 'تمت عملية إلغاء الطلب بنجاح!'})
             
         except Order.DoesNotExist:
@@ -202,7 +194,6 @@ def remove_order_item(request):
                 if days_since_delivery > max_return_days:
                     return JsonResponse({'success': False, 'error': F"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإرجاع و هي {max_return_days} أيام"})
                 
-            
             order_item = order.order_items.get(id=remove_id)
             old_qty = order_item.qty
             old_bounce = order_item.points
@@ -214,11 +205,10 @@ def remove_order_item(request):
             
             # =================================================================
             # تعديل النقاط إذا كان الطلب قد تم تسليمه بالفعل
-            if order.status == 'delivered':
-                profile = UserProfile.objects.get(user=user)
+            if order.status == 'delivered' or order.deliverey_date:
                 points_change = old_bounce * old_qty
-                profile.points -= points_change  # تعديل النقاط بناءً على الطلب المعدل
-                profile.save()
+            else:
+                points_change = 0
             # =================================================================   
             # اعد حساب جميع القيم
             order.old_total = order.order_items.aggregate(total=models.Sum(models.F('price') * models.F('qty')))['total'] or 0
@@ -235,8 +225,9 @@ def remove_order_item(request):
                 old_qty = old_qty,
                 old_price = old_discount_price, # السعر المخفض القديم
                 status = 'return',
-                # يتم وضع قيمة لفارق السعر فقط ان كان الطلب مسلما
+                # يتم وضع قيمة لفارق السعر والنقاط فقط ان كان الطلب مسلما
                 price_difference = price_difference if order.status=='delivered' else 0,
+                points_difference = 0 - points_change if order.status=='delivered' else 0, #-------------------------------------------------------
             )
             dealing.save()
             # =================================================================
@@ -358,12 +349,11 @@ def edit_order(request):
                     # =================================================================
                     # تحديث إجمالي نقاط الطلب 
                     order.total_points = order.order_items.aggregate(total=models.Sum(models.F('points') * models.F('qty')))['total'] or 0
-                    # تعديل النقاط إذا كان الطلب قد تم تسليمه بالفعل
-                    if order.status == 'delivered':
-                        profile = UserProfile.objects.get(user=user)
-                        points_change = order.total_points - old_order_points # ايجاد فارق النقاط بين الطلب قبل التعديل وبعد التعديل
-                        profile.points += points_change  # تعديل النقاط بناءً على الطلب المعدل
-                        profile.save()
+                    # ايجاد فارق النقاط بين الطلب قبل التعديل وبعد التعديل                   
+                    if order.status == 'delivered' or order.deliverey_date :
+                        points_change = order.total_points - old_order_points 
+                    else:
+                        points_change = 0
                     # =================================================================   
                     # اعد حساب جميع القيم
                     order.old_total = order.order_items.aggregate(total=models.Sum(models.F('price') * models.F('qty')))['total'] or 0
@@ -384,8 +374,9 @@ def edit_order(request):
                             old_price = old_discount_price, # السعر المخفض القديم
                             new_price = new_discount_price, # السعر المخفض الجديد
                             status = 'replace',
-                            # يتم وضع قيمة لفارق السعر فقط ان كان الطلب مسلما
+                            # يتم وضع قيمة لفارق السعر والنقاط  فقط ان كان الطلب مسلما
                             price_difference = price_difference if order.status=='delivered' else 0,
+                            points_difference = points_change if order.status=='delivered' else 0, #-------------------------------------------------------
                         )
                     except IntegrityError:
                         logger.error(f"المستخدم {user} تم انشاء معاملتين تعديل لنفس العنصر ", exc_info=True)
@@ -454,7 +445,7 @@ def create_order(request):
                 product_variation = item.cart_item
                 stock = product_variation.stock if product_variation else 0
 
-                if stock > 0:
+                if stock > 0 and (product_variation.product_item.product.ready_to_sale==True):
                     available_items.append({
                         'product_variation': product_variation,
                         'cart_item': item,

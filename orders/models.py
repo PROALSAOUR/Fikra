@@ -135,6 +135,7 @@ class DealingItem(models.Model):
     new_price = models.IntegerField(default=0, verbose_name='السعر الجديد')
     discount = models.IntegerField(default=0, verbose_name='الخصم')
     price_difference = models.IntegerField(null=True, blank=True , verbose_name='فرق السعر')  
+    points_difference =  models.IntegerField(default=0 , verbose_name='فرق النقاط')
     is_dealt = models.BooleanField(default=False , verbose_name='المعالجة') # هل تم تنفيذ عملية التعديل  
     status = models.CharField(max_length=20, choices=Dealing_status, blank=True , verbose_name='الحالة') 
     created_at = models.DateTimeField(auto_now_add=True , verbose_name='تاريخ الإنشاء')
