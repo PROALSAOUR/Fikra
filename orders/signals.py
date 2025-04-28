@@ -1,6 +1,6 @@
-from orders.models import Order, OrderDealing, DealingItem
+from orders.models import *
 from accounts.models import UserProfile
-from django.db.models.signals import pre_save, post_save, post_delete
+from django.db.models.signals import pre_save, post_save, post_delete, pre_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from accounts.send_messages import add_order_points_message
@@ -155,3 +155,49 @@ def check_order_dealing_status(sender, instance, **kwargs):
         order.status = 'canceled'
         order.save()
         
+@receiver(pre_delete, sender=DealingItem)
+def undo_dealingitem_changes(sender, instance, **kwargs):
+    if instance.is_dealt: # ان كانت تمت المعالجة اخرج
+        return
+
+    order = instance.order_dealing.order
+
+    if instance.status == 'return':
+        # نضيف منتج الطلب القديم (المرتجع) إلى الطلب
+        OrderItem.objects.create(
+            order=order,
+            order_item=instance.old_item,
+            qty=instance.old_qty,
+            price=instance.old_item.product_item.product.get_price(),
+            discount_price = instance.old_price , 
+            points=instance.old_item.product_item.product.bonus,
+        )
+
+    elif instance.status == 'replace':
+        # نعيد المنتج القديم
+        OrderItem.objects.create(
+            order=order,
+            order_item=instance.old_item,
+            qty=instance.old_qty,
+            price=instance.old_item.product_item.product.get_price(),
+            discount_price = instance.old_price , 
+            points=instance.old_item.product_item.product.bonus,
+        )
+
+        # نحاول حذف المنتج الجديد
+        try:
+            order_item_to_delete = OrderItem.objects.get(
+                order=order,
+                order_item=instance.new_item,
+                qty=instance.new_qty
+            )
+            order_item_to_delete.delete()
+        except OrderItem.DoesNotExist:
+            pass
+        
+    # تحديث احصائيات الطلب
+    order.total_points = order.order_items.aggregate(total=models.Sum(models.F('points') * models.F('qty')))['total'] or 0
+    order.old_total = order.order_items.aggregate(total=models.Sum(models.F('price') * models.F('qty')))['total'] or 0
+    order.total_price = order.order_items.aggregate(total=models.Sum(models.F('discount_price')))['total'] or 0
+    order.used_discount = order.old_total - order.total_price
+    order.save()

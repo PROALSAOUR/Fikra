@@ -8,13 +8,10 @@ from orders.models import *
 from cards.models import CoponItem
 from settings.models import Settings
 from store.models import Cart
-from accounts.models import UserProfile, Banned_users
+from accounts.models import  Banned_users
 from django.utils import timezone
 from accounts.send_messages import create_order_message, cancel_order_message, edit_order_message, return_order_item_message
 import logging
-import qrcode
-from io import BytesIO
-import base64
 
 logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللوج
 

@@ -158,20 +158,23 @@ LOGGING = {
             "class": "logging.FileHandler",
             "filename": os.path.join(BASE_DIR, "logs/debug.log"),
             "formatter": "verbose",
+            "encoding": "utf-8",
         },
-        "db_file": {  # حفظ سجلات قاعدة البيانات في ملف
+        "db_file": {
             "level": "DEBUG",
             "class": "logging.FileHandler",
             "filename": os.path.join(BASE_DIR, "logs/db.log"),
             "formatter": "verbose",
+            "encoding": "utf-8",
         },
-        "security_file": {  # حفظ سجلات الأمان في ملف
+        "security_file": {
             "level": "WARNING",
             "class": "logging.FileHandler",
             "filename": os.path.join(BASE_DIR, "logs/security.log"),
             "formatter": "verbose",
+            "encoding": "utf-8",
         },
-        "console": {  # طباعة السجلات في وحدة التحكم
+        "console": {
             "level": "INFO",
             "class": "logging.StreamHandler",
             "formatter": "simple",

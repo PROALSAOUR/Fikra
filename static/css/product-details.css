@@ -299,11 +299,11 @@
     -o-transform: rotate(150deg);
   }
   /*  offer */
-  
   .product-details-page .product-details .name-price .product-price:not(.point).offer .offer-percient{
     display: block;
     position: absolute;
     bottom: -30px;
+    left: 0;
     background-color: #9D2121;
     text-wrap: nowrap;
     color: #ffffff;

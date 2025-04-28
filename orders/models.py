@@ -133,7 +133,6 @@ class DealingItem(models.Model):
     new_qty = models.IntegerField(null=True, blank=True , verbose_name='الكمية الجديدة')
     old_price = models.IntegerField(default=0, verbose_name='السعر القديم')
     new_price = models.IntegerField(default=0, verbose_name='السعر الجديد')
-    discount = models.IntegerField(default=0, verbose_name='الخصم')
     price_difference = models.IntegerField(null=True, blank=True , verbose_name='فرق السعر')  
     points_difference =  models.IntegerField(default=0 , verbose_name='فرق النقاط')
     is_dealt = models.BooleanField(default=False , verbose_name='المعالجة') # هل تم تنفيذ عملية التعديل  
@@ -160,4 +159,4 @@ class DealingItem(models.Model):
         return f'{self.order_dealing.order.user} => {self.order_dealing.order.serial_number}'
     
     class Meta:
-        unique_together = ('order_dealing', 'old_item', 'new_item', 'old_qty', 'new_qty', 'discount') # منع إدخال نفس المعاملة مرتين 
+        unique_together = ('order_dealing', 'old_item', 'new_item', 'old_qty', 'new_qty',) # منع إدخال نفس المعاملة مرتين 
