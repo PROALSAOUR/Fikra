@@ -102,14 +102,14 @@ def update_monthly_totals(sender, created, instance, **kwargs):
 def calc_groups_incomes(sender, created, instance, **kwargs):
     """
     دالة وظيفتها حساب نصيب المجموعات الاستثمارية من المجموع الشهري
+    تعمل هذه الدالة عند الحفظ على احدث احصائيتين في قاعدة البيانات لتفادي تعديل التوزيع على احصائيات قديمة
     """
     
-    # اذا لم تكن الاحصائية احدث احصائية بقاعدة البيانات اخرج من الدالة
-    latest_stat = MonthlyTotal.objects.all().order_by('-year', '-month').first()
-    # إذا كانت هذه الإحصائية ليست الأحدث (أي هناك إحصائية لاحقة لها في نفس العام)
-    if latest_stat != instance:
-        return
-    
+    # إذا لم تكن الإحصائية الحالية من بين أحدث إحصائيتين، اخرج من الدالة
+    latest_two_stats = list(MonthlyTotal.objects.all().order_by('-year', '-month')[:2])
+    if instance not in latest_two_stats:
+        return 
+
     # جلب احصائيات الشهر
     total_goods_amount = instance.goods_price 
     partners_percentage = get_partners_percentage()

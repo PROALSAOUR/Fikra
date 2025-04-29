@@ -24,7 +24,7 @@
                 </div>
                 <div class="nav-item {% if request.path == '/cart/' %}active{% endif %}">
                     <a href="{% url 'store:cart_page' %}" aria-label="السلة" id="cart"><i class="fa-solid fa-bag-shopping"></i></a>
-                    <label for="cart">حقيبتي</label>
+                    <label for="cart">السلة</label>
                 </div>
                 <div class="nav-item  {% if request.path == '/search/' %}active{% endif %}">
                     <a href="{% url 'store:search_page' %}" aria-label="البحث" id="search"><i class="fa-solid fa-magnifying-glass"></i></a>
