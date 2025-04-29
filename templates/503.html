@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/webp" href="{% static 'images/icons/small-logo.webp' %}" sizes="192x192">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <title>503 - الخدمة غير متوفرة مؤقتًا</title>
+    <style>
+        body {
+            background-color: #232323;
+            color:#ececec;
+            font-family: "Almarai", sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            font-size: clamp(82px, 10vw, 164px);
+            margin: 0;
+            color: #B18E4B;
+        }
+        h2 {
+            font-size: clamp(64px, 4vw, 102px);
+            margin-top: 10px;
+        }
+
+        p {
+            color: #B5B3B3;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            background-color: #4caf50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        p, a {
+            font-size: clamp(32px, 2vw, 64px);
+        }
+
+        a:hover {
+            background-color: #45a049;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>503</h1>
+        <h2>الخدمة غير متوفرة مؤقتًا</h2>
+        <p>عذراً، يبدو أن الموقع يخضع لصيانة حالياً، يرجى اعادة المحاولة لاحقا </p>
+    </div>
+</body>
+</html>
+
