@@ -75,8 +75,8 @@ class ProductItemInline(admin.TabularInline):
 
 class ProductItemAdmin(admin.ModelAdmin):
     list_display = ('sku', 'product__name', 'color', 'item_image')
-    search_fields = ('sku',)
-    list_filter = ('sku', 'color')
+    search_fields = ('sku', 'product__name',)
+    list_filter = ('sku', 'color', 'product',)
     inlines = (ProductVariationInline,)
    
 class ProductAdmin(admin.ModelAdmin):

@@ -126,7 +126,9 @@
                     <div class="swiper products-slider">
                         <div class="swiper-wrapper">
                             {% for product in category.products.all %}
-                                {% include "common/product-card.html" %}
+                                {% if product.featured and product.ready_to_sale %} 
+                                    {% include "common/product-card.html" %}
+                                {% endif %}
                             {% endfor %}
                         </div>
                     </div> 
