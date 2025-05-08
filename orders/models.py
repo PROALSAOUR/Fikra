@@ -30,6 +30,8 @@ class Order(models.Model):
     order_date = models.DateTimeField(auto_now_add=True, verbose_name='تاريخ الطلب')
     deliverey_date = models.DateTimeField(null=True, blank=True, verbose_name='تاريخ التسليم')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='تاريخ التعديل')
+    max_return_days = models.IntegerField(verbose_name='اقصى مدة استرجاع', default=0)
+    max_replace_days = models.IntegerField(verbose_name='اقصى مدة استبدال', default=0)
     note = models.TextField(null=True, blank=True, verbose_name='ملاحظة')
         
     def get_total_items(self):

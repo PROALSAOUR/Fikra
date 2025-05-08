@@ -24,8 +24,8 @@ def print_invoice_view(request, order_id):
     
     replace_possibility = Settings.objects.values_list("replace_possibility", flat=True).first()    
     return_possibility = Settings.objects.values_list("return_possibility", flat=True).first()
-    max_replace_days = Settings.objects.values_list('max_replace_days', flat=True).first()
-    max_return_days = Settings.objects.values_list('max_return_days', flat=True).first()
+    max_replace_days = order.max_replace_days
+    max_return_days = order.max_return_days
 
     context = {
         'order':order,
@@ -67,8 +67,12 @@ def order_details(request, oid):
     return_possibility = Settings.objects.values_list("return_possibility", flat=True).first()
     if order.status == "delivered" and order.deliverey_date: # التحقق ان كانت مضت مدة على تسليم المنتج اكبر من اقصى مدة للاستبدال والاسترجاع
         days_since_delivery = (timezone.now() - order.deliverey_date).days # احسب الفرق بين التاريخ الحالي وتاريخ التسليم
-        max_return_days = Settings.objects.values_list('max_return_days', flat=True).first()
-        max_replace_days = Settings.objects.values_list('max_replace_days', flat=True).first()
+        max_return_days = order.max_return_days
+        max_replace_days = order.max_replace_days
+        if order.max_return_days == 0:
+            return_possibility = False
+        if order.max_replace_days == 0:
+            replace_possibility = False
         if days_since_delivery > max_return_days :
             return_possibility = False
         if days_since_delivery > max_replace_days :
@@ -184,12 +188,8 @@ def remove_order_item(request):
                 if return_possibility == False: # لو المتجر مقفل عمليات الارجاع
                     return JsonResponse({'success': False, 'error': f"المعذرة، خدمات الإرجاع موقفة حالياً من قبل ادارة المتجر."})
                 
-                max_return_days = Settings.objects.values_list('max_return_days', flat=True).first()
-                if max_return_days is None:
-                    max_return_days = 3  # ثلاث أيام كقيمة افتراضية
-                
-                if days_since_delivery > max_return_days:
-                    return JsonResponse({'success': False, 'error': F"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإرجاع و هي {max_return_days} أيام"})
+                if days_since_delivery > order.max_return_days or order.max_return_days == 0:
+                    return JsonResponse({'success': False, 'error': F"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإرجاع و هي {order.max_return_days} أيام"})
                 
             order_item = order.order_items.get(id=remove_id)
             old_qty = order_item.qty
@@ -294,13 +294,9 @@ def edit_order(request):
                     
                     if replace_possibility == False: # لو المتجر مقفل عمليات الاستبدال
                         return JsonResponse({'success': False, 'error': f"المعذرة، خدمات الاستبدال موقفة حالياً من قبل ادارة المتجر."})
-
-                    max_replace_days = Settings.objects.values_list('max_replace_days', flat=True).first()
-                    if max_replace_days is None:
-                        max_replace_days = 3  # ثلاث أيام كقيمة افتراضية
-                    
-                    if days_since_delivery > max_replace_days:
-                        return JsonResponse({'success': False, 'error': f"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإستبدال و هي {max_replace_days} أيام"})
+                                
+                    if days_since_delivery > order.max_replace_days or order.max_replace_days == 0:
+                        return JsonResponse({'success': False, 'error': f"نعتذر , يبدو انك قد تجاوزت اقصى مدة مسموحة للإستبدال و هي {order.max_replace_days} أيام"})
                     
                 try:
                     # الحصول على عنصر الطلب المراد استبداله
@@ -485,7 +481,6 @@ def create_order(request):
         # ========  الاستعلام عما ان كان التوصيل مجاني ==========
         
         settings =  Settings.get_settings()
-        delivery = settings.free_delivery
         city = user.profile.city.name if user.profile.city  else 'غير محددة'
         
         # إنشاء الطلب
@@ -496,8 +491,10 @@ def create_order(request):
             total_price=total_price,
             total_points=total_bonus,
             copon_value=copon_value,
-            free_delivery = delivery,
             city=city,
+            free_delivery = settings.free_delivery,
+            max_replace_days = settings.max_replace_days  if settings.replace_possibility else 0,
+            max_return_days = settings.max_return_days  if settings.return_possibility else 0,
         )
         
         # إنشاء عناصر الطلب
