@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)  # تسجيل الأخطاء في اللو�
 def get_partners_percentage():
     """دالة تجلب نسبة الشركاء من الربح من ملف الاعدادات"""
     percentage = Settings.objects.values_list('partners_percentage', flat=True).first()
-    return decimal.Decimal(percentage) if percentage else decimal.Decimal(0)
+    return decimal.Decimal(percentage / decimal.Decimal(100)) if percentage else decimal.Decimal(0)
 
 # ========================== SIGNALS =========================
 

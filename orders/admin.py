@@ -3,6 +3,8 @@ from django.utils.html import format_html
 from orders.models import *
 from django.urls import reverse
 from django.shortcuts import redirect
+from django.utils.html import mark_safe
+
 
 
 class OrderItemInline(admin.TabularInline):
