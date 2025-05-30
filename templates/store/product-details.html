@@ -144,7 +144,13 @@
                             </div> 
                     
                             <span class="get-points">عند شرائك لهذا المنتج سوف تحصل على {{ product.bonus }} نقطة</span>
-                            <input type="submit" value="أضف إلى السلة" id="add-to-cart" class="add-cart-pop-link">
+                            {% if user.is_authenticated %}
+                                <input type="submit" value="أضف إلى السلة" id="add-to-cart" class="add-cart-pop-link">
+                            {% else %}
+                                <a href="{% url 'accounts:sign' %}" id="add-to-cart" class="add-cart-pop-link">
+                                    اضف الى السلة
+                                </a>
+                            {% endif %}
                         </form>
                     {% else %}
                         <div  class='form' style='padding:20px 20px 40px;text-align:center;'>
