@@ -84,7 +84,7 @@ class ProductAdmin(admin.ModelAdmin):
     readonly_fields =('total_sales', 'interested_count', 'available',)
     search_fields = ('id', 'name', )
     list_filter = ('category', 'brand', 'ready_to_sale', 'featured' , 'offer', 'available',)
-    ordering = ('updated_at',)
+    ordering = ('-updated_at',)
     inlines = (ProductImagesInline, ProductItemInline,)
     
     def interested_count(self, obj):
